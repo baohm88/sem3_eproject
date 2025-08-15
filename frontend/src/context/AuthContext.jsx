@@ -18,8 +18,14 @@ export const AuthProvider = ({ children }) => {
     const savedUser = localStorage.getItem("user");
 
     if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setToken(savedToken);
+        setUser(parsedUser);
+      } catch (e) {
+        console.error("Lỗi parse user từ localStorage:", e);
+        localStorage.removeItem("user"); // Xóa dữ liệu hỏng
+      }
     }
     setLoading(false);
   }, []);
