@@ -1,38 +1,74 @@
-import { useState } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
-import authApi from "../../api/authApi";
+import axiosClient from "../../api/axiosClient";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+const LoginSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Email không hợp lệ")
+    .required("Bắt buộc nhập email"),
+  password: Yup.string()
+    .min(6, "Tối thiểu 6 ký tự")
+    .required("Bắt buộc nhập mật khẩu"),
+});
 
 export default function LoginPage() {
-  // const { login } = useAuth();
-  const [form, setForm] = useState({ email: "", password: "" });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // try {
-    //   const res = await loginApi(form); // { token, user }
-    //   login(res.user, res.token);
-    //   toast.success("Đăng nhập thành công!");
-    // } catch (err) {
-    //   toast.error("Sai email hoặc mật khẩu");
-    // }
-  };
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        placeholder="Email"
-        value={form.email}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-      />
-      <input
-        type="password"
-        placeholder="Mật khẩu"
-        value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-      />
-      <button type="submit">Đăng nhập</button>
-    </form>
+    <div className="form-container">
+      <h2>Đăng nhập</h2>
+      <Formik
+        initialValues={{ email: "", password: "" }}
+        validationSchema={LoginSchema}
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            const res = await axiosClient.post("/auth/login", values);
+            console.log(res);
+
+            // { success, message, data: { token, user } }
+            const { token, user } = res.data;
+
+            if (!token || !user) {
+              toast.error("Dữ liệu trả về từ server không hợp lệ");
+              return;
+            }
+
+            login(user, token);
+            toast.success("Đăng nhập thành công!");
+            navigate("/");
+          } catch (err) {
+            toast.error(
+              err.response?.data?.message || "Sai email hoặc mật khẩu"
+            );
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <div>
+              <label>Email</label>
+              <Field type="email" name="email" />
+              <ErrorMessage name="email" component="div" className="error" />
+            </div>
+
+            <div>
+              <label>Mật khẩu</label>
+              <Field type="password" name="password" />
+              <ErrorMessage name="password" component="div" className="error" />
+            </div>
+
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
+            </button>
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
 }

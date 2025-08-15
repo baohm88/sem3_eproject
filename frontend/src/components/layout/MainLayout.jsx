@@ -4,11 +4,7 @@ import { navLinks } from "../../constants/navLinks";
 import NavBar from "./NavBar";
 
 export default function MainLayout() {
-  // const { user } = useAuth();
-  const user = {
-    name: "ABC",
-    role: "User",
-  };
+  const { user } = useAuth();
 
   return (
     <div className="app-layout">
