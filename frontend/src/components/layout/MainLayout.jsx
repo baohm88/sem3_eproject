@@ -4,15 +4,15 @@ import { navLinks } from "../../constants/navLinks";
 import NavBar from "./NavBar";
 
 export default function MainLayout() {
-  const { user } = useAuth();
+    const { user } = useAuth();
 
-  return (
-    <div className="app-layout">
-      <NavBar links={navLinks[user?.role || "User"]} />
-      {/* <Sidebar links={navLinks[user?.role || "User"]} /> */}
-      <main className="page-container">
-        <Outlet />
-      </main>
-    </div>
-  );
+    return (
+        <div className="app-layout">
+            <NavBar links={navLinks[user?.role || "User"]} />
+
+            <main className="container">
+                <Outlet />
+            </main>
+        </div>
+    );
 }

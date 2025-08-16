@@ -16,6 +16,19 @@ export default function LoginPage() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
+    const redirectByRole = (role) => {
+        switch (role) {
+            case "Admin":
+                return "/admin";
+            case "Driver":
+                return "/driver";
+            case "Company":
+                return "/company";
+            default:
+                return "/";
+        }
+    };
+
     return (
         <FormWrapper
             title="Login"
@@ -35,6 +48,7 @@ export default function LoginPage() {
                             "/auth/login",
                             values
                         );
+
                         const { token, user } = res.data;
 
                         if (!token || !user) {
@@ -44,10 +58,13 @@ export default function LoginPage() {
 
                         login(user, token);
                         toast.success("Login successful!");
-                        navigate("/");
+
+                        const target = redirectByRole(user.role);
+                        navigate(target, { replace: true });
                     } catch (err) {
                         toast.error(
-                            err.response?.data?.message || "Login failed"
+                            err.response?.data?.message ||
+                                "Invalid email or password"
                         );
                     } finally {
                         setSubmitting(false);
