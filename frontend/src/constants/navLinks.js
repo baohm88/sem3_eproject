@@ -1,6 +1,6 @@
 export const navLinks = {
     Admin: [
-        { to: "/admin", label: "Home", end: true },
+        { to: "/admin", label: "Dashboard", end: true },
         { to: "/admin/ads", label: "Ads" },
         { to: "/admin/payments", label: "Payments" },
         { to: "/admin/feedbacks", label: "Feedbacks" },
@@ -12,7 +12,6 @@ export const navLinks = {
         { to: "/company/ads", label: "Ads" },
         { to: "/company/payments", label: "Payments" },
         { to: "/company/drivers", label: "Drivers" },
-        
     ],
     Driver: [
         { to: "/driver/drivers", label: "Companies" },
