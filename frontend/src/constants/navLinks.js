@@ -1,23 +1,24 @@
 export const navLinks = {
-  Admin: [
-    { path: "/admin/dashboard", label: "Dashboard" },
-    { path: "/admin/ads", label: "Ads" },
-    { path: "/admin/payments", label: "Payments" },
-    { path: "/admin/feedbacks", label: "Feedbacks" },
-  ],
-  Company: [
-    { path: "/company/dashboard", label: "Dashboard" },
-    { path: "/company/ads", label: "Ads" },
-    { path: "/company/payments", label: "Payments" },
-  ],
-  Driver: [
-    { path: "/driver/companies", label: "Companies" },
-    { path: "/company/payments", label: "Payments" },
-  ],
-  User: [
-    { path: "/drivers", label: "Drivers List" },
-    { path: "/companies", label: "Companies List" },
-    { path: "/login", label: "Login" },
-    { path: "/register", label: "Register" },
-  ],
+    Admin: [
+        { to: "/admin", label: "Home", end: true },
+        { to: "/admin/dashboard", label: "Dashboard" },
+        { to: "/admin/ads", label: "Ads" },
+        { to: "/admin/payments", label: "Payments" },
+        { to: "/admin/feedbacks", label: "Feedbacks" },
+    ],
+    Company: [
+        { to: "/company/dashboard", label: "Dashboard" },
+        { to: "/company/ads", label: "Ads" },
+        { to: "/company/payments", label: "Payments" },
+    ],
+    Driver: [
+        { to: "/driver/companies", label: "Companies" },
+        { to: "/company/payments", label: "Payments" },
+    ],
+    User: [
+        { to: "/drivers", label: "Drivers" },
+        { to: "/companies", label: "Companies" },
+        // { to: "/login", label: "Login" },
+        // { to: "/register", label: "Register" },
+    ],
 };
