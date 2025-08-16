@@ -12,6 +12,7 @@ import {
 import { RiMenu2Line } from "react-icons/ri";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import SideBar from "./SideBar";
 
 export default function NavBar({ links = [] }) {
     const { user, isAuthenticated, logout } = useAuth();
@@ -19,10 +20,7 @@ export default function NavBar({ links = [] }) {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
 
-    console.log(isAuthenticated);
-
     const handleSearchChange = (e) => setSearchTerm(e.target.value);
-
     const handleKeyPress = (e) => {
         if (e.key === "Enter" && searchTerm.trim() !== "") {
             navigate("/");
@@ -30,12 +28,14 @@ export default function NavBar({ links = [] }) {
     };
 
     const toggleSidebar = () => setShowSidebar((prev) => !prev);
+
     return (
         <>
             <header>
                 <Navbar bg="light" className="shadow-sm">
                     <Container className="d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center gap-3">
+                            {/* Menu icon (mobile) */}
                             <RiMenu2Line
                                 className="fs-3 d-md-none text-danger"
                                 onClick={toggleSidebar}
@@ -53,22 +53,25 @@ export default function NavBar({ links = [] }) {
                                 />
                             </Navbar.Brand>
 
-                            {links.map(({ to, label, end }) => (
-                                <NavLink
-                                    key={to}
-                                    to={to}
-                                    end={end}
-                                    className={({ isActive }) =>
-                                        `nav-link d-flex align-items-center gap-2 mb-2 ${
-                                            isActive
-                                                ? "text-danger fw-bold"
-                                                : "text-muted"
-                                        }`
-                                    }
-                                >
-                                    {label}
-                                </NavLink>
-                            ))}
+                            {/* Hide links on mobile */}
+                            <div className="d-none d-md-flex">
+                                {links.map(({ to, label, end }) => (
+                                    <NavLink
+                                        key={to}
+                                        to={to}
+                                        end={end}
+                                        className={({ isActive }) =>
+                                            `nav-link d-flex align-items-center gap- m-2 ${
+                                                isActive
+                                                    ? "text-primary fw-bold"
+                                                    : "text-muted"
+                                            }`
+                                        }
+                                    >
+                                        {label}
+                                    </NavLink>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Centered brand on mobile */}
@@ -91,14 +94,14 @@ export default function NavBar({ links = [] }) {
                         >
                             <FormControl
                                 type="search"
-                                placeholder="Search for taxi companies (ex. Xanh SM)"
+                                placeholder="Search taxi companies (ex. Xanh SM)"
                                 className="me-2"
                                 value={searchTerm}
                                 onChange={handleSearchChange}
                             />
                         </Form>
 
-                        {/* User controls */}
+                        {/* User controls (desktop only) */}
                         {isAuthenticated ? (
                             <div className="d-flex align-items-center gap-3">
                                 <i className="bi bi-bell-fill fs-5 text-muted"></i>
@@ -156,6 +159,13 @@ export default function NavBar({ links = [] }) {
                     </Container>
                 </Navbar>
             </header>
+
+            {/* SideBar for mobile */}
+            <SideBar
+                show={showSidebar}
+                handleClose={() => setShowSidebar(false)}
+                links={links}
+            />
         </>
     );
 }
