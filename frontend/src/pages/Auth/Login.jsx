@@ -3,15 +3,13 @@ import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import axiosClient from "../../api/axiosClient";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Button, Form as BootstrapForm } from "react-bootstrap";
+import FormWrapper from "../../components/common/FormWrapper";
 
 const LoginSchema = Yup.object().shape({
-    email: Yup.string()
-        .email("Email không hợp lệ")
-        .required("Bắt buộc nhập email"),
-    password: Yup.string()
-        .min(6, "Tối thiểu 6 ký tự")
-        .required("Bắt buộc nhập mật khẩu"),
+    email: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string().min(6, "Too short").required("Required"),
 });
 
 export default function LoginPage() {
@@ -19,8 +17,15 @@ export default function LoginPage() {
     const navigate = useNavigate();
 
     return (
-        <div className="form-container">
-            <h2>Đăng nhập</h2>
+        <FormWrapper
+            title="Login"
+            footer={
+                <>
+                    <span>Don't have an account? </span>
+                    <Link to="/register">Register here</Link>
+                </>
+            }
+        >
             <Formik
                 initialValues={{ email: "", password: "" }}
                 validationSchema={LoginSchema}
@@ -30,25 +35,19 @@ export default function LoginPage() {
                             "/auth/login",
                             values
                         );
-                        console.log(res);
-
-                        // { success, message, data: { token, user } }
                         const { token, user } = res.data;
 
                         if (!token || !user) {
-                            toast.error(
-                                "Dữ liệu trả về từ server không hợp lệ"
-                            );
+                            toast.error("Invalid server response");
                             return;
                         }
 
                         login(user, token);
-                        toast.success("Đăng nhập thành công!");
+                        toast.success("Login successful!");
                         navigate("/");
                     } catch (err) {
                         toast.error(
-                            err.response?.data?.message ||
-                                "Sai email hoặc mật khẩu"
+                            err.response?.data?.message || "Login failed"
                         );
                     } finally {
                         setSubmitting(false);
@@ -57,32 +56,48 @@ export default function LoginPage() {
             >
                 {({ isSubmitting }) => (
                     <Form>
-                        <div>
-                            <label>Email</label>
-                            <Field type="email" name="email" />
+                        <BootstrapForm.Group className="mb-3">
+                            <BootstrapForm.Label>Email</BootstrapForm.Label>
+                            <Field
+                                type="email"
+                                name="email"
+                                as={BootstrapForm.Control}
+                                placeholder="Enter email"
+                            />
                             <ErrorMessage
                                 name="email"
                                 component="div"
-                                className="error"
+                                className="text-danger small"
                             />
-                        </div>
+                        </BootstrapForm.Group>
 
-                        <div>
-                            <label>Mật khẩu</label>
-                            <Field type="password" name="password" />
+                        <BootstrapForm.Group className="mb-3">
+                            <BootstrapForm.Label>Password</BootstrapForm.Label>
+                            <Field
+                                type="password"
+                                name="password"
+                                as={BootstrapForm.Control}
+                                placeholder="Enter password"
+                            />
                             <ErrorMessage
                                 name="password"
                                 component="div"
-                                className="error"
+                                className="text-danger small"
                             />
-                        </div>
+                        </BootstrapForm.Group>
 
-                        <button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
-                        </button>
+                        <div className="d-grid">
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? "Logging in..." : "Login"}
+                            </Button>
+                        </div>
                     </Form>
                 )}
             </Formik>
-        </div>
+        </FormWrapper>
     );
 }
