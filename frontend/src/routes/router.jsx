@@ -10,7 +10,6 @@ import ResetPasswordPage from "../pages/Auth/ResetPasswordPage";
 import DriversPage from "../pages/Drivers/DriversPage";
 import CompaniesPage from "../pages/Companies/CompaniesPage";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
-import SubLayout from "../components/layout/SubLayout";
 import DriverDashboard from "../pages/Drivers/DriverDashboard";
 import DriverPayments from "../pages/Drivers/DriverPayments";
 import CompanyDashboard from "../pages/Companies/CompanyDashboard";
@@ -18,6 +17,9 @@ import CompanyAds from "../pages/Companies/CompanyAds";
 import CompanyDrivers from "../pages/Companies/CompanyDrivers";
 import CompanyPayments from "../pages/Companies/CompanyPayments";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import NotFoundPage from "../pages/NotFoundPage";
+import UnauthorizedPage from "../pages/UnauthorizedPage";
+import ErrorLayout from "../components/layout/ErrorLayout";
 
 export const router = createBrowserRouter([
     {
@@ -27,6 +29,7 @@ export const router = createBrowserRouter([
                 <AuthLayout />
             </MainLayout>
         ),
+
         children: [
             { index: true, element: <HomePage /> },
             // Auth routes
@@ -34,6 +37,16 @@ export const router = createBrowserRouter([
             { path: "register", element: <RegisterPage /> },
             { path: "forgot-password", element: <ForgotPasswordPage /> },
             { path: "reset-password", element: <ResetPasswordPage /> },
+
+            // Error pages page
+            // { path: "unauthorized", element: <UnauthorizedPage /> },
+            {
+                element: <ErrorLayout />,
+                children: [
+                    { path: "unauthorized", element: <UnauthorizedPage /> },
+                    { path: "*", element: <NotFoundPage /> },
+                ],
+            },
 
             // Public pages
             { path: "drivers", element: <DriversPage /> },
@@ -49,7 +62,7 @@ export const router = createBrowserRouter([
                     { path: "drivers", element: <DriversPage /> },
                 ],
             },
-            
+
             // Drivers routes (Protected)
             {
                 path: "driver",
@@ -59,11 +72,11 @@ export const router = createBrowserRouter([
                     { path: "payments", element: <DriverPayments /> },
                 ],
             },
-            
+
             // Companies routes (Protected)
             {
                 path: "company",
-                element: <ProtectedRoute allowedRoles={['Company']} />,
+                element: <ProtectedRoute allowedRoles={["Company"]} />,
                 children: [
                     { index: true, element: <CompanyDashboard /> },
                     { path: "ads", element: <CompanyAds /> },
@@ -71,6 +84,7 @@ export const router = createBrowserRouter([
                     { path: "payments", element: <CompanyPayments /> },
                 ],
             },
+            // { path: "*", element: <NotFoundPage /> },
         ],
     },
 ]);
