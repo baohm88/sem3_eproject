@@ -17,8 +17,10 @@ export const navLinks = {
         { to: "/driver/drivers", label: "Companies" },
         { to: "/company/payments", label: "Payments" },
     ],
-    User: [
+    Rider: [
+        { to: "/companies", label: "Listings" },
         { to: "/drivers", label: "Drivers" },
-        { to: "/companies", label: "Companies" },
+        { to: "/services", label: "Services" },
+        { to: "/advertise", label: "Advertise" },
     ],
 };

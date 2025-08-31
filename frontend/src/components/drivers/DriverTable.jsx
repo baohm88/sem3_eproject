@@ -8,7 +8,7 @@ import {
     Row,
     Col,
 } from "react-bootstrap";
-import axiosClient from "../../api/axiosClient";
+import { listDrivers } from "../../api/drivers.ts";
 import { toast } from "react-toastify";
 
 export default function DriverTable({ canEdit, canDelete }) {
@@ -25,7 +25,9 @@ export default function DriverTable({ canEdit, canDelete }) {
     useEffect(() => {
         const fetchDrivers = async () => {
             try {
-                const res = await axiosClient.get("/drivers");
+                const res = await listDrivers();
+                console.log(res);
+
                 setDrivers(res.data || []);
                 setFilteredDrivers(res.data || []);
             } catch (err) {

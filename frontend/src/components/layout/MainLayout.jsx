@@ -8,7 +8,7 @@ export default function MainLayout() {
 
     return (
         <div className="app-layout">
-            <NavBar links={navLinks[user?.role || "User"]} />
+            <NavBar links={navLinks[user?.role || "Rider"]} />
 
             <main className="container">
                 <Outlet />

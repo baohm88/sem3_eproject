@@ -5,7 +5,7 @@ import DriverForm from "../../components/drivers/DriverForm";
 
 export default function DriversPage() {
     const { user } = useAuth();
-    const role = user?.role || "Guest";
+    const role = user?.role || "Rider";
 
     return (
         <Container className="py-4">

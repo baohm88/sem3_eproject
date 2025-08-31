@@ -1,7 +1,7 @@
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button, Form, Row, Col } from "react-bootstrap";
-import axiosClient from "../../api/axiosClient";
+import { updateMyCompany } from "../../api/companies.ts";
 import { toast } from "react-toastify";
 
 const CompanySchema = Yup.object().shape({
@@ -26,13 +26,10 @@ export default function CompanyForm({ initialData, onSuccess }) {
             onSubmit={async (values, { setSubmitting, resetForm }) => {
                 try {
                     if (isEdit) {
-                        await axiosClient.put(
-                            `/companies/${initialData.id}`,
-                            values
-                        );
+                        await updateMyCompany(values);
                         toast.success("Company updated successfully!");
                     } else {
-                        await axiosClient.post("/companies", values);
+                        await updateMyCompany(values);
                         toast.success("Company created successfully!");
                         resetForm();
                     }

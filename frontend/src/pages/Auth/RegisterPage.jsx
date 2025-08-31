@@ -1,6 +1,6 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import axiosClient from "../../api/axiosClient";
+import { registerAsync } from "../../api/auth.ts";
 import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 import { Button, Form as BootstrapForm } from "react-bootstrap";
@@ -45,10 +45,7 @@ export default function RegisterPage() {
                 onSubmit={async (values, { setSubmitting, resetForm }) => {
                     try {
                         const { confirmPassword, ...payload } = values;
-                        const res = await axiosClient.post(
-                            "/auth/register",
-                            payload
-                        );
+                        const res = await registerAsync(payload);
 
                         toast.success(
                             res.message || "Registration successful!"
@@ -68,7 +65,7 @@ export default function RegisterPage() {
                     <Form>
                         {/* Email */}
                         <BootstrapForm.Group className="mb-3">
-                            <BootstrapForm.Label>Email</BootstrapForm.Label>
+                            {/* <BootstrapForm.Label>Email</BootstrapForm.Label> */}
                             <Field
                                 type="email"
                                 name="email"
@@ -84,7 +81,7 @@ export default function RegisterPage() {
 
                         {/* Password */}
                         <BootstrapForm.Group className="mb-3">
-                            <BootstrapForm.Label>Password</BootstrapForm.Label>
+                            {/* <BootstrapForm.Label>Password</BootstrapForm.Label> */}
                             <Field
                                 type="password"
                                 name="password"
@@ -100,9 +97,9 @@ export default function RegisterPage() {
 
                         {/* Confirm Password */}
                         <BootstrapForm.Group className="mb-3">
-                            <BootstrapForm.Label>
+                            {/* <BootstrapForm.Label>
                                 Confirm Password
-                            </BootstrapForm.Label>
+                            </BootstrapForm.Label> */}
                             <Field
                                 type="password"
                                 name="confirmPassword"
@@ -118,7 +115,7 @@ export default function RegisterPage() {
 
                         {/* Role */}
                         <BootstrapForm.Group className="mb-3">
-                            <BootstrapForm.Label>Role</BootstrapForm.Label>
+                            {/* <BootstrapForm.Label>Role</BootstrapForm.Label> */}
                             <Field
                                 as="select"
                                 name="role"

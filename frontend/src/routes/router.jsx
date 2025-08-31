@@ -5,8 +5,6 @@ import MainLayout from "../components/layout/MainLayout";
 import LoginPage from "../pages/Auth/LoginPage";
 import RegisterPage from "../pages/Auth/RegisterPage";
 import AuthLayout from "../components/layout/AuthLayout";
-import ForgotPasswordPage from "../pages/Auth/ForgotPasswordPage";
-import ResetPasswordPage from "../pages/Auth/ResetPasswordPage";
 import DriversPage from "../pages/Drivers/DriversPage";
 import CompaniesPage from "../pages/Companies/CompaniesPage";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
@@ -35,8 +33,8 @@ export const router = createBrowserRouter([
             // Auth routes
             { path: "login", element: <LoginPage /> },
             { path: "register", element: <RegisterPage /> },
-            { path: "forgot-password", element: <ForgotPasswordPage /> },
-            { path: "reset-password", element: <ResetPasswordPage /> },
+            // { path: "forgot-password", element: <ForgotPasswordPage /> },
+            // { path: "reset-password", element: <ResetPasswordPage /> },
 
             // Error pages page
             // { path: "unauthorized", element: <UnauthorizedPage /> },
@@ -84,7 +82,7 @@ export const router = createBrowserRouter([
                     { path: "payments", element: <CompanyPayments /> },
                 ],
             },
-            // { path: "*", element: <NotFoundPage /> },
+            { path: "*", element: <NotFoundPage /> },
         ],
     },
 ]);

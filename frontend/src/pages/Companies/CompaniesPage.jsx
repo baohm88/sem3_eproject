@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Button, Modal } from "react-bootstrap";
-import axiosClient from "../../api/axiosClient";
+import { listCompanies } from "../../api/companies.ts";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import CompanyTable from "../../components/companies/CompanyTable";
@@ -21,10 +21,12 @@ export default function CompaniesPage() {
     const fetchCompanies = async () => {
         setLoading(true);
         try {
-            const res = await axiosClient.get("/companies", {
-                params: { search: searchTerm, status: statusFilter },
-            });
-            setCompanies(res.data || []);
+            const res = await listCompanies();
+            console.log("list companies: ", res);
+
+            console.log(res.data.data);
+
+            setCompanies(res.data.data.items || []);
         } catch (err) {
             toast.error("Failed to fetch companies");
         } finally {

@@ -15,7 +15,7 @@ import { useAuth } from "../../context/AuthContext";
 import SideBar from "./SideBar";
 
 export default function NavBar({ links = [] }) {
-    const { user, isAuthenticated, logout } = useAuth();
+    const { profile, isAuthenticated, logout } = useAuth();
     const [showSidebar, setShowSidebar] = useState(false);
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
@@ -111,7 +111,7 @@ export default function NavBar({ links = [] }) {
                                         title={
                                             <Image
                                                 src={
-                                                    user.image_url ||
+                                                    profile.image_url ||
                                                     "https://png.pngtree.com/png-clipart/20240705/original/pngtree-web-programmer-avatar-png-image_15495270.png"
                                                 }
                                                 roundedCircle
