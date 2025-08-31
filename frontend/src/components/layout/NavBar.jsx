@@ -122,8 +122,15 @@ export default function NavBar({ links = [] }) {
                                         id="user-dropdown"
                                     >
                                         <NavDropdown.Item
+                                            disabled
+                                            className="small text-muted"
+                                        >
+                                            {profile?.email || "Account"}
+                                        </NavDropdown.Item>
+                                        <NavDropdown.Divider />
+                                        <NavDropdown.Item
                                             as={NavLink}
-                                            to="/driver"
+                                            to={profile?.role}
                                         >
                                             <i className="bi bi-clipboard-data-fill me-2" />
                                             Dashboard
