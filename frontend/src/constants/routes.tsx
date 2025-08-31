@@ -73,7 +73,11 @@ export const ROLE_ROUTES: RoleRoutes = {
                 label: "Profile",
                 element: <CompanyProfilePage />,
             },
-            { path: "ads", label: "Ads", element: <CompanyServices /> },
+            {
+                path: "services",
+                label: "Services",
+                element: <CompanyServices />,
+            },
             { path: "drivers", label: "Drivers", element: <CompanyDrivers /> },
             {
                 path: "payments",
