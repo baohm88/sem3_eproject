@@ -22,7 +22,7 @@ export default function CompaniesPage() {
         setLoading(true);
         try {
             const res = await listCompanies();
-            console.log("list companies: ", res);
+            console.log("list companies: ", res.items);
 
             setCompanies(res.items || []);
         } catch (err) {

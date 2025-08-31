@@ -1,6 +1,18 @@
 import api from './axios';
 import type { Company, PageResult, Service, Wallet, Transaction, Invite, JobApplication } from './types';
 
+
+export async function getCompanyWallet(companyId: string): Promise<Wallet> {
+  const res = await api.get(`/api/companies/${companyId}/wallet`);
+  return res.data.data as Wallet;
+}
+
+export async function listCompanyTransactions(companyId: string, params: Record<string, any> = {}) {
+  const res = await api.get(`/api/companies/${companyId}/transactions`, { params });
+  return res.data.data as { items: Transaction[]; totalItems: number; page: number; size: number };
+}
+
+
 export async function listCompanies(params: Record<string, any> = {}) {
   const res = await api.get('/api/companies', { params });
   return res.data.data as PageResult<Company>;
@@ -31,19 +43,9 @@ export async function addService(companyId: string, payload: { title: string; de
   return res.data.data as Service;
 }
 
-export async function getWallet(companyId: string) {
-  const res = await api.get(`/api/companies/${companyId}/wallet`);
-  return res.data.data as Wallet;
-}
-
 export async function listTransactions(companyId: string, params: Record<string, any> = {}) {
   const res = await api.get(`/api/companies/${companyId}/transactions`, { params });
   return res.data.data as PageResult<Transaction>;
-}
-
-export async function topup(companyId: string, payload: { amountCents: number; idempotencyKey?: string }) {
-  const res = await api.post(`/api/companies/${companyId}/wallet/topup`, payload);
-  return res.data.data;
 }
 
 export async function paySalary(companyId: string, payload: { driverUserId: string; amountCents: number; idempotencyKey?: string }) {
@@ -89,4 +91,9 @@ export async function confirmOrder(orderId: string) {
 export async function completeOrder(orderId: string) {
   const res = await api.post(`/api/companies/orders/${orderId}/complete`);
   return res.data.data;
+}
+
+export async function topupCompanyWallet(companyId: string, payload: { amountCents: number; idempotencyKey?: string }) {
+  const res = await api.post(`/api/companies/${companyId}/wallet/topup`, payload);
+  return res.data.data; // có thể trả wallet hoặc receipt tuỳ backend
 }

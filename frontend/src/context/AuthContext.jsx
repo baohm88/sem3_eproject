@@ -86,6 +86,8 @@ export const AuthProvider = ({ children }) => {
         if (!location.pathname.startsWith("/login")) {
             const qs = reason ? `?reason=${encodeURIComponent(reason)}` : "";
             window.location.assign("/login" + qs);
+        } else {
+            window.location.assign("/");
         }
     };
 

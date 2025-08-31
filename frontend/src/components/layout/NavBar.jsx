@@ -29,6 +29,14 @@ export default function NavBar({ links = [] }) {
 
     const toggleSidebar = () => setShowSidebar((prev) => !prev);
 
+    const DASH_BY_ROLE = {
+        Admin: "/admin",
+        Company: "/company",
+        Driver: "/driver",
+        Rider: "/",
+    };
+    const dashboardTo = DASH_BY_ROLE[profile?.role] || "/";
+
     return (
         <>
             <header>
@@ -111,7 +119,7 @@ export default function NavBar({ links = [] }) {
                                         title={
                                             <Image
                                                 src={
-                                                    profile.image_url ||
+                                                    profile.imgUrl ||
                                                     "https://png.pngtree.com/png-clipart/20240705/original/pngtree-web-programmer-avatar-png-image_15495270.png"
                                                 }
                                                 roundedCircle
@@ -130,14 +138,14 @@ export default function NavBar({ links = [] }) {
                                         <NavDropdown.Divider />
                                         <NavDropdown.Item
                                             as={NavLink}
-                                            to={profile?.role}
+                                            to={dashboardTo}
                                         >
                                             <i className="bi bi-clipboard-data-fill me-2" />
                                             Dashboard
                                         </NavDropdown.Item>
                                         <NavDropdown.Item
                                             as={NavLink}
-                                            to="/driver/profile"
+                                            to={`${profile.role}/profile`}
                                         >
                                             <i className="bi bi-heart-fill me-2 text-danger" />
                                             Profile

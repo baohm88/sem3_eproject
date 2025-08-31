@@ -1,23 +1,30 @@
 import { createBrowserRouter } from "react-router-dom";
-import HomePage from "../pages/Home";
-
 import MainLayout from "../components/layout/MainLayout";
+import AuthLayout from "../components/layout/AuthLayout";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+import ErrorLayout from "../components/layout/ErrorLayout";
+
 import LoginPage from "../pages/Auth/LoginPage";
 import RegisterPage from "../pages/Auth/RegisterPage";
-import AuthLayout from "../components/layout/AuthLayout";
-import DriversPage from "../pages/Drivers/DriversPage";
-import CompaniesPage from "../pages/Companies/CompaniesPage";
-import AdminDashboard from "../pages/Admin/AdminDashboard";
-import DriverDashboard from "../pages/Drivers/DriverDashboard";
-import DriverPayments from "../pages/Drivers/DriverPayments";
-import CompanyDashboard from "../pages/Companies/CompanyDashboard";
-import CompanyAds from "../pages/Companies/CompanyAds";
-import CompanyDrivers from "../pages/Companies/CompanyDrivers";
-import CompanyPayments from "../pages/Companies/CompanyPayments";
-import ProtectedRoute from "../components/auth/ProtectedRoute";
-import NotFoundPage from "../pages/NotFoundPage";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
-import ErrorLayout from "../components/layout/ErrorLayout";
+import NotFoundPage from "../pages/NotFoundPage";
+
+import CompaniesPage from "../pages/Companies/CompaniesPage";
+import DriversPage from "../pages/Drivers/DriversPage";
+import HomePage from "../pages/Home";
+
+import { ROLE_ROUTES } from "../constants/routes.tsx";
+
+// helper builder
+function buildProtectedChildren(role) {
+    const def = ROLE_ROUTES[role];
+    if (!def) return [];
+    return def.nav.concat(def.children).map((r) => ({
+        path: r.path,
+        element: r.element,
+        index: r.end === true,
+    }));
+}
 
 export const router = createBrowserRouter([
     {
@@ -27,17 +34,38 @@ export const router = createBrowserRouter([
                 <AuthLayout />
             </MainLayout>
         ),
-
         children: [
+            // public basic (Rider base already covers "/")
             { index: true, element: <HomePage /> },
-            // Auth routes
+            { path: "companies", element: <CompaniesPage /> },
+            { path: "drivers", element: <DriversPage /> },
+
+            // auth
             { path: "login", element: <LoginPage /> },
             { path: "register", element: <RegisterPage /> },
-            // { path: "forgot-password", element: <ForgotPasswordPage /> },
-            // { path: "reset-password", element: <ResetPasswordPage /> },
 
-            // Error pages page
-            // { path: "unauthorized", element: <UnauthorizedPage /> },
+            // protected: Admin
+            {
+                path: ROLE_ROUTES.Admin.base.slice(1),
+                element: <ProtectedRoute allowedRoles={["Admin"]} />,
+                children: buildProtectedChildren("Admin"),
+            },
+
+            // protected: Company
+            {
+                path: ROLE_ROUTES.Company.base.slice(1),
+                element: <ProtectedRoute allowedRoles={["Company"]} />,
+                children: buildProtectedChildren("Company"),
+            },
+
+            // protected: Driver
+            {
+                path: ROLE_ROUTES.Driver.base.slice(1),
+                element: <ProtectedRoute allowedRoles={["Driver"]} />,
+                children: buildProtectedChildren("Driver"),
+            },
+
+            // error layout + catch-all
             {
                 element: <ErrorLayout />,
                 children: [
@@ -45,44 +73,6 @@ export const router = createBrowserRouter([
                     { path: "*", element: <NotFoundPage /> },
                 ],
             },
-
-            // Public pages
-            { path: "drivers", element: <DriversPage /> },
-            { path: "companies", element: <CompaniesPage /> },
-
-            // Admin routes (Protected)
-            {
-                path: "admin",
-                element: <ProtectedRoute allowedRoles={["Admin"]} />,
-                children: [
-                    { index: true, element: <AdminDashboard /> },
-                    { path: "companies", element: <CompaniesPage /> },
-                    { path: "drivers", element: <DriversPage /> },
-                ],
-            },
-
-            // Drivers routes (Protected)
-            {
-                path: "driver",
-                element: <ProtectedRoute allowedRoles={["Driver"]} />,
-                children: [
-                    { index: true, element: <DriverDashboard /> },
-                    { path: "payments", element: <DriverPayments /> },
-                ],
-            },
-
-            // Companies routes (Protected)
-            {
-                path: "company",
-                element: <ProtectedRoute allowedRoles={["Company"]} />,
-                children: [
-                    { index: true, element: <CompanyDashboard /> },
-                    { path: "ads", element: <CompanyAds /> },
-                    { path: "drivers", element: <CompanyDrivers /> },
-                    { path: "payments", element: <CompanyPayments /> },
-                ],
-            },
-            { path: "*", element: <NotFoundPage /> },
         ],
     },
 ]);

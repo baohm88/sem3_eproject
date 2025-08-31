@@ -1,12 +1,12 @@
 import React from "react";
 
-function CompanyAds() {
+function CompanyServices() {
     return (
         <>
-            <h1>CompanyAds</h1>
+            <h1>CompanyServices</h1>
             <p>Here comes a lists of ads run by your company</p>
         </>
     );
 }
 
-export default CompanyAds;
+export default CompanyServices;
