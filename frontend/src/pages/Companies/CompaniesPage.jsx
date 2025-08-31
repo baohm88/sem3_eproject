@@ -24,9 +24,7 @@ export default function CompaniesPage() {
             const res = await listCompanies();
             console.log("list companies: ", res);
 
-            console.log(res.data.data);
-
-            setCompanies(res.data.data.items || []);
+            setCompanies(res.items || []);
         } catch (err) {
             toast.error("Failed to fetch companies");
         } finally {

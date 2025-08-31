@@ -123,17 +123,17 @@ export default function NavBar({ links = [] }) {
                                     >
                                         <NavDropdown.Item
                                             as={NavLink}
-                                            to="/account/dashboard"
+                                            to="/driver"
                                         >
                                             <i className="bi bi-clipboard-data-fill me-2" />
                                             Dashboard
                                         </NavDropdown.Item>
                                         <NavDropdown.Item
                                             as={NavLink}
-                                            to="/account/watch-list"
+                                            to="/driver/profile"
                                         >
                                             <i className="bi bi-heart-fill me-2 text-danger" />
-                                            Watch List
+                                            Profile
                                         </NavDropdown.Item>
                                         <NavDropdown.Item
                                             as="button"
