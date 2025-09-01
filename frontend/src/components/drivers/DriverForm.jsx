@@ -1,7 +1,7 @@
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button, Form, Row, Col } from "react-bootstrap";
-import { updateMyDriver } from "../../api/drivers.ts";
+import { updateMyDriverProfile } from "../../api/drivers.ts";
 import { toast } from "react-toastify";
 
 // Validation schema
@@ -29,11 +29,11 @@ export default function DriverForm({ initialData, onSuccess }) {
                 try {
                     if (isEdit) {
                         // Update
-                        await updateMyDriver(values);
+                        await updateMyDriverProfile(values);
                         toast.success("Driver updated successfully!");
                     } else {
                         // Create
-                        await updateMyDriver(values);
+                        await updateMyDriverProfile(values);
                         toast.success("Driver created successfully!");
                         resetForm();
                     }

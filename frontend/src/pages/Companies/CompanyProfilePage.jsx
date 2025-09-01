@@ -18,7 +18,7 @@ import {
     listCompanyTransactions,
 } from "../../api/companies";
 import TopUpModal from "../../components/company/TopUpModal";
-import EditProfileModal from "../../components/company/EditProfileModal";
+import EditProfileModal from "../../components/common/EditProfileModal";
 import TransactionList from "../../components/common/TransactionList";
 
 export default function CompanyProfilePage() {
@@ -41,8 +41,6 @@ export default function CompanyProfilePage() {
                 size: 3,
                 page: 1,
             });
-            console.log(tRes);
-
             setTxs(tRes.items || []);
         } catch {
             // optional
@@ -69,9 +67,9 @@ export default function CompanyProfilePage() {
     const membershipBadge = (m, expires) => (
         <Badge
             bg={
-                m === "Pro"
+                m === "Premium"
                     ? "success"
-                    : m === "Business"
+                    : m === "Basic"
                     ? "primary"
                     : "secondary"
             }
@@ -84,6 +82,7 @@ export default function CompanyProfilePage() {
     const onSave = async (payload) => {
         const updated = await updateMyCompany(payload);
         setCompany(updated);
+        toast.success("Updated company profile!");
     };
 
     const centsToVnd = (c) =>
@@ -235,7 +234,11 @@ export default function CompanyProfilePage() {
                                 <Card.Header className="bg-white">
                                     <strong>Recent Transactions</strong>
                                 </Card.Header>
-                                <TransactionList transactions={txs} limit={5} perspectiveWalletId={wallet?.id}/>
+                                <TransactionList
+                                    transactions={txs}
+                                    limit={5}
+                                    perspectiveWalletId={wallet?.id}
+                                />
                             </Card>
                         </Col>
                     </Row>
@@ -248,6 +251,27 @@ export default function CompanyProfilePage() {
                 onHide={() => setShowEdit(false)}
                 initial={company}
                 onSave={onSave}
+                title="Edit Company"
+                fields={[
+                    {
+                        name: "name",
+                        label: "Name",
+                        placeholder: "Company name",
+                    },
+                    {
+                        name: "description",
+                        label: "Description",
+                        as: "textarea",
+                        rows: 3,
+                        placeholder: "What does your company do?",
+                    },
+                    {
+                        name: "imgUrl",
+                        label: "Logo URL",
+                        placeholder: "https://...",
+                        helpText: "Leave blank to keep current.",
+                    },
+                ]}
             />
 
             <TopUpModal

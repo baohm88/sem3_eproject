@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { Button, Form as BForm } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { registerAsync, loginAsync } from "../../api/auth";
-import { getMyDriver, updateMyDriver } from "../../api/drivers";
+import { getMyDriverProfile, updateMyDriverProfile } from "../../api/drivers";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { cleanPayload } from "../../utils/cleanPayload";
@@ -62,9 +62,9 @@ export default function RegisterFormDriver({ onDone }) {
                         password: payload.password,
                     });
                     login(profile, token);
-                    await getMyDriver();
+                    await getMyDriverProfile();
 
-                    await updateMyDriver(
+                    await updateMyDriverProfile(
                         cleanPayload({
                             fullName: payload.fullName,
                             phone: payload.phone,

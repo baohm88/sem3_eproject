@@ -12,8 +12,11 @@ import NotFoundPage from "../pages/NotFoundPage";
 import CompaniesPage from "../pages/Companies/CompaniesPage";
 import DriversPage from "../pages/Drivers/DriversPage";
 import HomePage from "../pages/Home";
+import ServicesPage from "../pages/ServicesPage";
+import AdvertisePage from "../pages/AdvertisePage";
+import FeedbackPage from "../pages/FeedbackPage";
 
-import { ROLE_ROUTES } from "../constants/routes.tsx";
+import { ROLE_ROUTES, PUBLIC_ROUTES } from "./routes.tsx";
 
 // helper builder
 function buildProtectedChildren(role) {
@@ -26,7 +29,7 @@ function buildProtectedChildren(role) {
     }));
 }
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
     {
         path: "/",
         element: (
@@ -37,8 +40,11 @@ export const router = createBrowserRouter([
         children: [
             // public basic (Rider base already covers "/")
             { index: true, element: <HomePage /> },
-            { path: "companies", element: <CompaniesPage /> },
+            { path: "listings", element: <CompaniesPage /> },
             { path: "drivers", element: <DriversPage /> },
+            { path: "services", element: <ServicesPage /> },
+            { path: "advertise", element: <AdvertisePage /> },
+            { path: "feedback", element: <FeedbackPage /> },
 
             // auth
             { path: "login", element: <LoginPage /> },
@@ -76,3 +82,6 @@ export const router = createBrowserRouter([
         ],
     },
 ]);
+
+export { router };
+export default router;

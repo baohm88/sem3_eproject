@@ -9,41 +9,46 @@ import type {
     JobApplication,
 } from "./types";
 
-export async function getMyDriver() {
+/* Profile (me) */
+export async function getMyDriverProfile() {
     const res = await api.get("/api/drivers/me");
     return res.data.data as DriverProfile;
 }
 
-export async function updateMyDriver(payload: Partial<DriverProfile>) {
+export async function updateMyDriverProfile(payload: Partial<DriverProfile>) {
     const res = await api.put("/api/drivers/me", payload);
-    console.log("update driver: ", res);
-
     return res.data.data as DriverProfile;
 }
 
+/* Public / by id */
 export async function listDrivers(params: Record<string, any> = {}) {
     const res = await api.get("/api/drivers", { params });
     return res.data.data as PageResult<DriverProfile>;
 }
 
-export async function getDriver(userId: string) {
+export async function getDriverProfile(userId: string) {
     const res = await api.get(`/api/drivers/${userId}`);
     return res.data.data as DriverProfile;
 }
 
-export async function setAvailability(userId: string, isAvailable: boolean) {
+/* Availability */
+export async function updateDriverAvailability(
+    userId: string,
+    isAvailable: boolean
+) {
     const res = await api.post(`/api/drivers/${userId}/availability`, {
         isAvailable,
     });
     return res.data.data as DriverProfile;
 }
 
-export async function getWallet(userId: string) {
+/* Wallet & Transactions */
+export async function getDriverWallet(userId: string) {
     const res = await api.get(`/api/drivers/${userId}/wallet`);
     return res.data.data as Wallet;
 }
 
-export async function listTransactions(
+export async function listDriverTransactions(
     userId: string,
     params: Record<string, any> = {}
 ) {
@@ -53,7 +58,7 @@ export async function listTransactions(
     return res.data.data as PageResult<Transaction>;
 }
 
-export async function withdraw(
+export async function withdrawFromDriverWallet(
     userId: string,
     payload: { amountCents: number; idempotencyKey?: string }
 ) {
@@ -64,7 +69,8 @@ export async function withdraw(
     return res.data.data;
 }
 
-export async function listMyCompanies(
+/* Companies & Applications (perspective: driver) */
+export async function listCompaniesForDriver(
     userId: string,
     params: Record<string, any> = {}
 ) {
@@ -72,7 +78,7 @@ export async function listMyCompanies(
     return res.data.data as PageResult<Company>;
 }
 
-export async function applyToCompany(
+export async function applyToCompanyAsDriver(
     userId: string,
     payload: { companyId: string; expiresAt?: string }
 ) {
@@ -80,7 +86,7 @@ export async function applyToCompany(
     return res.data.data as JobApplication;
 }
 
-export async function listMyApplications(
+export async function listDriverApplications(
     userId: string,
     params: Record<string, any> = {}
 ) {
@@ -90,7 +96,8 @@ export async function listMyApplications(
     return res.data.data as PageResult<JobApplication>;
 }
 
-export async function listMyInvitations(
+/* Invitations */
+export async function listDriverInvitations(
     userId: string,
     params: Record<string, any> = {}
 ) {
@@ -98,14 +105,14 @@ export async function listMyInvitations(
     return res.data.data as PageResult<Invite>;
 }
 
-export async function acceptInvitation(userId: string, inviteId: string) {
+export async function acceptDriverInvitation(userId: string, inviteId: string) {
     const res = await api.post(
         `/api/drivers/${userId}/invitations/${inviteId}/accept`
     );
     return res.data.data;
 }
 
-export async function rejectInvitation(userId: string, inviteId: string) {
+export async function rejectDriverInvitation(userId: string, inviteId: string) {
     const res = await api.post(
         `/api/drivers/${userId}/invitations/${inviteId}/reject`
     );
