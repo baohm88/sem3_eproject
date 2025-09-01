@@ -69,33 +69,99 @@ function SectionHeader({ title, subtitle, actionText = "Xem tất cả", onActio
 function Banner() {
     return (
         <section className="container mt-4">
-            <div className="hero card-soft">
-                <div className="row g-0">
-                    <div className="col-lg-7 p-4 p-lg-5">
-                        <span className="badge badge-brand rounded-pill px-3 py-2 fw-semibold">IVB CAREER</span>
-                        <h1 className="mt-3 fw-bold" style={{ lineHeight: 1.05 }}>
-                            Grow & Glow – Vững kết sự nghiệp, bền tầm phát triển
-                        </h1>
-                        <p className="mt-2 text-white-50">
-                            Tìm việc mơ ước, khám phá công ty phù hợp và ứng tuyển chỉ trong vài bước.
-                        </p>
-                        <div className="d-flex gap-2 mt-2">
-                            <button className="btn btn-brand rounded-pill px-4">Khám phá ngay</button>
-                            <button className="btn btn-outline-light rounded-pill px-4">Tìm hiểu thêm</button>
-                        </div>
-                        <div className="mt-4 d-flex gap-2 flex-wrap">
-                            <span className="badge chip rounded-pill">Developer</span>
-                            <span className="badge chip rounded-pill">Designer</span>
-                            <span className="badge chip rounded-pill">Data</span>
-                            <span className="badge chip rounded-pill">Marketing</span>
+            <div id="bannerCarousel" className="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                <div className="carousel-inner rounded-4">
+                    {/* Slide 1 */}
+                    <div className="carousel-item active">
+                        <div className="hero card-soft">
+                            <div className="row g-0">
+                                <div className="col-lg-7 p-4 p-lg-5">
+                                    <span className="badge badge-brand rounded-pill px-3 py-2 fw-semibold">IVB CAREER</span>
+                                    <h1 className="mt-3 fw-bold" style={{ lineHeight: 1.05 }}>
+                                        Grow & Glow – Vững kết sự nghiệp, bền tầm phát triển
+                                    </h1>
+                                    <p className="mt-2 text-white-50">
+                                        Tìm việc mơ ước, khám phá công ty phù hợp và ứng tuyển chỉ trong vài bước.
+                                    </p>
+                                    <div className="d-flex gap-2 mt-2">
+                                        <button className="btn btn-brand rounded-pill px-4">Khám phá ngay</button>
+                                        <button className="btn btn-outline-light rounded-pill px-4">Tìm hiểu thêm</button>
+                                    </div>
+                                    <div className="mt-4 d-flex gap-2 flex-wrap">
+                                        <span className="badge chip rounded-pill">Developer</span>
+                                        <span className="badge chip rounded-pill">Designer</span>
+                                        <span className="badge chip rounded-pill">Data</span>
+                                        <span className="badge chip rounded-pill">Marketing</span>
+                                    </div>
+                                </div>
+                                <div className="col-lg-5 hero-visual" />
+                            </div>
                         </div>
                     </div>
-                    <div className="col-lg-5 hero-visual" />
+                    {/* Slide 2 */}
+                    <div className="carousel-item">
+                        <div className="hero card-soft">
+                            <div className="row g-0">
+                                <div className="col-lg-7 p-4 p-lg-5">
+                                    <span className="badge badge-brand rounded-pill px-3 py-2 fw-semibold">ỨNG TUYỂN</span>
+                                    <h1 className="mt-3 fw-bold" style={{ lineHeight: 1.05 }}>
+                                        Ứng tuyển dễ dàng – Nhanh chóng & tiện lợi
+                                    </h1>
+                                    <p className="mt-2 text-white-50">
+                                        Hàng ngàn công việc mới mỗi ngày, phù hợp với bạn.
+                                    </p>
+                                    <button className="btn btn-light rounded-pill px-4 mt-2">Ứng tuyển ngay</button>
+                                </div>
+                                <div
+                                    className="col-lg-5 hero-visual"
+                                    style={{
+                                        background: "url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat",
+                                        minHeight: "320px",
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    {/* Slide 3 */}
+                    <div className="carousel-item">
+                        <div className="hero card-soft">
+                            <div className="row g-0">
+                                <div className="col-lg-7 p-4 p-lg-5">
+                                    <span className="badge badge-brand rounded-pill px-3 py-2 fw-semibold">ĐỐI TÁC</span>
+                                    <h1 className="mt-3 fw-bold" style={{ lineHeight: 1.05 }}>
+                                        Đối tác uy tín – Cơ hội nghề nghiệp rộng mở
+                                    </h1>
+                                    <p className="mt-2 text-white-50">
+                                        Hợp tác cùng những doanh nghiệp hàng đầu Việt Nam.
+                                    </p>
+                                    <button className="btn btn-brand rounded-pill px-4 mt-2">Khám phá thêm</button>
+                                </div>
+                                <div
+                                    className="col-lg-5 hero-visual"
+                                    style={{
+                                        background: "url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat",
+                                        minHeight: "320px",
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Nút điều hướng */}
+                <button className="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span className="visually-hidden">Previous</span>
+                </button>
+                <button className="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span className="visually-hidden">Next</span>
+                </button>
             </div>
         </section>
     );
 }
+
 
 function TopCompanies() {
     return (
