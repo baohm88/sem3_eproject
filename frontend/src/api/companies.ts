@@ -189,6 +189,11 @@ export async function listCompanyServices(
     return res.data.data as PageResult<Service>;
 }
 
+export async function listCompanyServicesPublic(companyId: string, params: Record<string, any> = {}) {
+  const res = await api.get(`/api/companies/${companyId}/services/public`, { params });
+  return res.data.data as PageResult<Service>;
+}
+
 export async function createCompanyService(
     companyId: string,
     payload: {

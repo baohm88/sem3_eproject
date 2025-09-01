@@ -82,7 +82,7 @@ export const ROLE_ROUTES: RoleRoutes = {
     nav: [
       { path: "", label: "Dashboard", element: <DriverDashboard />, end: true },
       { path: "profile", label: "Profile", element: <DriverProfilePage /> },
-      // { path: "jobs", label: "Jobs", element: <DriverJobsPage /> },
+      { path: "jobs", label: "Jobs", element: <DriverJobsPage /> },
       { path: "payments", label: "Payments", element: <DriverPayments /> },
     ],
     children: [],

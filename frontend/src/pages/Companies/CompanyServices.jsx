@@ -168,6 +168,8 @@ export default function CompanyServices() {
                 company.id,
                 cleanPayload({ page, size: pageInfo.size, q: query })
             );
+            console.log(res);
+
             setServices(res.items || []);
             setPageInfo({
                 page: res.page,

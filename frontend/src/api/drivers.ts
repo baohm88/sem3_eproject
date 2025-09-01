@@ -93,7 +93,14 @@ export async function applyToCompanyAsDriver(
     payload: { companyId: string; expiresAt?: string }
 ) {
     const res = await api.post(`/api/drivers/${userId}/applications`, payload);
+    console.log('applyToCompanyAsDriver', res);
+    
     return res.data.data as JobApplication;
+}
+
+export async function cancelApplication(userId: string, applicationId: string) {
+  const res = await api.post(`/api/drivers/${userId}/applications/${applicationId}/cancel`);
+  return res.data.data;
 }
 
 export async function listDriverApplications(

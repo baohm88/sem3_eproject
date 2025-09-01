@@ -1,199 +1,444 @@
+// import { useEffect, useState } from "react";
+// import { Container, Row, Col } from "react-bootstrap";
+// import { useNavigate } from "react-router-dom";
+// import { toast } from "react-toastify";
+
+// import { listCompanies } from "../../api/companies.ts";
+// import { useAuth } from "../../context/AuthContext";
+// import PaginationBar from "../../components/common/PaginationBar";
+// import CompanyCard from "../../components/company/CompanyCard.jsx";
+// import CompanyCardSkeleton from "../../components/company/CompanyCardSkeleton.jsx";
+// import FilterBar from "../../components/common/FilterBar.jsx";
+
+// export default function CompaniesPage() {
+//     const { profile } = useAuth();
+//     const isAdmin = profile?.role === "Admin";
+
+//     // dữ liệu
+//     const [companies, setCompanies] = useState([]);
+//     const [loading, setLoading] = useState(false);
+
+//     // filter & sort
+//     const [searchTerm, setSearchTerm] = useState("");
+//     const [sort, setSort] = useState("name:asc");
+//     const [statusFilter, setStatusFilter] = useState(""); // "", "active", "inactive"
+//     const [membership, setMembership] = useState("");
+//     const [minRating, setMinRating] = useState("");
+
+//     // phân trang
+//     const [page, setPage] = useState(1);
+//     const [size, setSize] = useState(12);
+//     const [totalItems, setTotalItems] = useState(0);
+//     const [totalPages, setTotalPages] = useState(0);
+
+//     // yêu thích (demo)
+//     const [favorites, setFavorites] = useState([]);
+
+//     const navigate = useNavigate();
+
+//     // debounce search
+//     const [debouncedName, setDebouncedName] = useState(searchTerm);
+//     useEffect(() => {
+//         const t = setTimeout(() => setDebouncedName(searchTerm), 300);
+//         return () => clearTimeout(t);
+//     }, [searchTerm]);
+
+//     const fetchCompanies = async () => {
+//         setLoading(true);
+//         try {
+//             const params = {
+//                 page,
+//                 size,
+//                 sort,
+//                 ...(debouncedName.trim() ? { name: debouncedName.trim() } : {}),
+//                 ...(membership ? { membership } : {}),
+//                 ...(minRating ? { minRating: Number(minRating) } : {}),
+//                 ...(statusFilter === "active"
+//                     ? { isActive: true }
+//                     : statusFilter === "inactive"
+//                     ? { isActive: false }
+//                     : {}),
+//             };
+
+//             const res = await listCompanies(params);
+//             setCompanies(res.items || []);
+//             setTotalItems(res.totalItems || 0);
+//             setTotalPages(res.totalPages || 0);
+//         } catch {
+//             toast.error("Failed to fetch companies");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     useEffect(() => {
+//         fetchCompanies();
+//         // eslint-disable-next-line react-hooks/exhaustive-deps
+//     }, [debouncedName, sort, statusFilter, page, size]);
+
+//     const toggleFavorite = (id) => {
+//         setFavorites((prev) =>
+//             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+//         );
+//     };
+
+//     return (
+//         <Container className="py-4">
+//             {/* FilterBar generic */}
+//             <FilterBar
+//                 search={{
+//                     value: searchTerm,
+//                     onChange: (v) => {
+//                         setSearchTerm(v);
+//                         setPage(1);
+//                     },
+//                     placeholder: "Search by company name…",
+//                 }}
+//                 selects={[
+//                     {
+//                         value: membership,
+//                         onChange: (v) => {
+//                             setMembership(v);
+//                             setPage(1);
+//                         },
+//                         style: { maxWidth: 180 },
+//                         options: [
+//                             { value: "", label: "All plans" },
+//                             { value: "Premium", label: "Premium" },
+//                             { value: "Basic", label: "Basic" },
+//                             { value: "Free", label: "Free" },
+//                         ],
+//                     },
+//                     {
+//                         value: minRating,
+//                         onChange: (v) => {
+//                             setMinRating(v);
+//                             setPage(1);
+//                         },
+//                         style: { maxWidth: 160 },
+//                         options: [
+//                             { value: "", label: "Min rating" },
+//                             { value: "4.5", label: "≥ 4.5" },
+//                             { value: "4.0", label: "≥ 4.0" },
+//                             { value: "3.5", label: "≥ 3.5" },
+//                         ],
+//                     },
+//                     {
+//                         value: sort,
+//                         onChange: (v) => {
+//                             setSort(v);
+//                             setPage(1);
+//                         },
+//                         style: { maxWidth: 200 },
+//                         options: [
+//                             { value: "rating:desc", label: "Sort: Rating ↓" },
+//                             { value: "rating:asc", label: "Sort: Rating ↑" },
+//                             { value: "name:asc", label: "Sort: Name ↑" },
+//                             { value: "name:desc", label: "Sort: Name ↓" },
+//                             {
+//                                 value: "membership:asc",
+//                                 label: "Sort: Membership ↑",
+//                             },
+//                             {
+//                                 value: "membership:desc",
+//                                 label: "Sort: Membership ↓",
+//                             },
+//                         ],
+//                     },
+//                     ...(isAdmin
+//                         ? [
+//                               {
+//                                   value: statusFilter,
+//                                   onChange: (v) => {
+//                                       setStatusFilter(v);
+//                                       setPage(1);
+//                                   },
+//                                   style: { maxWidth: 180 },
+//                                   options: [
+//                                       { value: "", label: "All statuses" },
+//                                       { value: "active", label: "Active only" },
+//                                       {
+//                                           value: "inactive",
+//                                           label: "Inactive only",
+//                                       },
+//                                   ],
+//                               },
+//                           ]
+//                         : []),
+//                 ]}
+//             />
+
+//             {/* Grid cards */}
+//             {loading ? (
+//                 <Row className="g-4">
+//                     {Array.from({ length: 6 }).map((_, i) => (
+//                         <Col xs={12} md={6} lg={4} key={`sk-${i}`}>
+//                             <CompanyCardSkeleton />
+//                         </Col>
+//                     ))}
+//                 </Row>
+//             ) : (
+//                 <>
+//                     <Row className="g-4">
+//                         {companies.map((c) => (
+//                             <Col xs={12} md={6} lg={4} key={c.id}>
+//                                 <CompanyCard
+//                                     company={c}
+//                                     isFavorite={favorites.includes(c.id)}
+//                                     onToggleFavorite={() =>
+//                                         toggleFavorite(c.id)
+//                                     }
+//                                     onClick={() =>
+//                                         navigate(`/companies/${c.id}`)
+//                                     }
+//                                     showDescription
+//                                     showStatusBadges
+//                                     imgHeight={200}
+//                                 />
+//                             </Col>
+//                         ))}
+//                         {!companies.length && (
+//                             <Col
+//                                 xs={12}
+//                                 className="text-center text-muted py-5"
+//                             >
+//                                 No companies found.
+//                             </Col>
+//                         )}
+//                     </Row>
+
+//                     {/* Pagination */}
+//                     <div className="mt-4">
+//                         <PaginationBar
+//                             page={page}
+//                             size={size}
+//                             totalItems={totalItems}
+//                             totalPages={totalPages}
+//                             onPageChange={(p) => setPage(p)}
+//                             onSizeChange={(s) => {
+//                                 setSize(s);
+//                                 setPage(1);
+//                             }}
+//                             sizeOptions={[2, 4, 6, 8]}
+//                         />
+//                     </div>
+//                 </>
+//             )}
+//         </Container>
+//     );
+// }
+
+// src/pages/Companies/CompaniesPage.jsx
 import { useEffect, useState } from "react";
-import {
-    Container,
-    Row,
-    Col,
-    Card,
-    Button,
-    Form,
-    Spinner,
-} from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+
 import { listCompanies } from "../../api/companies.ts";
 import { useAuth } from "../../context/AuthContext";
 import PaginationBar from "../../components/common/PaginationBar";
 import CompanyCard from "../../components/company/CompanyCard.jsx";
 import CompanyCardSkeleton from "../../components/company/CompanyCardSkeleton.jsx";
+import FilterBar from "../../components/common/FilterBar.jsx";
 
 export default function CompaniesPage() {
-    const { profile } = useAuth();
-    const isAdmin = profile?.role === "Admin";
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === "Admin";
 
-    // dữ liệu
-    const [companies, setCompanies] = useState([]);
-    const [loading, setLoading] = useState(false);
+  // data
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    // bộ lọc & sắp xếp
-    const [searchTerm, setSearchTerm] = useState("");
-    const [sort, setSort] = useState("name:asc");
-    const [statusFilter, setStatusFilter] = useState("");
+  // filters & sort
+  const [searchTerm, setSearchTerm] = useState("");
+  const [membership, setMembership] = useState(""); // "", "Premium", "Basic", "Free"
+  const [minRating, setMinRating] = useState("");   // "", "4.5", "4.0", "3.5"
+  const [sort, setSort] = useState("name:asc");
+  const [statusFilter, setStatusFilter] = useState(""); // "", "active", "inactive"
 
-    // phân trang
-    const [page, setPage] = useState(1); // 1-based
-    const [size, setSize] = useState(12);
-    const [totalItems, setTotalItems] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+  // pagination
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(12);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-    // yêu thích (demo lưu local state)
-    const [favorites, setFavorites] = useState([]);
+  // favorites (demo)
+  const [favorites, setFavorites] = useState([]);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    // debounce cho search
-    const [debouncedName, setDebouncedName] = useState(searchTerm);
-    useEffect(() => {
-        const t = setTimeout(() => setDebouncedName(searchTerm), 300);
-        return () => clearTimeout(t);
-    }, [searchTerm]);
+  // debounce search
+  const [debouncedName, setDebouncedName] = useState(searchTerm);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedName(searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
-    const fetchCompanies = async () => {
-        setLoading(true);
-        try {
-            const params = {
-                page,
-                size,
-                sort,
-                ...(debouncedName.trim() ? { name: debouncedName.trim() } : {}),
-            };
-            const res = await listCompanies(params);
-            // res là PageResult<Company>
-            setCompanies(res.items || []);
-            setTotalItems(res.totalItems || 0);
-            setTotalPages(res.totalPages || 0);
-        } catch (err) {
-            toast.error("Failed to fetch companies");
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchCompanies = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        page,
+        size,
+        sort,
+        ...(debouncedName.trim() ? { name: debouncedName.trim() } : {}),
+        ...(membership ? { membership } : {}),
+        ...(minRating ? { minRating: Number(minRating) } : {}),
+        ...(statusFilter === "active"
+          ? { isActive: true }
+          : statusFilter === "inactive"
+          ? { isActive: false }
+          : {}),
+      };
 
-    useEffect(() => {
-        fetchCompanies();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedName, sort, page, size]);
+      const res = await listCompanies(params);
+      setCompanies(res.items || []);
+      setTotalItems(res.totalItems || 0);
+      setTotalPages(res.totalPages || 0);
+    } catch {
+      toast.error("Failed to fetch companies");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const toggleFavorite = (id) => {
-        setFavorites((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-        );
-    };
+  useEffect(() => {
+    fetchCompanies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedName, membership, minRating, sort, statusFilter, page, size]);
 
-    return (
-        <Container className="py-4">
-            {/* Header & controls */}
-            <Row className="mb-3 g-2 align-items-center">
-                {/* Search by name */}
-                <Col xs={12} md={5} lg={4}>
-                    <Form.Control
-                        type="search"
-                        placeholder="Search by company name…"
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setPage(1); // reset về trang 1 khi đổi search
-                        }}
-                    />
-                </Col>
-
-                {/* Sort */}
-                <Col xs={12} md={4} lg={3}>
-                    <Form.Select
-                        value={sort}
-                        onChange={(e) => {
-                            setSort(e.target.value);
-                            setPage(1); // reset về trang 1 khi đổi sort
-                        }}
-                        aria-label="Sort companies"
-                    >
-                        <option value="name:asc">Name ↑</option>
-                        <option value="name:desc">Name ↓</option>
-                        <option value="rating:asc">Rating ↑</option>
-                        <option value="rating:desc">Rating ↓</option>
-                        <option value="membership:asc">Membership ↑</option>
-                        <option value="membership:desc">Membership ↓</option>
-                    </Form.Select>
-                </Col>
-
-                {isAdmin && (
-                    <>
-                        {/* Status filter (tuỳ chọn) */}
-                        <Col xs={6} md={3}>
-                            <Form.Select
-                                value={statusFilter}
-                                onChange={(e) =>
-                                    setStatusFilter(e.target.value)
-                                }
-                                aria-label="Filter by status"
-                            >
-                                <option value="">All statuses</option>
-                                <option value="active">Active only</option>
-                                <option value="inactive">Inactive only</option>
-                            </Form.Select>
-                        </Col>
-                        <Col xs={12} md="auto" className="text-md-end">
-                            <Button variant="success">+ Add Company</Button>
-                        </Col>
-                    </>
-                )}
-            </Row>
-
-            {/* Grid cards */}
-            {loading ? (
-                <Row className="g-4">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                        <Col xs={12} md={6} lg={4} key={`sk-${i}`}>
-                            <CompanyCardSkeleton />
-                        </Col>
-                    ))}
-                </Row>
-            ) : (
-                <>
-                    <Row className="g-4">
-                        {companies.map((c) => (
-                            <Col xs={12} md={6} lg={4} key={c.id}>
-                                <CompanyCard
-                                    company={c}
-                                    isFavorite={favorites.includes(c.id)}
-                                    onToggleFavorite={() =>
-                                        toggleFavorite(c.id)
-                                    }
-                                    onClick={() =>
-                                        navigate(`/companies/${c.id}`)
-                                    }
-                                    showDescription={true}
-                                    showStatusBadges={true}
-                                    imgHeight={200}
-                                />
-                            </Col>
-                        ))}
-                        {!companies.length && (
-                            <Col
-                                xs={12}
-                                className="text-center text-muted py-5"
-                            >
-                                No companies found.
-                            </Col>
-                        )}
-                    </Row>
-
-                    {/* Pagination */}
-                    <div className="mt-4">
-                        <PaginationBar
-                            page={page}
-                            size={size}
-                            totalItems={totalItems}
-                            totalPages={totalPages}
-                            onPageChange={(p) => setPage(p)}
-                            onSizeChange={(s) => {
-                                setSize(s);
-                                setPage(1); // reset về trang 1 khi đổi page size
-                            }}
-                            sizeOptions={[1, 2, 3]}
-                        />
-                    </div>
-                </>
-            )}
-        </Container>
+  const toggleFavorite = (id) => {
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+  };
+
+  return (
+    <Container className="py-4">
+      {/* FilterBar generic */}
+      <FilterBar
+        search={{
+          value: searchTerm,
+          onChange: (v) => {
+            setSearchTerm(v);
+            setPage(1);
+          },
+          placeholder: "Search by company name…",
+        }}
+        selects={[
+          {
+            value: membership,
+            onChange: (v) => {
+              setMembership(v);
+              setPage(1);
+            },
+            style: { maxWidth: 180 },
+            options: [
+              { value: "", label: "All plans" },
+              { value: "Premium", label: "Premium" },
+              { value: "Basic", label: "Basic" },
+              { value: "Free", label: "Free" },
+            ],
+          },
+          {
+            value: minRating,
+            onChange: (v) => {
+              setMinRating(v);
+              setPage(1);
+            },
+            style: { maxWidth: 160 },
+            options: [
+              { value: "", label: "Min rating" },
+              { value: "4.5", label: "≥ 4.5" },
+              { value: "4.0", label: "≥ 4.0" },
+              { value: "3.5", label: "≥ 3.5" },
+            ],
+          },
+          {
+            value: sort,
+            onChange: (v) => {
+              setSort(v);
+              setPage(1);
+            },
+            style: { maxWidth: 220 },
+            options: [
+              { value: "rating:desc", label: "Sort: Rating ↓" },
+              { value: "rating:asc", label: "Sort: Rating ↑" },
+              { value: "name:asc", label: "Sort: Name ↑" },
+              { value: "name:desc", label: "Sort: Name ↓" },
+              { value: "membership:asc", label: "Sort: Membership ↑" },
+              { value: "membership:desc", label: "Sort: Membership ↓" },
+            ],
+          },
+          ...(isAdmin
+            ? [
+                {
+                  value: statusFilter,
+                  onChange: (v) => {
+                    setStatusFilter(v);
+                    setPage(1);
+                  },
+                  style: { maxWidth: 180 },
+                  options: [
+                    { value: "", label: "All statuses" },
+                    { value: "active", label: "Active only" },
+                    { value: "inactive", label: "Inactive only" },
+                  ],
+                },
+              ]
+            : []),
+        ]}
+      />
+
+      {/* Grid cards */}
+      {loading ? (
+        <Row className="g-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Col xs={12} md={6} lg={4} key={`sk-${i}`}>
+              <CompanyCardSkeleton />
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <>
+          <Row className="g-4">
+            {companies.map((c) => (
+              <Col xs={12} md={6} lg={4} key={c.id}>
+                <CompanyCard
+                  company={c}
+                  isFavorite={favorites.includes(c.id)}
+                  onToggleFavorite={() => toggleFavorite(c.id)}
+                  onClick={() => navigate(`/companies/${c.id}`)}
+                  showDescription
+                  showStatusBadges
+                  imgHeight={200}
+                />
+              </Col>
+            ))}
+            {!companies.length && (
+              <Col xs={12} className="text-center text-muted py-5">
+                No companies found.
+              </Col>
+            )}
+          </Row>
+
+          {/* Pagination */}
+          <div className="mt-4">
+            <PaginationBar
+              page={page}
+              size={size}
+              totalItems={totalItems}
+              totalPages={totalPages}
+              onPageChange={(p) => setPage(p)}
+              onSizeChange={(s) => {
+                setSize(s);
+                setPage(1);
+              }}
+              sizeOptions={[6, 12, 24, 48]}
+            />
+          </div>
+        </>
+      )}
+    </Container>
+  );
 }
