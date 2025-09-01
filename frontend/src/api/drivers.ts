@@ -49,11 +49,11 @@ export async function getDriverWallet(userId: string) {
 }
 
 export async function topupDriverWallet(
-  userId: string,
-  payload: { amountCents: number; idempotencyKey?: string }
+    userId: string,
+    payload: { amountCents: number; idempotencyKey?: string }
 ) {
-  const res = await api.post(`/api/drivers/${userId}/wallet/topup`, payload);
-  return res.data.data;
+    const res = await api.post(`/api/drivers/${userId}/wallet/topup`, payload);
+    return res.data.data;
 }
 
 export async function withdrawFromDriverWallet(
@@ -67,7 +67,6 @@ export async function withdrawFromDriverWallet(
     return res.data.data;
 }
 
-
 export async function listDriverTransactions(
     userId: string,
     params: Record<string, any> = {}
@@ -77,7 +76,6 @@ export async function listDriverTransactions(
     });
     return res.data.data as PageResult<Transaction>;
 }
-
 
 /* Companies & Applications (perspective: driver) */
 export async function listCompaniesForDriver(
@@ -93,14 +91,14 @@ export async function applyToCompanyAsDriver(
     payload: { companyId: string; expiresAt?: string }
 ) {
     const res = await api.post(`/api/drivers/${userId}/applications`, payload);
-    console.log('applyToCompanyAsDriver', res);
-    
     return res.data.data as JobApplication;
 }
 
 export async function cancelApplication(userId: string, applicationId: string) {
-  const res = await api.post(`/api/drivers/${userId}/applications/${applicationId}/cancel`);
-  return res.data.data;
+    const res = await api.delete(
+        `/api/drivers/${userId}/applications/${applicationId}`
+    );
+    return res.data.data;
 }
 
 export async function listDriverApplications(

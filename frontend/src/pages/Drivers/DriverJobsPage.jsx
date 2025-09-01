@@ -1,311 +1,9 @@
-// import { useEffect, useRef, useState } from "react";
-// import { Row, Col, Spinner } from "react-bootstrap";
-// import { toast } from "react-toastify";
-// import { useAuth } from "../../context/AuthContext";
-
-// import { listCompanies, listCompanyServicesPublic } from "../../api/companies";
-// import {
-//     applyToCompanyAsDriver,
-//     getMyDriverProfile,
-//     listDriverApplications,
-// } from "../../api/drivers";
-
-// import ConfirmModal from "../../components/common/ConfirmModal";
-// import PaginationBar from "../../components/common/PaginationBar";
-// import FilterBar from "../../components/common/FilterBar";
-// import CompanyCardForDriver from "../../components/driver/CompanyCardForDriver";
-
-// export default function DriverJobPage() {
-//     // <-- tên component khớp file
-//     const { profile } = useAuth();
-//     const [driverUserId, setDriverUserId] = useState(profile?.id || null);
-
-//     const [companies, setCompanies] = useState([]);
-//     const [loading, setLoading] = useState(true);
-//     const [pageInfo, setPageInfo] = useState({
-//         page: 1,
-//         size: 9,
-//         totalPages: 1,
-//         totalItems: 0,
-//     });
-
-//     // filters
-//     const [q, setQ] = useState("");
-//     const [minRating, setMinRating] = useState("");
-//     const [membership, setMembership] = useState("");
-//     const [sort, setSort] = useState("rating:desc");
-
-//     // services cache per company
-//     const [expanded, setExpanded] = useState({});
-//     const [servicesCache, setServicesCache] = useState({});
-//     const [loadingServices, setLoadingServices] = useState({});
-
-//     // apply state
-//     const [confirmOpen, setConfirmOpen] = useState(false);
-//     const [applyingCompany, setApplyingCompany] = useState(null);
-//     const [appliedIds, setAppliedIds] = useState(new Set()); // đánh dấu đã apply
-
-//     const debounced = useRef(null);
-
-//     // 1) ensure driver id
-//     useEffect(() => {
-//         if (!driverUserId) {
-//             (async () => {
-//                 try {
-//                     const me = await getMyDriverProfile();
-//                     setDriverUserId(me.userId);
-//                 } catch {
-//                     // user có thể chưa là driver
-//                 }
-//             })();
-//         }
-//     }, [driverUserId]);
-
-//     // 2) load applications -> appliedIds (giữ trạng thái sau refresh)
-//     useEffect(() => {
-//         const loadApplications = async () => {
-//             if (!driverUserId) return;
-//             try {
-//                 const res = await listDriverApplications(driverUserId, {
-//                     page: 1,
-//                     size: 200,
-//                     status: "Applied",
-//                 });
-
-//                 console.log("applied:", res);
-
-//                 const setIds = new Set(
-//                     (res.items || []).map((a) => a.companyId)
-//                 );
-//                 setAppliedIds(setIds);
-//             } catch (e) {
-//                 // không critical, có thể bỏ qua
-//             }
-//         };
-//         loadApplications();
-//     }, [driverUserId]);
-
-//     const fetchCompanies = async (page = 1, size = pageInfo.size) => {
-//         setLoading(true);
-//         try {
-//             const params = {
-//                 page,
-//                 size,
-//                 sort,
-//                 name: q || undefined,
-//                 membership: membership || undefined,
-//                 minRating: minRating ? Number(minRating) : undefined,
-//                 isActive: true,
-//             };
-//             const res = await listCompanies(params);
-//             setCompanies(res.items || []);
-//             setPageInfo({
-//                 page: res.page,
-//                 size: res.size,
-//                 totalPages: res.totalPages,
-//                 totalItems: res.totalItems,
-//             });
-//         } catch (e) {
-//             toast.error(e.message || "Failed to fetch companies"); // fixed typo
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     // initial
-//     useEffect(() => {
-//         fetchCompanies(1);
-//         // eslint-disable-next-line react-hooks/exhaustive-deps
-//     }, []);
-
-//     // debounce filters
-//     useEffect(() => {
-//         if (debounced.current) clearTimeout(debounced.current);
-//         debounced.current = setTimeout(() => {
-//             fetchCompanies(1);
-//         }, 400);
-//         return () => clearTimeout(debounced.current);
-//         // eslint-disable-next-line react-hooks/exhaustive-deps
-//     }, [q, minRating, membership, sort]);
-
-//     const onToggleServices = async (cid) => {
-//         setExpanded((s) => ({ ...s, [cid]: !s[cid] }));
-//         if (!servicesCache[cid]) {
-//             try {
-//                 setLoadingServices((ls) => ({ ...ls, [cid]: true }));
-//                 const res = await listCompanyServicesPublic(cid, {
-//                     isActive: true,
-//                     page: 1,
-//                     size: 6,
-//                     sort: "updatedAt:desc",
-//                 });
-//                 setServicesCache((c) => ({ ...c, [cid]: res.items || [] }));
-//             } catch (e) {
-//                 toast.error(e.message || "Cannot load services");
-//             } finally {
-//                 setLoadingServices((ls) => ({ ...ls, [cid]: false }));
-//             }
-//         }
-//     };
-
-//     const openApply = (company) => {
-//         if (!driverUserId) {
-//             toast.error(
-//                 "Bạn cần đăng nhập bằng tài khoản Driver để ứng tuyển."
-//             );
-//             return;
-//         }
-//         setApplyingCompany(company);
-//         setConfirmOpen(true);
-//     };
-
-//     const doApply = async () => {
-//         if (!applyingCompany || !driverUserId) return;
-//         try {
-//             await applyToCompanyAsDriver(driverUserId, {
-//                 companyId: applyingCompany.id,
-//             });
-//             toast.success(`Đã ứng tuyển vào ${applyingCompany.name}`);
-//             setAppliedIds((prev) => {
-//                 const next = new Set(prev);
-//                 next.add(applyingCompany.id);
-//                 return next;
-//             });
-//         } catch (e) {
-//             // nếu BE trả DUPLICATE thì show message như hiện tại
-//             toast.error(e.message || "Apply failed");
-//         } finally {
-//             setApplyingCompany(null);
-//             setConfirmOpen(false);
-//         }
-//     };
-
-//     return (
-//         <div>
-//             <FilterBar
-//                 search={{
-//                     value: q,
-//                     onChange: setQ,
-//                     placeholder: "Search companies by name…",
-//                 }}
-//                 selects={[
-//                     {
-//                         value: membership,
-//                         onChange: setMembership,
-//                         style: { maxWidth: 180 },
-//                         options: [
-//                             { value: "", label: "All plans" },
-//                             { value: "Premium", label: "Premium" },
-//                             { value: "Basic", label: "Basic" },
-//                             { value: "Free", label: "Free" },
-//                         ],
-//                     },
-//                     {
-//                         value: minRating,
-//                         onChange: setMinRating,
-//                         style: { maxWidth: 160 },
-//                         options: [
-//                             { value: "", label: "Min rating" },
-//                             { value: "4.5", label: "≥ 4.5" },
-//                             { value: "4.0", label: "≥ 4.0" },
-//                             { value: "3.5", label: "≥ 3.5" },
-//                         ],
-//                     },
-//                     {
-//                         value: sort,
-//                         onChange: setSort,
-//                         style: { maxWidth: 200 },
-//                         options: [
-//                             { value: "rating:desc", label: "Rating ↓" },
-//                             { value: "rating:asc", label: "Rating ↑" },
-//                             { value: "name:asc", label: "Name ↑" },
-//                             { value: "name:desc", label: "Name ↓" },
-//                             { value: "membership:asc", label: "Membership ↑" },
-//                             { value: "membership:desc", label: "Membership ↓" },
-//                         ],
-//                     },
-//                 ]}
-//             />
-
-//             {loading ? (
-//                 <div className="py-5 text-center">
-//                     <Spinner animation="border" />
-//                 </div>
-//             ) : companies.length === 0 ? (
-//                 <div className="text-center py-5 text-muted">
-//                     Không có công ty nào phù hợp.
-//                 </div>
-//             ) : (
-//                 <>
-//                     <Row className="g-3">
-//                         {companies.map((c) => (
-//                             <Col xs={12} sm={6} lg={4} key={c.id}>
-//                                 <CompanyCardForDriver
-//                                     company={c}
-//                                     isExpanded={!!expanded[c.id]}
-//                                     onToggleServices={onToggleServices}
-//                                     services={servicesCache[c.id] || []}
-//                                     loadingServices={!!loadingServices[c.id]}
-//                                     onApply={openApply}
-//                                     isApplied={appliedIds.has(c.id)} // <-- giữ trạng thái sau refresh
-//                                 />
-//                             </Col>
-//                         ))}
-//                     </Row>
-
-//                     <div className="mt-3">
-//                         <PaginationBar
-//                             page={pageInfo.page}
-//                             size={pageInfo.size}
-//                             totalItems={pageInfo.totalItems}
-//                             totalPages={pageInfo.totalPages}
-//                             onPageChange={(p) =>
-//                                 fetchCompanies(p, pageInfo.size)
-//                             }
-//                             onSizeChange={(s) => fetchCompanies(1, s)}
-//                         />
-//                     </div>
-//                 </>
-//             )}
-
-//             <ConfirmModal
-//                 show={confirmOpen}
-//                 onHide={() => {
-//                     setConfirmOpen(false);
-//                     setApplyingCompany(null);
-//                 }}
-//                 title="Apply to Company"
-//                 message={
-//                     applyingCompany ? (
-//                         <div>
-//                             Ứng tuyển vào{" "}
-//                             <strong>{applyingCompany.name}</strong>?<br />
-//                             Nhà tuyển dụng sẽ xem hồ sơ và liên hệ bạn.
-//                         </div>
-//                     ) : (
-//                         "Apply?"
-//                     )
-//                 }
-//                 confirmText="Apply"
-//                 variant="primary"
-//                 onConfirm={doApply}
-//             />
-
-            
-//         </div>
-//     );
-// }
-
-
 import { useEffect, useRef, useState } from "react";
 import { Row, Col, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 
-import {
-    listCompanies,
-    listCompanyServicesPublic,
-} from "../../api/companies";
+import { listCompanies, listCompanyServicesPublic } from "../../api/companies";
 import {
     applyToCompanyAsDriver,
     getMyDriverProfile,
@@ -378,6 +76,9 @@ export default function DriverJobsPage() {
                     size: 200,
                     status: "Applied",
                 });
+
+                console.log("applied", res);
+
                 const ids = new Set();
                 const map = {};
                 (res.items || []).forEach((a) => {
@@ -458,7 +159,9 @@ export default function DriverJobsPage() {
 
     const openApply = (company) => {
         if (!driverUserId) {
-            toast.error("Bạn cần đăng nhập bằng tài khoản Driver để ứng tuyển.");
+            toast.error(
+                "Bạn cần đăng nhập bằng tài khoản Driver để ứng tuyển."
+            );
             return;
         }
         setApplyingCompany(company);
@@ -471,6 +174,8 @@ export default function DriverJobsPage() {
             const res = await applyToCompanyAsDriver(driverUserId, {
                 companyId: applyingCompany.id,
             });
+            console.log("app", res);
+
             toast.success(`Đã ứng tuyển vào ${applyingCompany.name}`);
             setAppliedIds((prev) => {
                 const next = new Set(prev);
@@ -502,8 +207,9 @@ export default function DriverJobsPage() {
                 toast.error("Không tìm thấy application để huỷ");
                 return;
             }
-            await cancelApplication(driverUserId, appId);
+            await cancelApplication(driverUserId, appId); // <-- DELETE endpoint mới
             toast.success(`Đã huỷ ứng tuyển tại ${recallingCompany.name}`);
+
             setAppliedIds((prev) => {
                 const next = new Set(prev);
                 next.delete(recallingCompany.id);
@@ -607,7 +313,9 @@ export default function DriverJobsPage() {
                             size={pageInfo.size}
                             totalItems={pageInfo.totalItems}
                             totalPages={pageInfo.totalPages}
-                            onPageChange={(p) => fetchCompanies(p, pageInfo.size)}
+                            onPageChange={(p) =>
+                                fetchCompanies(p, pageInfo.size)
+                            }
                             onSizeChange={(s) => fetchCompanies(1, s)}
                         />
                     </div>
@@ -625,7 +333,8 @@ export default function DriverJobsPage() {
                 message={
                     applyingCompany ? (
                         <div>
-                            Ứng tuyển vào <strong>{applyingCompany.name}</strong>?<br />
+                            Ứng tuyển vào{" "}
+                            <strong>{applyingCompany.name}</strong>?<br />
                             Nhà tuyển dụng sẽ xem hồ sơ và liên hệ bạn.
                         </div>
                     ) : (
