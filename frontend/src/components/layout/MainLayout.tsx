@@ -1,16 +1,31 @@
-// import { useMemo, useState } from "react";
+// import { useEffect, useMemo, useRef, useState } from "react";
 // import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 // import {
-//   Navbar, Nav, Container, Button, Form, FormControl, NavDropdown, Image,
+//   Navbar,
+//   Nav,
+//   Container,
+//   Button,
+//   Form,
+//   FormControl,
+//   NavDropdown,
+//   Image,
 // } from "react-bootstrap";
 // import { RiMenu2Line } from "react-icons/ri";
 // import { toast } from "react-toastify";
 // import { useAuth } from "../../context/AuthContext";
 // import SideBar from "./SideBar";
-// import { PUBLIC_ROUTES, type RouteItem, type Role, buildNavLinks } from "../../routes/routes";
-// import SubNav from "./SubNav"; 
+// import SubNav from "./SubNav";
+// import {
+//   PUBLIC_ROUTES,
+//   buildNavLinks,
+//   ROLE_ROUTES,
+//   type Role,
+//   type RouteItem,
+// } from "../../routes/routes";
 
 // type LinkItem = { to: string; label: string; end?: boolean };
+
+// const NAVBAR_HEIGHT = 56; // px
 
 // export default function MainLayout() {
 //   const { profile, isAuthenticated, logout } = useAuth();
@@ -19,7 +34,22 @@
 //   const navigate = useNavigate();
 //   const location = useLocation();
 
-//   // public links trên thanh chính
+//   // đo chiều cao thực của SubNav (phòng khi responsive thay đổi)
+//   const subnavRef = useRef<HTMLDivElement | null>(null);
+//   const [subnavHeight, setSubnavHeight] = useState(44); // default ước lượng
+
+//   useEffect(() => {
+//     const measure = () => {
+//       if (subnavRef.current) {
+//         const h = subnavRef.current.getBoundingClientRect().height || 0;
+//         setSubnavHeight(Math.round(h));
+//       }
+//     };
+//     measure();
+//     window.addEventListener("resize", measure);
+//     return () => window.removeEventListener("resize", measure);
+//   }, [location.pathname]); // đo lại khi đổi route (SubNav có thể khác)
+
 //   const links: LinkItem[] = useMemo(
 //     () =>
 //       PUBLIC_ROUTES.filter((r) => !!r.label).map((r: RouteItem) => ({
@@ -30,50 +60,83 @@
 //     []
 //   );
 
-// // sub links theo role cho thanh dưới
-// const subLinks = useMemo(
-//   () => buildNavLinks((profile?.role as Role) ?? "Rider"),
-//   [profile?.role]
-// );
+//   const role = (profile?.role as Role) ?? ("Rider" as Role);
+//   const roleBase = ROLE_ROUTES[role]?.base ?? "/";
+//   const showSubNav =
+//     (location.pathname === roleBase ||
+//       location.pathname.startsWith(roleBase + "/")) &&
+//     ["Admin", "Company", "Driver"].includes(role);
 
-//   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-//     setSearchTerm(e.target.value);
-
-//   const handleKeyPress = (e: React.KeyboardEvent) => {
-//     if (e.key === "Enter" && searchTerm.trim() !== "") navigate("/");
-//   };
-
-//   const toggleSidebar = () => setShowSidebar((prev) => !prev);
+//   const subLinks = useMemo(() => buildNavLinks(role), [role]);
 
 //   const DASH_BY_ROLE: Record<Role | "Guest" | undefined, string> = {
-//     Admin: "/admin", Company: "/company", Driver: "/driver", Rider: "/", Guest: "/", undefined: "/",
+//     Admin: "/admin",
+//     Company: "/company",
+//     Driver: "/driver",
+//     Rider: "/",
+//     Guest: "/",
+//     undefined: "/",
 //   };
 //   const dashboardTo = DASH_BY_ROLE[(profile?.role as Role) ?? "Guest"];
 
+//   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+//     setSearchTerm(e.target.value);
+//   const handleKeyPress = (e: React.KeyboardEvent) => {
+//     if (e.key === "Enter" && searchTerm.trim() !== "") navigate("/");
+//   };
+//   const toggleSidebar = () => setShowSidebar((prev) => !prev);
+
 //   const onClickNav = (to: string, e?: React.MouseEvent) => {
 //     if (to === "/advertise") {
-//       if (!isAuthenticated) { e?.preventDefault(); navigate("/login", { state: { from: location } }); return; }
-//       if (profile?.role !== "Company") { e?.preventDefault(); toast.error("Only companies can access Advertise"); return; }
+//       if (!isAuthenticated) {
+//         e?.preventDefault();
+//         navigate("/login", { state: { from: location } });
+//         return;
+//       }
+//       if (profile?.role !== "Company") {
+//         e?.preventDefault();
+//         toast.error("Only companies can access Advertise");
+//         return;
+//       }
 //     }
 //   };
 
 //   return (
 //     <>
+//       {/* MAIN NAV - fixed top */}
 //       <header>
-//         {/* MAIN NAV */}
-//         <Navbar bg="light" className="shadow-sm" expand="md">
+//         <Navbar
+//           bg="light"
+//           className="shadow-sm"
+//           expand="md"
+//           fixed="top" // <-- fixed
+//         >
 //           <Container className="d-flex justify-content-between align-items-center">
 //             <div className="d-flex align-items-center gap-3">
-//               <RiMenu2Line className="fs-3 d-md-none text-danger" onClick={toggleSidebar} style={{ cursor: "pointer" }} />
+//               <RiMenu2Line
+//                 className="fs-3 d-md-none text-danger"
+//                 onClick={toggleSidebar}
+//                 style={{ cursor: "pointer" }}
+//               />
 //               <Navbar.Brand as={NavLink} to="/" className="d-none d-md-block">
-//                 <img src="https://cdn.xanhsm.com/2023/08/1d8dda9d-xe-premium-06-2025-2048x1365.png" alt="AutoBid" height={50} />
+//                 <img
+//                   src="https://cdn.xanhsm.com/2023/08/1d8dda9d-xe-premium-06-2025-2048x1365.png"
+//                   alt="AutoBid"
+//                   height={50}
+//                 />
 //               </Navbar.Brand>
 //               <div className="d-none d-md-flex">
 //                 {links.map(({ to, label, end }) => (
 //                   <NavLink
-//                     key={to} to={to} end={end}
+//                     key={to}
+//                     to={to}
+//                     end={end}
 //                     onClick={(e) => onClickNav(to, e)}
-//                     className={({ isActive }) => `nav-link d-flex align-items-center m-2 ${isActive ? "text-primary fw-bold" : "text-muted"}`}
+//                     className={({ isActive }) =>
+//                       `nav-link d-flex align-items-center m-2 ${
+//                         isActive ? "text-primary fw-bold" : "text-muted"
+//                       }`
+//                     }
 //                   >
 //                     {label}
 //                   </NavLink>
@@ -82,11 +145,21 @@
 //             </div>
 
 //             <Navbar.Brand as={NavLink} to="/" className="mx-auto d-md-none">
-//               <img src="https://cdn.xanhsm.com/2023/08/1d8dda9d-xe-premium-06-2025-2048x1365.png" alt="AutoBid" height={30} />
+//               <img
+//                 src="https://cdn.xanhsm.com/2023/08/1d8dda9d-xe-premium-06-2025-2048x1365.png"
+//                 alt="AutoBid"
+//                 height={30}
+//               />
 //             </Navbar.Brand>
 
 //             <Form className="d-none d-md-flex w-50 mx-auto" onKeyPress={handleKeyPress}>
-//               <FormControl type="search" placeholder="Search taxi companies (ex. Xanh SM)" className="me-2" value={searchTerm} onChange={handleSearchChange} />
+//               <FormControl
+//                 type="search"
+//                 placeholder="Search taxi companies (ex. Xanh SM)"
+//                 className="me-2"
+//                 value={searchTerm}
+//                 onChange={handleSearchChange}
+//               />
 //             </Form>
 
 //             {isAuthenticated ? (
@@ -97,8 +170,13 @@
 //                     align="end"
 //                     title={
 //                       <Image
-//                         src={(profile as any)?.imgUrl || "https://png.pngtree.com/png-clipart/20240705/original/pngtree-web-programmer-avatar-png-image_15495270.png"}
-//                         roundedCircle height={30} width={30}
+//                         src={
+//                           (profile as any)?.imgUrl ||
+//                           "https://png.pngtree.com/png-clipart/20240705/original/pngtree-web-programmer-avatar-png-image_15495270.png"
+//                         }
+//                         roundedCircle
+//                         height={30}
+//                         width={30}
 //                       />
 //                     }
 //                     id="user-dropdown"
@@ -111,7 +189,10 @@
 //                       <i className="bi bi-clipboard-data-fill me-2" />
 //                       Dashboard
 //                     </NavDropdown.Item>
-//                     <NavDropdown.Item as={NavLink} to={`/${(profile as any)?.role?.toLowerCase?.()}/profile`}>
+//                     <NavDropdown.Item
+//                       as={NavLink}
+//                       to={`/${(profile as any)?.role?.toLowerCase?.()}/profile`}
+//                     >
 //                       <i className="bi bi-heart-fill me-2 text-danger" />
 //                       Profile
 //                     </NavDropdown.Item>
@@ -124,19 +205,42 @@
 //               </div>
 //             ) : (
 //               <Button variant="success" size="sm" as={NavLink} to="/login">
-//                 <i className="bi bi-box-arrow-left me-2"></i> Login
+//                 <i className="bi bi-box-arrow-left me-2"></i>
+//                 Login
 //               </Button>
 //             )}
 //           </Container>
 //         </Navbar>
-
-//       {/* SUB NAV (role-based) */}
-//       {subLinks.length > 0 && <SubNav links={subLinks} />}
 //       </header>
 
-//       {/* SideBar for mobile (public links) */}
-//       <SideBar show={showSidebar} handleClose={() => setShowSidebar(false)} links={links} />
+//       {/* Spacer dưới Navbar: ngăn che nội dung */}
+//       <div style={{ height: NAVBAR_HEIGHT }} />
 
+//       {/* SUB NAV - sticky ngay dưới MainNav */}
+//       {showSubNav && (
+//         <>
+//           <div
+//             ref={subnavRef}
+//             className="sticky-top bg-white border-bottom"
+//             style={{ top: NAVBAR_HEIGHT, zIndex: 1020 }}
+//           >
+//             <SubNav links={subLinks} role={role} />
+//           </div>
+
+//           {/* Spacer dưới SubNav: để Outlet không bị che khi ở top.
+//               Khi cuộn, SubNav sẽ overlay nội dung (đúng mong muốn). */}
+//           <div style={{ height: subnavHeight }} />
+//         </>
+//       )}
+
+//       {/* SideBar for mobile */}
+//       <SideBar
+//         show={showSidebar}
+//         handleClose={() => setShowSidebar(false)}
+//         links={links}
+//       />
+
+//       {/* Content */}
 //       <main className="container py-3">
 //         <Outlet />
 //       </main>
@@ -145,7 +249,8 @@
 // }
 
 
-import { useMemo, useState } from "react";
+// src/components/layout/MainLayout.tsx
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Navbar,
@@ -164,13 +269,15 @@ import SideBar from "./SideBar";
 import SubNav from "./SubNav";
 import {
   PUBLIC_ROUTES,
-  ROLE_ROUTES,
   buildNavLinks,
-  type RouteItem,
+  ROLE_ROUTES,
   type Role,
+  type RouteItem,
 } from "../../routes/routes";
 
 type LinkItem = { to: string; label: string; end?: boolean };
+
+const NAVBAR_HEIGHT = 80;
 
 export default function MainLayout() {
   const { profile, isAuthenticated, logout } = useAuth();
@@ -179,7 +286,22 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Main nav (public) links
+  // đo chiều cao thực của SubNav (phòng khi responsive thay đổi)
+  const subnavRef = useRef<HTMLDivElement | null>(null);
+  const [subnavHeight, setSubnavHeight] = useState(44); // default ước lượng
+
+  useEffect(() => {
+    const measure = () => {
+      if (subnavRef.current) {
+        const h = subnavRef.current.getBoundingClientRect().height || 0;
+        setSubnavHeight(Math.round(h));
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [location.pathname]); // đo lại khi đổi route (SubNav có thể khác)
+
   const links: LinkItem[] = useMemo(
     () =>
       PUBLIC_ROUTES.filter((r) => !!r.label).map((r: RouteItem) => ({
@@ -190,16 +312,14 @@ export default function MainLayout() {
     []
   );
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchTerm(e.target.value);
+  const role = (profile?.role as Role) ?? ("Rider" as Role);
+  const roleBase = ROLE_ROUTES[role]?.base ?? "/";
+  const showSubNav =
+    (location.pathname === roleBase ||
+      location.pathname.startsWith(roleBase + "/")) &&
+    ["Admin", "Company", "Driver"].includes(role);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && searchTerm.trim() !== "") {
-      navigate("/");
-    }
-  };
-
-  const toggleSidebar = () => setShowSidebar((prev) => !prev);
+  const subLinks = useMemo(() => buildNavLinks(role), [role]);
 
   const DASH_BY_ROLE: Record<Role | "Guest" | undefined, string> = {
     Admin: "/admin",
@@ -209,11 +329,16 @@ export default function MainLayout() {
     Guest: "/",
     undefined: "/",
   };
-  const role = (profile?.role as Role) ?? "Rider";
   const dashboardTo = DASH_BY_ROLE[(profile?.role as Role) ?? "Guest"];
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchTerm(e.target.value);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && searchTerm.trim() !== "") navigate("/");
+  };
+  const toggleSidebar = () => setShowSidebar((prev) => !prev);
+
   const onClickNav = (to: string, e?: React.MouseEvent) => {
-    // Guard cho /advertise
     if (to === "/advertise") {
       if (!isAuthenticated) {
         e?.preventDefault();
@@ -228,33 +353,23 @@ export default function MainLayout() {
     }
   };
 
-  // ========== SubNav visibility ==========
-  const roleBase = ROLE_ROUTES[role]?.base ?? "/";
-  const showSubNav = useMemo(() => {
-    // Chỉ hiển thị nếu path bắt đầu bằng base của role hiện tại
-    if (!roleBase || roleBase === "/") return false;
-    const path = location.pathname.toLowerCase();
-    const base = roleBase.toLowerCase().replace(/\/+$/, "");
-    return path === base || path.startsWith(base + "/");
-  }, [location.pathname, roleBase]);
-
-  const subLinks = useMemo(() => (showSubNav ? buildNavLinks(role) : []), [showSubNav, role]);
-
   return (
     <>
+      {/* MAIN NAV - fixed top */}
       <header>
-        <Navbar bg="light" className="shadow-sm" expand="md">
+        <Navbar
+          bg="light"
+          className="shadow-sm"
+          expand="md"
+          fixed="top" // <-- fixed
+        >
           <Container className="d-flex justify-content-between align-items-center">
-            {/* Left: menu + brand */}
             <div className="d-flex align-items-center gap-3">
-              {/* Menu icon (mobile) */}
               <RiMenu2Line
                 className="fs-3 d-md-none text-danger"
                 onClick={toggleSidebar}
                 style={{ cursor: "pointer" }}
               />
-
-              {/* Brand (hidden on mobile) */}
               <Navbar.Brand as={NavLink} to="/" className="d-none d-md-block">
                 <img
                   src="https://cdn.xanhsm.com/2023/08/1d8dda9d-xe-premium-06-2025-2048x1365.png"
@@ -262,8 +377,6 @@ export default function MainLayout() {
                   height={50}
                 />
               </Navbar.Brand>
-
-              {/* Links (hidden on mobile) */}
               <div className="d-none d-md-flex">
                 {links.map(({ to, label, end }) => (
                   <NavLink
@@ -283,7 +396,6 @@ export default function MainLayout() {
               </div>
             </div>
 
-            {/* Center brand on mobile */}
             <Navbar.Brand as={NavLink} to="/" className="mx-auto d-md-none">
               <img
                 src="https://cdn.xanhsm.com/2023/08/1d8dda9d-xe-premium-06-2025-2048x1365.png"
@@ -292,7 +404,6 @@ export default function MainLayout() {
               />
             </Navbar.Brand>
 
-            {/* Search (desktop only) */}
             <Form className="d-none d-md-flex w-50 mx-auto" onKeyPress={handleKeyPress}>
               <FormControl
                 type="search"
@@ -303,7 +414,6 @@ export default function MainLayout() {
               />
             </Form>
 
-            {/* User controls (desktop only) */}
             {isAuthenticated ? (
               <div className="d-none d-md-flex align-items-center gap-3">
                 <i className="bi bi-bell-fill fs-5 text-muted" />
@@ -353,10 +463,27 @@ export default function MainLayout() {
             )}
           </Container>
         </Navbar>
-
-        {/* SubNav chỉ hiện khi ở trong base của role hiện tại */}
-        {showSubNav && <SubNav links={subLinks} role={role} />}
       </header>
+
+      {/* Spacer dưới Navbar: ngăn che nội dung */}
+      <div style={{ height: NAVBAR_HEIGHT }} />
+
+      {/* SUB NAV - sticky ngay dưới MainNav */}
+      {showSubNav && (
+        <>
+          <div
+            ref={subnavRef}
+            className="sticky-top bg-white border-bottom"
+            style={{ top: NAVBAR_HEIGHT, zIndex: 1020 }}
+          >
+            <SubNav links={subLinks} role={role} />
+          </div>
+
+          {/* Spacer dưới SubNav: để Outlet không bị che khi ở top.
+              Khi cuộn, SubNav sẽ overlay nội dung (đúng mong muốn). */}
+          <div style={{ height: subnavHeight }} />
+        </>
+      )}
 
       {/* SideBar for mobile */}
       <SideBar
@@ -365,6 +492,7 @@ export default function MainLayout() {
         links={links}
       />
 
+      {/* Content */}
       <main className="container py-3">
         <Outlet />
       </main>

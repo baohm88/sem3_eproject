@@ -9,11 +9,6 @@ import type {
     JobApplication,
 } from "./types";
 
-export async function getCompanyWallet(companyId: string): Promise<Wallet> {
-    const res = await api.get(`/api/companies/${companyId}/wallet`);
-    return res.data.data as Wallet;
-}
-
 export async function listCompanyTransactions(
     companyId: string,
     params: Record<string, any> = {}
@@ -143,6 +138,12 @@ export async function completeOrder(orderId: string) {
     return res.data.data;
 }
 
+// COMPANY WALLET
+export async function getCompanyWallet(companyId: string): Promise<Wallet> {
+    const res = await api.get(`/api/companies/${companyId}/wallet`);
+    return res.data.data as Wallet;
+}
+
 export async function topupCompanyWallet(
     companyId: string,
     payload: { amountCents: number; idempotencyKey?: string }
@@ -152,6 +153,17 @@ export async function topupCompanyWallet(
         payload
     );
     return res.data.data; // có thể trả wallet hoặc receipt tuỳ backend
+}
+
+export async function withdrawCompanyWallet(
+    companyId: string,
+    payload: { amountCents: number; idempotencyKey?: string }
+) {
+    const res = await api.post(
+        `/api/companies/${companyId}/wallet/withdraw`,
+        payload
+    );
+    return res.data.data;
 }
 
 export async function addCompanyService(

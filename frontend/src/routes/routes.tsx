@@ -24,6 +24,7 @@ import DriverPayments from "../pages/Drivers/DriverPayments";
 import NotFoundPage from "../pages/NotFoundPage";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
 import DriverProfilePage from "../pages/Drivers/DriverProfilePage";
+import DriverJobsPage from "../pages/Drivers/DriverJobsPage";
 
 export type Role = "Admin" | "Company" | "Driver" | "Rider";
 
@@ -81,6 +82,7 @@ export const ROLE_ROUTES: RoleRoutes = {
     nav: [
       { path: "", label: "Dashboard", element: <DriverDashboard />, end: true },
       { path: "profile", label: "Profile", element: <DriverProfilePage /> },
+      // { path: "jobs", label: "Jobs", element: <DriverJobsPage /> },
       { path: "payments", label: "Payments", element: <DriverPayments /> },
     ],
     children: [],

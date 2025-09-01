@@ -1,25 +1,5 @@
 import { ListGroup, Badge } from "react-bootstrap";
 
-/**
- * TransactionList – danh sách giao dịch dùng chung (Company, Driver, Rider)
- *
- * Props:
- * - transactions: Array<{
- *     id: string
- *     createdAt: string | Date
- *     status: "Pending" | "Completed" | "Failed" | string
- *     type?: "Topup" | "PaySalary" | "PayMembership" | "OrderPayment" | "Refund" | string
- *     amountCents: number
- *     fromWalletId?: string | null
- *     toWalletId?: string | null
- *     metaJson?: string | object
- *   }>
- * - emptyText?: string
- * - limit?: number
- * - formatAmount?: (cents:number)=>string    // custom formatter (không gồm dấu +/-)
- * - onItemClick?: (tx)=>void
- * - perspectiveWalletId?: string             // ví “góc nhìn” để xác định chi/thu
- */
 export default function TransactionList({
   transactions = [],
   emptyText = "No transactions",

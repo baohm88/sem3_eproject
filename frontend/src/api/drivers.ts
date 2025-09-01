@@ -48,14 +48,12 @@ export async function getDriverWallet(userId: string) {
     return res.data.data as Wallet;
 }
 
-export async function listDriverTransactions(
-    userId: string,
-    params: Record<string, any> = {}
+export async function topupDriverWallet(
+  userId: string,
+  payload: { amountCents: number; idempotencyKey?: string }
 ) {
-    const res = await api.get(`/api/drivers/${userId}/transactions`, {
-        params,
-    });
-    return res.data.data as PageResult<Transaction>;
+  const res = await api.post(`/api/drivers/${userId}/wallet/topup`, payload);
+  return res.data.data;
 }
 
 export async function withdrawFromDriverWallet(
@@ -68,6 +66,18 @@ export async function withdrawFromDriverWallet(
     );
     return res.data.data;
 }
+
+
+export async function listDriverTransactions(
+    userId: string,
+    params: Record<string, any> = {}
+) {
+    const res = await api.get(`/api/drivers/${userId}/transactions`, {
+        params,
+    });
+    return res.data.data as PageResult<Transaction>;
+}
+
 
 /* Companies & Applications (perspective: driver) */
 export async function listCompaniesForDriver(

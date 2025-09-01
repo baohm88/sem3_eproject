@@ -53,3 +53,15 @@
 .subnav-scroll.at-end ~ ::after {
     opacity: 0;
 }
+
+/* COMPANY CARD */
+.company-card.hover-lift {
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.company-card.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 .5rem 1.25rem rgba(0,0,0,.08);
+}
+.company-card.hover-lift:hover .company-card__img {
+  transform: scale(1.03);
+}

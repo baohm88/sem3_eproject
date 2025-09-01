@@ -1,25 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-    Card,
-    Row,
-    Col,
-    Button,
-    Badge,
-    Image,
-    Spinner,
-    ListGroup,
-    ProgressBar,
-} from "react-bootstrap";
+import { Row, Col, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
 import {
     getMyCompany,
     updateMyCompany,
     getCompanyWallet,
     listCompanyTransactions,
+    topupCompanyWallet,
+    withdrawCompanyWallet,
 } from "../../api/companies";
-import TopUpModal from "../../components/company/TopUpModal";
+
+import CompanyIdentity from "../../components/company/CompanyIdentity";
 import EditProfileModal from "../../components/common/EditProfileModal";
-import TransactionList from "../../components/common/TransactionList";
+import WalletBalance from "../../components/common/WalletBalance";
+import RecentTransactions from "../../components/common/RecentTransactions";
+import TopUpModal from "../../components/common/TopUpModal";
+import WithdrawModal from "../../components/common/WithdrawModal";
 
 export default function CompanyProfilePage() {
     const [loading, setLoading] = useState(true);
@@ -28,6 +24,7 @@ export default function CompanyProfilePage() {
     const [txs, setTxs] = useState([]);
     const [showEdit, setShowEdit] = useState(false);
     const [showTopUp, setShowTopUp] = useState(false);
+    const [showWithdraw, setShowWithdraw] = useState(false);
 
     const dashboardPath = useMemo(() => "/company", []);
     const placeholderLogo =
@@ -38,14 +35,34 @@ export default function CompanyProfilePage() {
             const w = await getCompanyWallet(cid);
             setWallet(w);
             const tRes = await listCompanyTransactions(cid, {
-                size: 3,
+                size: 5,
                 page: 1,
             });
             setTxs(tRes.items || []);
-        } catch {
-            // optional
+        } catch (e) {
+            // có thể hiện toast nếu muốn
         }
     };
+
+    const editFields = [
+        {
+            name: "name",
+            label: "Name",
+            placeholder: "Company name",
+        },
+        {
+            name: "description",
+            label: "Description",
+            as: "textarea",
+            rows: 3,
+            placeholder: "What does your company do?",
+        },
+        {
+            name: "imgUrl",
+            label: "Logo URL",
+            placeholder: "https://...",
+        },
+    ];
 
     const refresh = async () => {
         setLoading(true);
@@ -54,7 +71,7 @@ export default function CompanyProfilePage() {
             setCompany(c);
             await refreshWalletAndTx(c.id);
         } catch (e) {
-            toast.error(e.message || "Cannot load company");
+            toast.error(e?.message || "Cannot load company");
         } finally {
             setLoading(false);
         }
@@ -64,31 +81,25 @@ export default function CompanyProfilePage() {
         refresh();
     }, []);
 
-    const membershipBadge = (m, expires) => (
-        <Badge
-            bg={
-                m === "Premium"
-                    ? "success"
-                    : m === "Basic"
-                    ? "primary"
-                    : "secondary"
-            }
-        >
-            {m || "Free"}
-            {expires ? ` · exp ${new Date(expires).toLocaleDateString()}` : ""}
-        </Badge>
-    );
-
-    const onSave = async (payload) => {
+    const handleSaveProfile = async (payload) => {
         const updated = await updateMyCompany(payload);
         setCompany(updated);
-        toast.success("Updated company profile!");
     };
 
-    const centsToVnd = (c) =>
-        (Math.round(c) / 100).toLocaleString("vi-VN", {
-            maximumFractionDigits: 0,
+    // Handlers TopUp / Withdraw
+    const handleTopUpConfirm = async ({ amountCents, idempotencyKey }) => {
+        if (!company?.id) throw new Error("Missing company id");
+        await topupCompanyWallet(company.id, { amountCents, idempotencyKey });
+        await refreshWalletAndTx(company.id);
+    };
+
+    const handleWithdrawConfirm = async ({ amountCents, idempotencyKey }) => {
+        await withdrawCompanyWallet(company.id, {
+            amountCents,
+            idempotencyKey,
         });
+        await refreshWalletAndTx(company.id);
+    };
 
     if (loading) {
         return (
@@ -109,137 +120,35 @@ export default function CompanyProfilePage() {
     return (
         <>
             <Row className="gy-3 align-items-stretch mt-3">
-                {/* Left column – identity */}
+                {/* 1) CompanyIdentity */}
                 <Col xs={12} md={6} lg={5}>
-                    <Card className="shadow-sm">
-                        <Card.Body className="d-flex gap-3 align-items-center">
-                            <Image
-                                src={company.imgUrl || placeholderLogo}
-                                roundedCircle
-                                style={{
-                                    width: 96,
-                                    height: 96,
-                                    objectFit: "cover",
-                                }}
-                                alt="Logo"
-                            />
-                            <div className="flex-grow-1">
-                                <div className="d-flex flex-wrap align-items-center gap-2">
-                                    <h4 className="mb-0">
-                                        {company.name || "Unnamed Company"}
-                                    </h4>
-                                    {membershipBadge(
-                                        company.membership,
-                                        company.membershipExpiresAt
-                                    )}
-                                    {company.isActive ? (
-                                        <Badge bg="primary" className="border">
-                                            Active
-                                        </Badge>
-                                    ) : (
-                                        <Badge bg="secondary">Inactive</Badge>
-                                    )}
-                                </div>
-                                {company.description ? (
-                                    <div className="text-muted mt-2">
-                                        {company.description}
-                                    </div>
-                                ) : (
-                                    <div className="text-muted mt-2 fst-italic">
-                                        No description yet.
-                                    </div>
-                                )}
-                                <div className="mt-3 d-flex gap-2">
-                                    <Button
-                                        size="sm"
-                                        variant="primary"
-                                        onClick={() => setShowEdit(true)}
-                                    >
-                                        Edit profile
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="outline-secondary"
-                                        href={dashboardPath}
-                                    >
-                                        Go to dashboard
-                                    </Button>
-                                </div>
-                            </div>
-                        </Card.Body>
-                    </Card>
+                    <CompanyIdentity
+                        company={company}
+                        placeholderLogo={placeholderLogo}
+                        onEdit={() => setShowEdit(true)}
+                        dashboardPath={dashboardPath}
+                    />
                 </Col>
 
-                {/* Right column – wallet & stats */}
+                {/* 2) WalletBalance + 3) RecentTransactions */}
                 <Col xs={12} md={6} lg={7}>
                     <Row className="g-3">
                         <Col xs={12}>
-                            <Card className="shadow-sm">
-                                <Card.Body>
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div className="text-muted">
-                                                Wallet balance
-                                            </div>
-                                            <h3 className="mb-0">
-                                                {wallet
-                                                    ? centsToVnd(
-                                                          wallet.balanceCents
-                                                      )
-                                                    : "--"}{" "}
-                                                ₫
-                                            </h3>
-                                        </div>
-                                        <div className="d-flex gap-2">
-                                            <Button
-                                                size="sm"
-                                                variant="success"
-                                                onClick={() =>
-                                                    setShowTopUp(true)
-                                                }
-                                            >
-                                                Top up
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <div className="mt-3">
-                                        <ProgressBar
-                                            now={Math.min(
-                                                100,
-                                                ((wallet?.balanceCents ?? 0) /
-                                                    Math.max(
-                                                        1,
-                                                        wallet?.lowBalanceThreshold ??
-                                                            100000
-                                                    )) *
-                                                    100
-                                            )}
-                                        />
-                                        <div className="small text-muted mt-1">
-                                            Low balance threshold:{" "}
-                                            {wallet
-                                                ? centsToVnd(
-                                                      wallet.lowBalanceThreshold
-                                                  )
-                                                : "--"}{" "}
-                                            ₫
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Card>
+                            <WalletBalance
+                                balanceCents={wallet?.balanceCents}
+                                thresholdCents={wallet?.lowBalanceThreshold}
+                                currencyLabel="₫"
+                                onTopUp={() => setShowTopUp(true)}
+                                onWithdraw={() => setShowWithdraw(true)}
+                            />
                         </Col>
-
                         <Col xs={12}>
-                            <Card className="shadow-sm">
-                                <Card.Header className="bg-white">
-                                    <strong>Recent Transactions</strong>
-                                </Card.Header>
-                                <TransactionList
-                                    transactions={txs}
-                                    limit={5}
-                                    perspectiveWalletId={wallet?.id}
-                                />
-                            </Card>
+                            <RecentTransactions
+                                transactions={txs}
+                                limit={5}
+                                perspectiveWalletId={wallet?.id}
+                                title="Recent Transactions"
+                            />
                         </Col>
                     </Row>
                 </Col>
@@ -250,35 +159,25 @@ export default function CompanyProfilePage() {
                 show={showEdit}
                 onHide={() => setShowEdit(false)}
                 initial={company}
-                onSave={onSave}
+                onSave={handleSaveProfile}
                 title="Edit Company"
-                fields={[
-                    {
-                        name: "name",
-                        label: "Name",
-                        placeholder: "Company name",
-                    },
-                    {
-                        name: "description",
-                        label: "Description",
-                        as: "textarea",
-                        rows: 3,
-                        placeholder: "What does your company do?",
-                    },
-                    {
-                        name: "imgUrl",
-                        label: "Logo URL",
-                        placeholder: "https://...",
-                        helpText: "Leave blank to keep current.",
-                    },
-                ]}
+                fields={editFields}
             />
 
             <TopUpModal
                 show={showTopUp}
                 onHide={() => setShowTopUp(false)}
-                companyId={company.id}
-                onDone={() => refreshWalletAndTx(company.id)}
+                title="Top Up (Company)"
+                currencyLabel="VND"
+                onConfirm={handleTopUpConfirm}
+            />
+
+            <WithdrawModal
+                show={showWithdraw}
+                onHide={() => setShowWithdraw(false)}
+                title="Withdraw (Company)"
+                currencyLabel="VND"
+                onConfirm={handleWithdrawConfirm}
             />
         </>
     );
