@@ -54,8 +54,6 @@ export default function CompanyCardForDriver({
         </Badge>
     );
 
-    console.log(company);
-
     return (
         <Card className="h-100 shadow-sm">
             <Card.Body className="d-flex flex-column">
@@ -148,6 +146,15 @@ export default function CompanyCardForDriver({
                                 Reject
                             </Button>
                         </>
+                    ) : disabledActions ? (
+                        <Button
+                            size="sm"
+                            disabled
+                            variant={disabledActions ? "secondary" : "primary"}
+                            title="Bạn đã là tài xế của một công ty"
+                        >
+                            Apply
+                        </Button>
                     ) : isApplied ? (
                         <Button
                             size="sm"

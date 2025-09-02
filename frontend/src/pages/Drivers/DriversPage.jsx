@@ -4,10 +4,10 @@ import { toast } from "react-toastify";
 
 import { listDrivers } from "../../api/drivers";
 import {
-    getMyCompany,
-    inviteDriver,
-    listInvitations,
-    cancelInvitation,
+  getMyCompany,
+  inviteDriver,
+  listInvitations,
+  cancelInvitation,
 } from "../../api/companies";
 import { useAuth } from "../../context/AuthContext";
 
@@ -18,319 +18,287 @@ import InviteDriverModal from "../../components/driver/InviteDriverModal";
 import ConfirmModal from "../../components/common/ConfirmModal";
 
 export default function DriversPage() {
-    const { profile } = useAuth();
-    const isCompany = profile?.role === "Company";
+  const { profile } = useAuth();
+  const isCompany = profile?.role === "Company";
 
-    // data
-    const [drivers, setDrivers] = useState([]);
-    const [loading, setLoading] = useState(false);
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    // filters & sort (đồng bộ UI với CompaniesPage)
-    const [searchTerm, setSearchTerm] = useState("");
-    const [status, setStatus] = useState(""); // "", "available", "offline"
-    const [minRating, setMinRating] = useState(""); // "", "4.5", "4.0", ...
-    const [sort, setSort] = useState("rating:desc");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [status, setStatus] = useState(""); // "", "available", "offline"
+  const [minRating, setMinRating] = useState("");
+  const [sort, setSort] = useState("rating:desc");
 
-    // pagination (đồng bộ với CompaniesPage)
-    const [page, setPage] = useState(1);
-    const [size, setSize] = useState(12);
-    const [totalItems, setTotalItems] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+  // NEW: hide hired
+  const [hideHired, setHideHired] = useState(false);
 
-    // debounce search
-    const [debouncedName, setDebouncedName] = useState(searchTerm);
-    useEffect(() => {
-        const t = setTimeout(() => setDebouncedName(searchTerm), 300);
-        return () => clearTimeout(t);
-    }, [searchTerm]);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(12);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-    // company id + invited map
-    const [companyId, setCompanyId] = useState(null);
-    // invitedMap: { [driverUserId]: inviteId }
-    const [invitedMap, setInvitedMap] = useState({});
+  const [debouncedName, setDebouncedName] = useState(searchTerm);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedName(searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
-    // invite modal state
-    const [showInvite, setShowInvite] = useState(false);
-    const [selectedDriver, setSelectedDriver] = useState(null);
+  const [companyId, setCompanyId] = useState(null);
+  const [invitedMap, setInvitedMap] = useState({});
 
-    // recall modal state
-    const [showRecall, setShowRecall] = useState(false);
-    const [recallDriver, setRecallDriver] = useState(null);
+  const [showInvite, setShowInvite] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState(null);
 
-    // load company id
-    useEffect(() => {
-        let mounted = true;
-        (async () => {
-            if (!isCompany) return;
-            try {
-                const me = await getMyCompany();
-                if (mounted) setCompanyId(me.id);
-            } catch (e) {
-                console.error(e);
-                toast.error("Không lấy được thông tin company của bạn.");
-            }
-        })();
-        return () => (mounted = false);
-    }, [isCompany]);
+  const [showRecall, setShowRecall] = useState(false);
+  const [recallDriver, setRecallDriver] = useState(null);
 
-    // load invites (status Pending) => invitedMap
-    const loadInvited = async (cid) => {
-        if (!cid) return;
-        try {
-            // lấy rộng rồi lọc client-side (BE ListInvitations chưa hỗ trợ filter)
-            const res = await listInvitations(cid, { page: 1, size: 500 });
-            const map = {};
-            (res.items || [])
-                .filter((i) => i.status === "Pending")
-                .forEach((i) => {
-                    if (i.driverUserId) map[i.driverUserId] = i.id;
-                });
-            setInvitedMap(map);
-        } catch (e) {
-            console.error(e);
-            // không toast để tránh ồn ào
-        }
-    };
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (!isCompany) return;
+      try {
+        const me = await getMyCompany();
+        if (mounted) setCompanyId(me.id);
+      } catch (e) {
+        console.error(e);
+        toast.error("Không lấy được thông tin company của bạn.");
+      }
+    })();
+    return () => (mounted = false);
+  }, [isCompany]);
 
-    useEffect(() => {
-        if (companyId) loadInvited(companyId);
-    }, [companyId]);
+  const loadInvited = async (cid) => {
+    if (!cid) return;
+    try {
+      const res = await listInvitations(cid, { page: 1, size: 500 });
+      const map = {};
+      (res.items || [])
+        .filter((i) => i.status === "Pending")
+        .forEach((i) => {
+          if (i.driverUserId) map[i.driverUserId] = i.id;
+        });
+      setInvitedMap(map);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-    // fetch drivers
-    const fetchDrivers = async () => {
-        setLoading(true);
-        try {
-            const params = {
-                page,
-                size,
-                sort,
-                ...(debouncedName.trim() ? { name: debouncedName.trim() } : {}),
-                ...(status ? { isAvailable: status === "available" } : {}),
-                ...(minRating ? { minRating: Number(minRating) } : {}),
-            };
-            const res = await listDrivers(params);
-            setDrivers(res.items || []);
-            setTotalItems(res.totalItems || 0);
-            setTotalPages(res.totalPages || 0);
-        } catch (e) {
-            console.error(e);
-            toast.error("Tải danh sách tài xế thất bại.");
-        } finally {
-            setLoading(false);
-        }
-    };
+  useEffect(() => {
+    if (companyId) loadInvited(companyId);
+  }, [companyId]);
 
-    useEffect(() => {
-        fetchDrivers();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedName, status, minRating, sort, page, size]);
+  const fetchDrivers = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        page,
+        size,
+        sort,
+        ...(debouncedName.trim() ? { name: debouncedName.trim() } : {}),
+        ...(status ? { isAvailable: status === "available" } : {}),
+        ...(minRating ? { minRating: Number(minRating) } : {}),
+        ...(hideHired ? { excludeHired: true } : {}), // <— NEW
+      };
+      const res = await listDrivers(params);
+      setDrivers(res.items || []);
+      setTotalItems(res.totalItems || 0);
+      setTotalPages(res.totalPages || 0);
+    } catch (e) {
+      console.error(e);
+      toast.error("Tải danh sách tài xế thất bại.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const canInvite = isCompany && !!companyId;
+  useEffect(() => {
+    fetchDrivers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedName, status, minRating, sort, page, size, hideHired]); // <— nhớ thêm hideHired
 
-    // open invite
-    const handleInviteClick = (driver) => {
-        if (!canInvite) return;
-        setSelectedDriver(driver);
-        setShowInvite(true);
-    };
+  const canInvite = isCompany && !!companyId;
 
-    // send invite
-    const handleSendInvite = async ({
-        driverUserId,
-        baseSalaryCents,
-        expiresAt,
-    }) => {
-        try {
-            await inviteDriver(companyId, {
-                driverUserId,
-                baseSalaryCents,
-                expiresAt,
-            });
-            toast.success("Đã gửi lời mời.");
-            setInvitedMap((prev) => ({
-                ...prev,
-                [driverUserId]: "__just_Pending__",
-            })); // cập nhật ngay UI
-            // đồng bộ id thật bằng cách refetch invites (nhẹ nhàng)
-            loadInvited(companyId);
-        } catch (e) {
-            console.error(e);
-            toast.error(
-                e?.response?.data?.error?.message || "Gửi invite thất bại."
-            );
-        } finally {
-            setShowInvite(false);
-            setSelectedDriver(null);
-        }
-    };
+  const handleInviteClick = (driver) => {
+    if (!canInvite) return;
+    // an toàn thêm: chặn mời nếu đã hired
+    if (driver?.isHired) {
+      toast.info("Driver này đã thuộc về một công ty.");
+      return;
+    }
+    setSelectedDriver(driver);
+    setShowInvite(true);
+  };
 
-    // open recall
-    const handleRecallClick = (driver) => {
-        setRecallDriver(driver);
-        setShowRecall(true);
-    };
+  const handleSendInvite = async ({ driverUserId, baseSalaryCents, expiresAt }) => {
+    try {
+      await inviteDriver(companyId, { driverUserId, baseSalaryCents, expiresAt });
+      toast.success("Đã gửi lời mời.");
+      setInvitedMap((prev) => ({ ...prev, [driverUserId]: "__just_Pending__" }));
+      loadInvited(companyId);
+    } catch (e) {
+      console.error(e);
+      toast.error(e?.response?.data?.error?.message || "Gửi invite thất bại.");
+    } finally {
+      setShowInvite(false);
+      setSelectedDriver(null);
+    }
+  };
 
-    // recall (tạm thời: BE chưa có endpoint)
-    const doRecall = async () => {
-        try {
-            const res = await cancelInvitation(
-                companyId,
-                invitedMap[recallDriver.userId]
-            );
-            console.log("after cancel:", res);
+  const handleRecallClick = (driver) => {
+    setRecallDriver(driver);
+    setShowRecall(true);
+  };
 
-            setInvitedMap((prev) => {
-                const { [recallDriver.userId]: _, ...rest } = prev;
-                return rest;
-            });
-        } finally {
-            setShowRecall(false);
-            setRecallDriver(null);
-        }
-    };
+  const doRecall = async () => {
+    try {
+      const res = await cancelInvitation(companyId, invitedMap[recallDriver.userId]);
+      console.log("after cancel:", res);
+      setInvitedMap((prev) => {
+        const { [recallDriver.userId]: _, ...rest } = prev;
+        return rest;
+      });
+    } finally {
+      setShowRecall(false);
+      setRecallDriver(null);
+    }
+  };
 
-    console.log('DRIVER 1', drivers[0]);
-    
+  return (
+    <Container className="py-4">
+      <FilterBar
+        search={{
+          value: searchTerm,
+          onChange: (v) => {
+            setSearchTerm(v);
+            setPage(1);
+          },
+          placeholder: "Search drivers by name…",
+        }}
+        selects={[
+          {
+            value: status,
+            onChange: (v) => {
+              setStatus(v);
+              setPage(1);
+            },
+            style: { maxWidth: 180 },
+            options: [
+              { value: "", label: "All statuses" },
+              { value: "available", label: "Available" },
+              { value: "offline", label: "Offline" },
+            ],
+          },
+          {
+            // NEW: Hide hired
+            value: hideHired ? "hide" : "",
+            onChange: (v) => {
+              setHideHired(v === "hide");
+              setPage(1);
+            },
+            style: { maxWidth: 160 },
+            options: [
+              { value: "", label: "Hired: Show all" },
+              { value: "hide", label: "Hired: Hide" },
+            ],
+          },
+          {
+            value: minRating,
+            onChange: (v) => {
+              setMinRating(v);
+              setPage(1);
+            },
+            style: { maxWidth: 160 },
+            options: [
+              { value: "", label: "Min rating" },
+              { value: "4.5", label: "≥ 4.5" },
+              { value: "4.0", label: "≥ 4.0" },
+              { value: "3.5", label: "≥ 3.5" },
+              { value: "3.0", label: "≥ 3.0" },
+            ],
+          },
+          {
+            value: sort,
+            onChange: (v) => {
+              setSort(v);
+              setPage(1);
+            },
+            style: { maxWidth: 220 },
+            options: [
+              { value: "rating:desc", label: "Sort: Rating ↓" },
+              { value: "rating:asc", label: "Sort: Rating ↑" },
+              { value: "name:asc", label: "Sort: Name ↑" },
+              { value: "name:desc", label: "Sort: Name ↓" },
+            ],
+          },
+        ]}
+      />
 
-    return (
-        <Container className="py-4">
-            {/* FilterBar — cùng style với CompaniesPage */}
-            <FilterBar
-                search={{
-                    value: searchTerm,
-                    onChange: (v) => {
-                        setSearchTerm(v);
-                        setPage(1);
-                    },
-                    placeholder: "Search drivers by name…",
-                }}
-                selects={[
-                    {
-                        value: status,
-                        onChange: (v) => {
-                            setStatus(v);
-                            setPage(1);
-                        },
-                        style: { maxWidth: 180 },
-                        options: [
-                            { value: "", label: "All statuses" },
-                            { value: "available", label: "Available" },
-                            { value: "offline", label: "Offline" },
-                        ],
-                    },
-                    {
-                        value: minRating,
-                        onChange: (v) => {
-                            setMinRating(v);
-                            setPage(1);
-                        },
-                        style: { maxWidth: 160 },
-                        options: [
-                            { value: "", label: "Min rating" },
-                            { value: "4.5", label: "≥ 4.5" },
-                            { value: "4.0", label: "≥ 4.0" },
-                            { value: "3.5", label: "≥ 3.5" },
-                            { value: "3.0", label: "≥ 3.0" },
-                        ],
-                    },
-                    {
-                        value: sort,
-                        onChange: (v) => {
-                            setSort(v);
-                            setPage(1);
-                        },
-                        style: { maxWidth: 220 },
-                        options: [
-                            { value: "rating:desc", label: "Sort: Rating ↓" },
-                            { value: "rating:asc", label: "Sort: Rating ↑" },
-                            { value: "name:asc", label: "Sort: Name ↑" },
-                            { value: "name:desc", label: "Sort: Name ↓" },
-                        ],
-                    },
-                ]}
-            />
-
-            {/* Grid cards */}
-            {loading ? (
-                <div className="py-5 text-center">
-                    <Spinner animation="border" />
-                </div>
-            ) : (
-                <>
-                    <Row className="g-4 mt-1">
-                        {drivers.map((d) => (
-                            <Col xs={12} md={6} lg={4} key={d.id}>
-                                <DriverCard
-                                    driver={d}
-                                    isInvited={!!invitedMap[d.userId]}
-                                    onInvite={
-                                        canInvite
-                                            ? handleInviteClick
-                                            : undefined
-                                    }
-                                    onRecall={
-                                        canInvite
-                                            ? handleRecallClick
-                                            : undefined
-                                    }
-                                />
-                            </Col>
-                        ))}
-                        {!drivers.length && (
-                            <Col
-                                xs={12}
-                                className="text-center text-muted py-5"
-                            >
-                                No drivers found.
-                            </Col>
-                        )}
-                    </Row>
-
-                    {/* PaginationBar — giống CompaniesPage */}
-                    <div className="mt-4">
-                        <PaginationBar
-                            page={page}
-                            size={size}
-                            totalItems={totalItems}
-                            totalPages={totalPages}
-                            onPageChange={(p) => setPage(p)}
-                            onSizeChange={(s) => {
-                                setSize(s);
-                                setPage(1);
-                            }}
-                            sizeOptions={[6, 12, 24, 48]}
-                        />
-                    </div>
-                </>
+      {loading ? (
+        <div className="py-5 text-center">
+          <Spinner animation="border" />
+        </div>
+      ) : (
+        <>
+          <Row className="g-4 mt-1">
+            {drivers.map((d) => (
+              <Col xs={12} md={6} lg={4} key={d.id}>
+                <DriverCard
+                  driver={d}
+                  isInvited={!!invitedMap[d.userId]}
+                  onInvite={canInvite ? handleInviteClick : undefined}
+                  onRecall={canInvite ? handleRecallClick : undefined}
+                />
+              </Col>
+            ))}
+            {!drivers.length && (
+              <Col xs={12} className="text-center text-muted py-5">
+                No drivers found.
+              </Col>
             )}
+          </Row>
 
-            {/* Invite modal */}
-            <InviteDriverModal
-                show={showInvite}
-                onHide={() => setShowInvite(false)}
-                driver={selectedDriver}
-                onSubmit={handleSendInvite}
+          <div className="mt-4">
+            <PaginationBar
+              page={page}
+              size={size}
+              totalItems={totalItems}
+              totalPages={totalPages}
+              onPageChange={(p) => setPage(p)}
+              onSizeChange={(s) => {
+                setSize(s);
+                setPage(1);
+              }}
+              sizeOptions={[6, 12, 24, 48]}
             />
+          </div>
+        </>
+      )}
 
-            {/* Recall confirm */}
-            <ConfirmModal
-                show={showRecall}
-                onHide={() => setShowRecall(false)}
-                title="Recall Invitation"
-                message={
-                    recallDriver ? (
-                        <div>
-                            Bạn có chắc muốn <strong>thu hồi lời mời</strong> đã
-                            gửi cho <strong>{recallDriver.fullName}</strong>?
-                        </div>
-                    ) : (
-                        "Recall this invitation?"
-                    )
-                }
-                confirmText="Yes, recall"
-                variant="danger"
-                onConfirm={doRecall}
-            />
-        </Container>
-    );
+      <InviteDriverModal
+        show={showInvite}
+        onHide={() => setShowInvite(false)}
+        driver={selectedDriver}
+        onSubmit={handleSendInvite}
+      />
+
+      <ConfirmModal
+        show={showRecall}
+        onHide={() => setShowRecall(false)}
+        title="Recall Invitation"
+        message={
+          recallDriver ? (
+            <div>
+              Bạn có chắc muốn <strong>thu hồi lời mời</strong> đã gửi cho{" "}
+              <strong>{recallDriver.fullName}</strong>?
+            </div>
+          ) : (
+            "Recall this invitation?"
+          )
+        }
+        confirmText="Yes, recall"
+        variant="danger"
+        onConfirm={doRecall}
+      />
+    </Container>
+  );
 }

@@ -143,7 +143,9 @@ export default function DriverInvitesPage() {
         if (!workingInvite || !driverUserId) return;
         try {
             if (confirmType === "accept") {
-                await acceptInvite(driverUserId, workingInvite.id);
+                const res = await acceptInvite(driverUserId, workingInvite.id);
+                
+
                 toast.success("Đã chấp nhận lời mời");
             } else {
                 await rejectInvite(driverUserId, workingInvite.id);
@@ -161,9 +163,6 @@ export default function DriverInvitesPage() {
             setConfirmType(null);
         }
     };
-
-    console.log('INVITE', invites[0]);
-    
 
     return (
         <Container className="py-4">

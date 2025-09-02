@@ -124,6 +124,7 @@ export async function acceptInvite(userId: string, inviteId: string) {
     const res = await api.post(
         `/api/drivers/${userId}/invitations/${inviteId}/accept`
     );
+    console.log("ACCEPT INVITE RES: ", res);
     return res.data.data;
 }
 
@@ -132,4 +133,10 @@ export async function rejectInvite(userId: string, inviteId: string) {
         `/api/drivers/${userId}/invitations/${inviteId}/reject`
     );
     return res.data.data;
+}
+
+
+export async function getEmploymentStatus(userId: string) {
+  const res = await api.get(`/api/drivers/${userId}/employment`);
+  return res.data.data as { isHired: boolean; companyId?: string };
 }

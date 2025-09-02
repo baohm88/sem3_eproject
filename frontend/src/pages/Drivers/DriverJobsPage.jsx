@@ -9,6 +9,7 @@ import {
     getMyDriverProfile,
     listDriverApplications,
     cancelApplication,
+    getEmploymentStatus,
 } from "../../api/drivers";
 
 import ConfirmModal from "../../components/common/ConfirmModal";
@@ -19,6 +20,7 @@ import CompanyCardForDriver from "../../components/driver/CompanyCardForDriver";
 export default function DriverJobsPage() {
     const { profile } = useAuth();
     const [driverUserId, setDriverUserId] = useState(profile?.id || null);
+    const [isHired, setIsHired] = useState(false);
 
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -64,6 +66,20 @@ export default function DriverJobsPage() {
                 }
             })();
         }
+    }, [driverUserId]);
+
+    // fetch driver employment status
+    useEffect(() => {
+        const loadEmployment = async () => {
+            if (!driverUserId) return;
+            try {
+                const s = await getEmploymentStatus(driverUserId);
+                setIsHired(!!s?.isHired);
+            } catch (e) {
+                // ignore
+            }
+        };
+        loadEmployment();
     }, [driverUserId]);
 
     // load applications of driver
@@ -162,30 +178,35 @@ export default function DriverJobsPage() {
             );
             return;
         }
+        if (isHired) {
+            toast.error(
+                "Bạn đã là tài xế của một công ty, không thể ứng tuyển nơi khác."
+            );
+            return;
+        }
         setApplyingCompany(company);
         setConfirmOpen(true);
     };
 
     const doApply = async () => {
         if (!applyingCompany || !driverUserId) return;
+        if (isHired) {
+            toast.error("Bạn đã là tài xế của một công ty.");
+            return;
+        }
         try {
             const res = await applyToCompanyAsDriver(driverUserId, {
                 companyId: applyingCompany.id,
             });
-            console.log("app", res);
-
-            toast.success(`Đã ứng tuyển vào ${applyingCompany.name}`);
-            setAppliedIds((prev) => {
-                const next = new Set(prev);
-                next.add(applyingCompany.id);
-                return next;
-            });
-            setApplicationsMap((prev) => ({
-                ...prev,
-                [applyingCompany.id]: res.id,
-            }));
+            console.log("APPLY RES", res);
         } catch (e) {
-            toast.error(e.message || "Apply failed");
+            const code = e?.response?.data?.error?.code;
+            if (code === "ALREADY_EMPLOYED") {
+                setIsHired(true);
+                toast.error("Bạn đã là tài xế của một công ty.");
+            } else {
+                toast.error(e.message || "Apply failed");
+            }
         } finally {
             setApplyingCompany(null);
             setConfirmOpen(false);
@@ -300,6 +321,7 @@ export default function DriverJobsPage() {
                                     onApply={openApply}
                                     onRecall={openRecall}
                                     isApplied={appliedIds.has(c.id)}
+                                    disabledActions={isHired}
                                 />
                             </Col>
                         ))}
