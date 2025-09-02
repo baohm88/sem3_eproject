@@ -17,6 +17,7 @@ import CompanyServices from "../pages/Companies/CompanyServices";
 import CompanyDrivers from "../pages/Companies/CompanyDrivers";
 import CompanyPayments from "../pages/Companies/CompanyPayments";
 import CompanyProfilePage from "../pages/Companies/CompanyProfilePage";
+import CompanyInvitesPage from "../pages/Companies/CompanyInvitesPage";
 
 import DriverDashboard from "../pages/Drivers/DriverDashboard";
 import DriverPayments from "../pages/Drivers/DriverPayments";
@@ -73,6 +74,7 @@ export const ROLE_ROUTES: RoleRoutes = {
       { path: "", label: "Dashboard", element: <CompanyDashboard />, end: true },
       { path: "profile", label: "Profile", element: <CompanyProfilePage /> },
       { path: "services", label: "Services", element: <CompanyServices /> },
+      { path: "invites", label: "Invites", element: <CompanyInvitesPage /> },
       { path: "drivers", label: "Drivers", element: <CompanyDrivers /> },
       { path: "payments", label: "Payments", element: <CompanyPayments /> },
     ],

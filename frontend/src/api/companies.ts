@@ -118,6 +118,11 @@ export async function inviteDriver(
     return res.data.data as Invite;
 }
 
+export async function cancelInvitation(companyId: string, inviteId: string) {
+  const res = await api.post(`/api/companies/${companyId}/invitations/${inviteId}/cancel`);
+  return res.data.data;
+}
+
 export async function listInvitations(
     companyId: string,
     params: Record<string, any> = {}
