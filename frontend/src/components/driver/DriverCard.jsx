@@ -1,0 +1,151 @@
+import { useState } from "react";
+import { Card, Badge, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+
+const FALLBACK_AVATAR =
+  "https://dummyimage.com/300x300/e9ecef/6c757d.jpg&text=No+Avatar";
+
+function safeSkills(skillsStr) {
+  if (!skillsStr) return [];
+  try {
+    const arr = JSON.parse(skillsStr);
+    return Array.isArray(arr) ? arr.filter(Boolean) : [];
+  } catch {
+    return String(skillsStr)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+}
+
+function Stars({ value = 0, size = 16 }) {
+  const v = Math.max(0, Math.min(5, Number(value) || 0));
+  const full = Math.floor(v);
+  const half = v - full >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  return (
+    <span className="d-inline-flex align-items-center gap-1">
+      {Array.from({ length: full }).map((_, i) => (
+        <i key={`f${i}`} className="bi bi-star-fill text-warning" style={{ fontSize: size }} />
+      ))}
+      {half === 1 && <i className="bi bi-star-half text-warning" style={{ fontSize: size }} />}
+      {Array.from({ length: empty }).map((_, i) => (
+        <i key={`e${i}`} className="bi bi-star" style={{ fontSize: size }} />
+      ))}
+    </span>
+  );
+}
+
+export default function DriverCard({
+  driver,
+  onClick,
+  onInvite, // chỉ hiện khi truyền vào (role Company)
+  className = "",
+  showBio = true,
+  imgSize = 72,
+}) {
+  const [imgSrc, setImgSrc] = useState(driver?.imgUrl || FALLBACK_AVATAR);
+  const skills = safeSkills(driver?.skills);
+
+  return (
+    <Card
+      className={`driver-card hover-lift h-100 shadow-sm ${className}`}
+      style={{ cursor: onClick ? "pointer" : "default" }}
+      onClick={() => onClick && onClick(driver)}
+    >
+      <Card.Body
+        className="d-flex align-items-start gap-3"
+        style={{ overflow: "hidden" }} // chặn tràn
+      >
+        <img
+          src={imgSrc}
+          onError={() => setImgSrc(FALLBACK_AVATAR)}
+          alt={driver?.fullName || "Driver"}
+          width={imgSize}
+          height={imgSize}
+          style={{ objectFit: "cover", borderRadius: 16, flexShrink: 0 }}
+        />
+
+        {/* Cột nội dung */}
+        <div className="flex-grow-1 w-100" style={{ minWidth: 0 }}>
+          {/* Hàng tiêu đề + Invite (cho phép wrap) */}
+          <div className="d-flex align-items-start gap-2 flex-wrap">
+            <div className="flex-grow-1" style={{ minWidth: 0 }}>
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                <Card.Title className="mb-0 text-truncate" title={driver?.fullName}>
+                  {driver?.fullName || "Unnamed Driver"}
+                </Card.Title>
+                {driver?.isAvailable ? (
+                  <Badge bg="success">Available</Badge>
+                ) : (
+                  <Badge bg="secondary">Offline</Badge>
+                )}
+              </div>
+
+              {/* Meta: rating + location + phone (wrap được) */}
+              <div className="d-flex flex-wrap align-items-center gap-2 text-muted small mt-1">
+                <OverlayTrigger
+                  placement="top"
+                  overlay={<Tooltip>{Number(driver?.rating ?? 0).toFixed(1)} / 5.0</Tooltip>}
+                >
+                  <span onClick={(e) => e.stopPropagation()}>
+                    <Stars value={driver?.rating ?? 0} />
+                  </span>
+                </OverlayTrigger>
+
+                {driver?.location && (
+                  <span className="d-inline-flex align-items-center">
+                    <i className="bi bi-geo-alt me-1" />
+                    <span className="text-truncate">{driver.location}</span>
+                  </span>
+                )}
+
+                {driver?.phone && (
+                  <span className="d-inline-flex align-items-center">
+                    <i className="bi bi-telephone me-1" />
+                    <span className="text-truncate">{driver.phone}</span>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {onInvite && (
+              <div className="ms-auto flex-shrink-0">
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInvite(driver);
+                  }}
+                >
+                  Invite
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {showBio && (
+            <Card.Text className="text-muted mt-2 mb-2">
+              {driver?.bio || <span className="fst-italic">No bio</span>}
+            </Card.Text>
+          )}
+
+          {skills.length > 0 ? (
+            <div className="d-flex flex-wrap gap-2">
+              {skills.slice(0, 8).map((sk) => (
+                <span key={sk} className="badge rounded-pill text-bg-light border">
+                  {sk}
+                </span>
+              ))}
+              {skills.length > 8 && (
+                <span className="badge rounded-pill text-bg-light border">+{skills.length - 8}</span>
+              )}
+            </div>
+          ) : (
+            <div className="text-muted fst-italic">No skills</div>
+          )}
+        </div>
+      </Card.Body>
+    </Card>
+  );
+}
