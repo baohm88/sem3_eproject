@@ -112,7 +112,7 @@ export async function listDriverApplications(
 }
 
 /* Invitations */
-export async function listDriverInvitations(
+export async function listDriverInvites(
     userId: string,
     params: Record<string, any> = {}
 ) {
@@ -120,14 +120,14 @@ export async function listDriverInvitations(
     return res.data.data as PageResult<Invite>;
 }
 
-export async function acceptDriverInvitation(userId: string, inviteId: string) {
+export async function acceptInvite(userId: string, inviteId: string) {
     const res = await api.post(
         `/api/drivers/${userId}/invitations/${inviteId}/accept`
     );
     return res.data.data;
 }
 
-export async function rejectDriverInvitation(userId: string, inviteId: string) {
+export async function rejectInvite(userId: string, inviteId: string) {
     const res = await api.post(
         `/api/drivers/${userId}/invitations/${inviteId}/reject`
     );

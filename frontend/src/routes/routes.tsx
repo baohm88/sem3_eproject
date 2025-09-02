@@ -10,7 +10,7 @@ import RegisterPage from "../pages/Auth/RegisterPage";
 
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import CompaniesPage from "../pages/Companies/CompaniesPage";
-import DriversPage from "../pages/Drivers/DriversPage";
+import DriverPayments from "../pages/Drivers/DriverPayments";
 
 import CompanyDashboard from "../pages/Companies/CompanyDashboard";
 import CompanyServices from "../pages/Companies/CompanyServices";
@@ -19,21 +19,22 @@ import CompanyPayments from "../pages/Companies/CompanyPayments";
 import CompanyProfilePage from "../pages/Companies/CompanyProfilePage";
 import CompanyInvitesPage from "../pages/Companies/CompanyInvitesPage";
 
-import DriverDashboard from "../pages/Drivers/DriverDashboard";
-import DriverPayments from "../pages/Drivers/DriverPayments";
-
 import NotFoundPage from "../pages/NotFoundPage";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
 import DriverProfilePage from "../pages/Drivers/DriverProfilePage";
 import DriverJobsPage from "../pages/Drivers/DriverJobsPage";
 import DriverApplicationsPage from "../pages/Drivers/DriverApplicationsPage";
+import DriverInvitesPage from "../pages/Drivers/DriverInvitesPage";
+
+import DriversPage from "../pages/Drivers/DriversPage";
+import DriverDashboard from "../pages/Drivers/DriverDashboard";
 
 export type Role = "Admin" | "Company" | "Driver" | "Rider";
 
 export type RouteItem = {
-    path: string; 
-    label?: string; 
-    element: React.ReactNode; 
+    path: string;
+    label?: string;
+    element: React.ReactNode;
     end?: boolean;
     showInNav?: boolean;
 };
@@ -41,74 +42,127 @@ export type RouteItem = {
 export type RoleRoutes = Record<
     Role,
     {
-        base: string; 
-        nav: RouteItem[]; 
-        children: RouteItem[]; 
+        base: string;
+        nav: RouteItem[];
+        children: RouteItem[];
     }
 >;
 
 export const PUBLIC_ROUTES: RouteItem[] = [
-  { path: "/", label: "Home", element: <HomePage />, end: true },
-  { path: "/listings", label: "Listings", element: <CompaniesPage /> },
-  { path: "/drivers", label: "Drivers", element: <DriversPage /> },
-  { path: "/services", label: "Services", element: <ServicesPage /> },
-  { path: "/feedback", label: "Feedback", element: <FeedbackPage /> },
-  // Advertise -> protected in layout logic, không phải public
-  { path: "/advertise", label: "Advertise", element: <AdvertisePage /> },
+    { path: "/", label: "Home", element: <HomePage />, end: true },
+    { path: "/listings", label: "Listings", element: <CompaniesPage /> },
+    { path: "/drivers", label: "Drivers", element: <DriversPage /> },
+    { path: "/services", label: "Services", element: <ServicesPage /> },
+    { path: "/feedback", label: "Feedback", element: <FeedbackPage /> },
+    // Advertise -> protected in layout logic, không phải public
+    { path: "/advertise", label: "Advertise", element: <AdvertisePage /> },
 ];
 
 // Single source of truth
 export const ROLE_ROUTES: RoleRoutes = {
-  Admin: {
-    base: "/admin",
-    nav: [
-      { path: "", label: "Dashboard", element: <AdminDashboard />, end: true },
-      { path: "companies", label: "Companies", element: <CompaniesPage /> },
-      { path: "drivers", label: "Drivers", element: <DriversPage /> },
-    ],
-    children: [],
-  },
-  Company: {
-    base: "/company",
-    nav: [
-      { path: "", label: "Dashboard", element: <CompanyDashboard />, end: true },
-      { path: "profile", label: "Profile", element: <CompanyProfilePage /> },
-      { path: "services", label: "Services", element: <CompanyServices /> },
-      { path: "invites", label: "Invites", element: <CompanyInvitesPage /> },
-      { path: "drivers", label: "Drivers", element: <CompanyDrivers /> },
-      { path: "payments", label: "Payments", element: <CompanyPayments /> },
-    ],
-    children: [],
-  },
-  Driver: {
-    base: "/driver",
-    nav: [
-      { path: "", label: "Dashboard", element: <DriverDashboard />, end: true },
-      { path: "profile", label: "Profile", element: <DriverProfilePage /> },
-      { path: "jobs", label: "Openings", element: <DriverJobsPage /> },
-      { path: "applications", label: "Applications", element: <DriverApplicationsPage /> },
-      { path: "payments", label: "Payments", element: <DriverPayments /> },
-    ],
-    children: [],
-  },
-  Rider: {
-    base: "/",
-    nav: [], 
-    children: [],
-  },
+    Admin: {
+        base: "/admin",
+        nav: [
+            {
+                path: "",
+                label: "Dashboard",
+                element: <AdminDashboard />,
+                end: true,
+            },
+            {
+                path: "companies",
+                label: "Companies",
+                element: <CompaniesPage />,
+            },
+            { path: "drivers", label: "Drivers", element: <DriversPage /> },
+        ],
+        children: [],
+    },
+    Company: {
+        base: "/company",
+        nav: [
+            {
+                path: "",
+                label: "Dashboard",
+                element: <CompanyDashboard />,
+                end: true,
+            },
+            {
+                path: "profile",
+                label: "Profile",
+                element: <CompanyProfilePage />,
+            },
+            {
+                path: "services",
+                label: "Services",
+                element: <CompanyServices />,
+            },
+            {
+                path: "invites",
+                label: "Invites",
+                element: <CompanyInvitesPage />,
+            },
+            { path: "drivers", label: "Drivers", element: <CompanyDrivers /> },
+            {
+                path: "payments",
+                label: "Payments",
+                element: <CompanyPayments />,
+            },
+        ],
+        children: [],
+    },
+    Driver: {
+        base: "/driver",
+        nav: [
+            {
+                path: "",
+                label: "Dashboard",
+                element: <DriverDashboard />,
+                end: true,
+            },
+            {
+                path: "profile",
+                label: "Profile",
+                element: <DriverProfilePage />,
+            },
+            { path: "jobs", label: "Openings", element: <DriverJobsPage /> },
+            {
+                path: "invites",
+                label: "Invites",
+                element: <DriverInvitesPage />,
+            },
+            {
+                path: "applications",
+                label: "Applications",
+                element: <DriverApplicationsPage />,
+            },
+            {
+                path: "payments",
+                label: "Payments",
+                element: <DriverPayments />,
+            },
+        ],
+        children: [],
+    },
+    Rider: {
+        base: "/",
+        nav: [],
+        children: [],
+    },
 };
-
 
 // helper: build navLinks chỉ dùng cho SubNav
 export function buildNavLinks(role: Role) {
-  const def = ROLE_ROUTES[role] ?? ROLE_ROUTES.Rider;
-  return def.nav
-    .filter((r) => r.label)
-    .map((r) => ({
-      to: (
-        (def.base.replace(/\/$/, "") + "/" + r.path).replace(/\/+$/, "") || "/"
-      ),
-      label: r.label!,
-      end: r.end,
-    }));
+    const def = ROLE_ROUTES[role] ?? ROLE_ROUTES.Rider;
+    return def.nav
+        .filter((r) => r.label)
+        .map((r) => ({
+            to:
+                (def.base.replace(/\/$/, "") + "/" + r.path).replace(
+                    /\/+$/,
+                    ""
+                ) || "/",
+            label: r.label!,
+            end: r.end,
+        }));
 }

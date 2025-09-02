@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Card, Badge, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Card, Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const FALLBACK_AVATAR =
     "https://dummyimage.com/300x300/e9ecef/6c757d.jpg&text=No+Avatar";
@@ -58,7 +58,19 @@ export default function DriverCard({
     showBio = true,
     imgSize = 56,
 }) {
-    const [imgSrc, setImgSrc] = useState(driver?.imgUrl || FALLBACK_AVATAR);
+    // 1) luôn đồng bộ với driver.imgUrl khi prop thay đổi
+    const preferred =
+        driver?.imgUrl && String(driver.imgUrl).trim().length > 0
+            ? driver.imgUrl
+            : FALLBACK_AVATAR;
+
+    const isAvailable = driver?.isAvailable;
+
+    const [imgSrc, setImgSrc] = useState(preferred);
+    useEffect(() => {
+        setImgSrc(preferred);
+    }, [preferred]);
+
     const skills = safeSkills(driver?.skills);
 
     return (
@@ -69,14 +81,18 @@ export default function DriverCard({
         >
             <Card.Body
                 className="d-flex align-items-start gap-3"
-                style={{ overflow: "hidden" }} // chặn tràn
+                style={{ overflow: "hidden" }}
             >
                 <img
                     src={imgSrc}
-                    onError={() => setImgSrc(FALLBACK_AVATAR)}
                     alt={driver?.fullName || "Driver"}
                     width={imgSize}
                     height={imgSize}
+                    onError={() => {
+                        // 2) chỉ rơi về fallback nếu chưa là fallback
+                        if (imgSrc !== FALLBACK_AVATAR)
+                            setImgSrc(FALLBACK_AVATAR);
+                    }}
                     style={{
                         objectFit: "cover",
                         borderRadius: 12,
@@ -84,9 +100,7 @@ export default function DriverCard({
                     }}
                 />
 
-                {/* Cột nội dung */}
                 <div className="flex-grow-1 w-100" style={{ minWidth: 0 }}>
-                    {/* Hàng tiêu đề + Invite (cho phép wrap) */}
                     <div className="d-flex align-items-start gap-2 flex-wrap">
                         <div className="flex-grow-1" style={{ minWidth: 0 }}>
                             <div className="d-flex align-items-center gap-2 flex-wrap">
@@ -96,8 +110,9 @@ export default function DriverCard({
                                 >
                                     {driver?.fullName || "Unnamed Driver"}
                                 </Card.Title>
-                                {driver?.isAvailable ? (
-                                    <Badge bg="success">Available</Badge>
+
+                                {isAvailable ? (
+                                    <Badge bg="info">Available</Badge>
                                 ) : (
                                     <Badge bg="secondary">Offline</Badge>
                                 )}
@@ -109,7 +124,6 @@ export default function DriverCard({
                                 )}
                             </div>
 
-                            {/* Meta: rating + location + phone (wrap được) */}
                             <div className="d-flex flex-wrap align-items-center gap-2 text-muted small mt-1">
                                 <OverlayTrigger
                                     placement="top"
@@ -149,19 +163,24 @@ export default function DriverCard({
 
                         <div className="mt-auto d-flex justify-content-end">
                             {isInvited ? (
-                                <> 
-                                    <button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() => onRecall?.(driver)}
-                                    >
-                                        Recall Invitation
-                                    </button>
-                                </>
+                                <button
+                                    className="btn btn-outline-danger btn-sm"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // 3) tránh kích hoạt onClick Card
+                                        onRecall?.(driver);
+                                    }}
+                                >
+                                    Recall Invitation
+                                </button>
                             ) : (
                                 !!onInvite && (
                                     <button
-                                        className="btn btn-primary btn-sm"
-                                        onClick={() => onInvite(driver)}
+                                        className={`btn ${isAvailable ? "btn-primary" : "btn-secondary"} btn-sm`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onInvite(driver);
+                                        }}
+                                        disabled={!isAvailable}
                                     >
                                         Invite
                                     </button>

@@ -73,7 +73,7 @@ export default function DriversPage() {
         return () => (mounted = false);
     }, [isCompany]);
 
-    // load invites (status Sent) => invitedMap
+    // load invites (status Pending) => invitedMap
     const loadInvited = async (cid) => {
         if (!cid) return;
         try {
@@ -81,7 +81,7 @@ export default function DriversPage() {
             const res = await listInvitations(cid, { page: 1, size: 500 });
             const map = {};
             (res.items || [])
-                .filter((i) => i.status === "Sent")
+                .filter((i) => i.status === "Pending")
                 .forEach((i) => {
                     if (i.driverUserId) map[i.driverUserId] = i.id;
                 });
@@ -149,7 +149,7 @@ export default function DriversPage() {
             toast.success("Đã gửi lời mời.");
             setInvitedMap((prev) => ({
                 ...prev,
-                [driverUserId]: "__just_sent__",
+                [driverUserId]: "__just_Pending__",
             })); // cập nhật ngay UI
             // đồng bộ id thật bằng cách refetch invites (nhẹ nhàng)
             loadInvited(companyId);
@@ -188,6 +188,9 @@ export default function DriversPage() {
             setRecallDriver(null);
         }
     };
+
+    console.log('DRIVER 1', drivers[0]);
+    
 
     return (
         <Container className="py-4">

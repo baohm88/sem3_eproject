@@ -31,7 +31,7 @@ export default function CompanyInvitesPage() {
 
     // Filters / Sort (client)
     const [searchTerm, setSearchTerm] = useState("");
-    const [status, setStatus] = useState(""); // "", "Sent", "Accepted", "Rejected", "Cancelled"
+    const [status, setStatus] = useState("Pending"); // "", "Pending", "Accepted", "Rejected", "Cancelled",  "Expired"
     const [sort, setSort] = useState("createdAt:desc"); // "createdAt:desc|asc" | "name:asc|desc"
 
     // Pagination (client)
@@ -72,7 +72,6 @@ export default function CompanyInvitesPage() {
             const res = await listInvitations(cid, {
                 page: 1,
                 size: 1000,
-                // status: "Sent",
             });
             setInvites(res.items || []);
         } catch (e) {
@@ -219,7 +218,7 @@ export default function CompanyInvitesPage() {
                         style: { maxWidth: 200 },
                         options: [
                             { value: "", label: "All statuses" },
-                            { value: "Sent", label: "Sent" },
+                            { value: "Pending", label: "Pending" },
                             { value: "Accepted", label: "Accepted" },
                             { value: "Rejected", label: "Rejected" },
                             { value: "Cancelled", label: "Cancelled" },
@@ -251,7 +250,7 @@ export default function CompanyInvitesPage() {
                 </div>
             ) : totalItems === 0 ? (
                 <div className="text-center text-muted py-5">
-                    Không có lời mời nào.
+                    Không có lời mời nào đang chờ driver duyệt.
                 </div>
             ) : (
                 <>
@@ -268,20 +267,20 @@ export default function CompanyInvitesPage() {
                                 isAvailable: true,
                             };
 
-                            const isSent = inv.status === "Sent";
+                            const isPending = inv.status === "Pending";
                             const isAccepted = inv.status === "Accepted";
                             const isRejected = inv.status === "Rejected";
                             const isCancelled = inv.status === "Cancelled";
 
-                            // Hiển thị badge Invited khi Sent, có thể custom trong DriverCard theo prop
+                            // Hiển thị badge Invited khi Pending, có thể custom trong DriverCard theo prop
                             return (
                                 <Col xs={12} md={6} lg={4} key={inv.id}>
                                     <DriverCard
                                         driver={driverForCard}
-                                        isInvited={isSent}
+                                        isInvited={isPending}
                                         // Hiển thị trạng thái khác qua subtitle/customBadge nếu DriverCard hỗ trợ
                                         statusBadge={
-                                            isSent
+                                            isPending
                                                 ? "Invited"
                                                 : isAccepted
                                                 ? "Accepted"
@@ -291,9 +290,9 @@ export default function CompanyInvitesPage() {
                                                 ? "Cancelled"
                                                 : ""
                                         }
-                                        // Chỉ cho phép Recall khi đang Sent
+                                        // Chỉ cho phép Recall khi đang Pending
                                         onRecall={
-                                            isSent
+                                            isPending
                                                 ? () => openCancel(inv)
                                                 : undefined
                                         }

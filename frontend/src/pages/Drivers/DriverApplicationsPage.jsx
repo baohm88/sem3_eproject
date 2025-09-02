@@ -4,10 +4,7 @@ import { Row, Col, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 
-import {
-    listCompanyServicesPublic,
-    getCompany, // cần api này: GET /api/companies/{id}
-} from "../../api/companies";
+import { listCompanyServicesPublic, getCompanyById } from "../../api/companies";
 import {
     getMyDriverProfile,
     listDriverApplications,
@@ -97,7 +94,7 @@ export default function DriverApplicationsPage() {
             const need = companyIds.filter((id) => !companiesById[id]);
             if (need.length > 0) {
                 const results = await Promise.allSettled(
-                    need.map((id) => getCompany(id))
+                    need.map((id) => getCompanyById(id))
                 );
                 const add = {};
                 need.forEach((id, idx) => {

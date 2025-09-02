@@ -29,7 +29,7 @@ export async function listCompanies(params: Record<string, any> = {}) {
     return res.data.data as PageResult<Company>;
 }
 
-export async function getCompany(id: string) {
+export async function getCompanyById(id: string) {
     const res = await api.get(`/api/companies/${id}`);
     return res.data.data as Company;
 }
@@ -119,8 +119,10 @@ export async function inviteDriver(
 }
 
 export async function cancelInvitation(companyId: string, inviteId: string) {
-  const res = await api.post(`/api/companies/${companyId}/invitations/${inviteId}/cancel`);
-  return res.data.data;
+    const res = await api.post(
+        `/api/companies/${companyId}/invitations/${inviteId}/cancel`
+    );
+    return res.data.data;
 }
 
 export async function listInvitations(
@@ -194,9 +196,14 @@ export async function listCompanyServices(
     return res.data.data as PageResult<Service>;
 }
 
-export async function listCompanyServicesPublic(companyId: string, params: Record<string, any> = {}) {
-  const res = await api.get(`/api/companies/${companyId}/services/public`, { params });
-  return res.data.data as PageResult<Service>;
+export async function listCompanyServicesPublic(
+    companyId: string,
+    params: Record<string, any> = {}
+) {
+    const res = await api.get(`/api/companies/${companyId}/services/public`, {
+        params,
+    });
+    return res.data.data as PageResult<Service>;
 }
 
 export async function createCompanyService(

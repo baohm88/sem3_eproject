@@ -77,8 +77,6 @@ export default function DriverJobsPage() {
                     status: "Applied",
                 });
 
-                console.log("applied", res);
-
                 const ids = new Set();
                 const map = {};
                 (res.items || []).forEach((a) => {

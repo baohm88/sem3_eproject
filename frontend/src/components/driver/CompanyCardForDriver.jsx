@@ -5,7 +5,7 @@ const PLACEHOLDER_LOGO =
     "https://images.unsplash.com/photo-1554189097-ffe88e998a2b?w=600&auto=format&fit=crop&q=60";
 
 /**
- * Card công ty dành cho trang DriverJobs
+ * Card công ty dành cho trang DriverJobs / DriverInvites
  *
  * Props:
  * - company
@@ -13,18 +13,32 @@ const PLACEHOLDER_LOGO =
  * - onToggleServices: (companyId)=>void
  * - services: Service[]
  * - loadingServices: boolean
+ *
  * - onApply: (company)=>void
+ * - onRecall: (company)=>void
  * - isApplied?: boolean
+ *
+ * - onAccept: (invite)=>void
+ * - onReject: (invite)=>void
+ * - inviteStatus?: string
+ * - disabledActions?: boolean
  */
 export default function CompanyCardForDriver({
+    invite,
     company,
-    isExpanded,
+    isExpanded = false,
     onToggleServices,
     services,
     loadingServices,
+
     onApply,
     onRecall,
     isApplied = false,
+
+    onAccept,
+    onReject,
+    inviteStatus,
+    disabledActions = false,
 }) {
     const membershipBadge = (m) => (
         <Badge
@@ -40,9 +54,12 @@ export default function CompanyCardForDriver({
         </Badge>
     );
 
+    console.log(company);
+
     return (
         <Card className="h-100 shadow-sm">
             <Card.Body className="d-flex flex-column">
+                {/* Header */}
                 <div className="d-flex align-items-center gap-3">
                     <img
                         src={company.imgUrl || PLACEHOLDER_LOGO}
@@ -65,6 +82,11 @@ export default function CompanyCardForDriver({
                                     Applied
                                 </Badge>
                             )}
+                            {inviteStatus && (
+                                <Badge bg="info" text="dark">
+                                    {inviteStatus}
+                                </Badge>
+                            )}
                         </div>
                         <div className="small text-muted">
                             Rating {company.rating?.toFixed?.(1) ?? "0.0"}
@@ -72,6 +94,7 @@ export default function CompanyCardForDriver({
                     </div>
                 </div>
 
+                {/* Description */}
                 <Card.Text
                     className="text-muted mt-2"
                     style={{ minHeight: 44 }}
@@ -81,23 +104,51 @@ export default function CompanyCardForDriver({
                     )}
                 </Card.Text>
 
-                <div className="mt-auto d-flex gap-2">
-                    <Button
-                        size="sm"
-                        variant="outline-secondary"
-                        onClick={() => onToggleServices(company.id)}
-                    >
-                        {isExpanded ? "Hide services" : "View services"}
-                    </Button>
-                    {/* <Button
-            size="sm"
-            onClick={() => onApply(company)}
-            disabled={isApplied}
-            variant={isApplied ? "outline-secondary" : "primary"}
-          >
-            {isApplied ? "Applied" : "Apply"}
-          </Button> */}
-                    {isApplied ? (
+                {/* Invite details */}
+                {invite && (
+                    <div className="my-2 small">
+                        <div>
+                            <strong>Base salary:</strong>{" "}
+                            {invite.baseSalaryCents}
+                        </div>
+                        <div>
+                            <strong>Expires at:</strong> {invite.expiresAt}
+                        </div>
+                    </div>
+                )}
+
+                {/* Actions */}
+                <div className="mt-auto d-flex gap-2 flex-wrap">
+                    {isExpanded ?? (
+                        <Button
+                            size="sm"
+                            variant="outline-secondary"
+                            onClick={() => onToggleServices(company.id)}
+                        >
+                            {isExpanded ? "Hide services" : "View services"}
+                        </Button>
+                    )}
+
+                    {onAccept || onReject ? (
+                        <>
+                            <Button
+                                size="sm"
+                                variant="primary"
+                                disabled={disabledActions}
+                                onClick={() => onAccept?.(company)}
+                            >
+                                Accept
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline-danger"
+                                disabled={disabledActions}
+                                onClick={() => onReject?.(company)}
+                            >
+                                Reject
+                            </Button>
+                        </>
+                    ) : isApplied ? (
                         <Button
                             size="sm"
                             variant="outline-danger"
@@ -112,6 +163,7 @@ export default function CompanyCardForDriver({
                     )}
                 </div>
 
+                {/* Services list */}
                 <Collapse in={isExpanded}>
                     <div>
                         <hr />
