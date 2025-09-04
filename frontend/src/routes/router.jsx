@@ -1,3 +1,92 @@
+// import { createBrowserRouter } from "react-router-dom";
+// import MainLayout from "../components/layout/MainLayout";
+// import AuthLayout from "../components/layout/AuthLayout";
+// import ProtectedRoute from "../components/auth/ProtectedRoute";
+// import ErrorLayout from "../components/layout/ErrorLayout";
+
+// import LoginPage from "../pages/Auth/LoginPage";
+// import RegisterPage from "../pages/Auth/RegisterPage";
+// import UnauthorizedPage from "../pages/UnauthorizedPage";
+// import NotFoundPage from "../pages/NotFoundPage";
+
+// import CompaniesPage from "../pages/Companies/CompaniesPage";
+// import DriversPage from "../pages/Drivers/DriversPage";
+// import HomePage from "../pages/Home";
+// import ServicesPage from "../pages/ServicesPage";
+// import AdvertisePage from "../pages/AdvertisePage";
+// import FeedbackPage from "../pages/FeedbackPage";
+
+// import { ROLE_ROUTES, PUBLIC_ROUTES } from "./routes.tsx";
+
+// // helper builder
+// function buildProtectedChildren(role) {
+//     const def = ROLE_ROUTES[role];
+//     if (!def) return [];
+//     return def.nav.concat(def.children).map((r) => ({
+//         path: r.path,
+//         element: r.element,
+//         index: r.end === true,
+//     }));
+// }
+
+// const router = createBrowserRouter([
+//     {
+//         path: "/",
+//         element: (
+//             <MainLayout>
+//                 <AuthLayout />
+//             </MainLayout>
+//         ),
+//         children: [
+//             // public basic (Rider base already covers "/")
+//             { index: true, element: <HomePage /> },
+//             { path: "listings", element: <CompaniesPage /> },
+//             { path: "drivers", element: <DriversPage /> },
+//             { path: "services/:id", element: <ServicesPage /> },
+//             { path: "advertise", element: <AdvertisePage /> },
+//             { path: "feedback", element: <FeedbackPage /> },
+
+//             // auth
+//             { path: "login", element: <LoginPage /> },
+//             { path: "register", element: <RegisterPage /> },
+
+//             // protected: Admin
+//             {
+//                 path: ROLE_ROUTES.Admin.base.slice(1),
+//                 element: <ProtectedRoute allowedRoles={["Admin"]} />,
+//                 children: buildProtectedChildren("Admin"),
+//             },
+
+//             // protected: Company
+//             {
+//                 path: ROLE_ROUTES.Company.base.slice(1),
+//                 element: <ProtectedRoute allowedRoles={["Company"]} />,
+//                 children: buildProtectedChildren("Company"),
+//             },
+
+//             // protected: Driver
+//             {
+//                 path: ROLE_ROUTES.Driver.base.slice(1),
+//                 element: <ProtectedRoute allowedRoles={["Driver"]} />,
+//                 children: buildProtectedChildren("Driver"),
+//             },
+
+//             // error layout + catch-all
+//             {
+//                 element: <ErrorLayout />,
+//                 children: [
+//                     { path: "unauthorized", element: <UnauthorizedPage /> },
+//                     { path: "*", element: <NotFoundPage /> },
+//                 ],
+//             },
+//         ],
+//     },
+// ]);
+
+// export { router };
+// export default router;
+
+
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import AuthLayout from "../components/layout/AuthLayout";
@@ -20,67 +109,73 @@ import { ROLE_ROUTES, PUBLIC_ROUTES } from "./routes.tsx";
 
 // helper builder
 function buildProtectedChildren(role) {
-    const def = ROLE_ROUTES[role];
-    if (!def) return [];
-    return def.nav.concat(def.children).map((r) => ({
-        path: r.path,
-        element: r.element,
-        index: r.end === true,
-    }));
+  const def = ROLE_ROUTES[role];
+  if (!def) return [];
+  return def.nav.concat(def.children).map((r) => ({
+    path: r.path,
+    element: r.element,
+    index: r.end === true,
+  }));
 }
 
 const router = createBrowserRouter([
-    {
-        path: "/",
-        element: (
-            <MainLayout>
-                <AuthLayout />
-            </MainLayout>
-        ),
+  {
+    path: "/",
+    element: (
+      <MainLayout>
+        {/* Lưu ý: MainLayout dùng <Outlet/>, nên children ở đây không render. */}
+      </MainLayout>
+    ),
+    children: [
+      // ===== Public =====
+      { index: true, element: <HomePage /> },
+      { path: "listings", element: <CompaniesPage /> },
+      { path: "drivers", element: <DriversPage /> },
+      { path: "services", element: <ServicesPage /> },
+      // { path: "advertise", element: <AdvertisePage /> }, // ❌ BỎ khỏi public
+      { path: "feedback", element: <FeedbackPage /> },
+
+      // ===== Auth pages (nếu muốn bọc bằng AuthLayout thì group riêng) =====
+      { path: "login", element: <LoginPage /> },
+      { path: "register", element: <RegisterPage /> },
+
+      // ===== Protected: Admin =====
+      {
+        path: ROLE_ROUTES.Admin.base.slice(1),
+        element: <ProtectedRoute allowedRoles={["Admin"]} />,
+        children: buildProtectedChildren("Admin"),
+      },
+
+      // ===== Protected: Company =====
+      {
+        path: ROLE_ROUTES.Company.base.slice(1),
+        element: <ProtectedRoute allowedRoles={["Company"]} />,
+        children: buildProtectedChildren("Company"),
+      },
+
+      // ➕ Protected: ADVERTISE (Company only)
+      {
+        element: <ProtectedRoute allowedRoles={["Company"]} />,
+        children: [{ path: "advertise", element: <AdvertisePage /> }],
+      },
+
+      // ===== Protected: Driver =====
+      {
+        path: ROLE_ROUTES.Driver.base.slice(1),
+        element: <ProtectedRoute allowedRoles={["Driver"]} />,
+        children: buildProtectedChildren("Driver"),
+      },
+
+      // ===== Error layout + catch-all =====
+      {
+        element: <ErrorLayout />,
         children: [
-            // public basic (Rider base already covers "/")
-            { index: true, element: <HomePage /> },
-            { path: "listings", element: <CompaniesPage /> },
-            { path: "drivers", element: <DriversPage /> },
-            { path: "services/:id", element: <ServicesPage /> },
-            { path: "advertise", element: <AdvertisePage /> },
-            { path: "feedback", element: <FeedbackPage /> },
-
-            // auth
-            { path: "login", element: <LoginPage /> },
-            { path: "register", element: <RegisterPage /> },
-
-            // protected: Admin
-            {
-                path: ROLE_ROUTES.Admin.base.slice(1),
-                element: <ProtectedRoute allowedRoles={["Admin"]} />,
-                children: buildProtectedChildren("Admin"),
-            },
-
-            // protected: Company
-            {
-                path: ROLE_ROUTES.Company.base.slice(1),
-                element: <ProtectedRoute allowedRoles={["Company"]} />,
-                children: buildProtectedChildren("Company"),
-            },
-
-            // protected: Driver
-            {
-                path: ROLE_ROUTES.Driver.base.slice(1),
-                element: <ProtectedRoute allowedRoles={["Driver"]} />,
-                children: buildProtectedChildren("Driver"),
-            },
-
-            // error layout + catch-all
-            {
-                element: <ErrorLayout />,
-                children: [
-                    { path: "unauthorized", element: <UnauthorizedPage /> },
-                    { path: "*", element: <NotFoundPage /> },
-                ],
-            },
+          { path: "unauthorized", element: <UnauthorizedPage /> },
+          { path: "*", element: <NotFoundPage /> },
         ],
-    },
+      },
+    ],
+  },
 ]);
 
 export { router };
