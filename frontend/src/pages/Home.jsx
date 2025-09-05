@@ -283,59 +283,84 @@
 // }
 
 // export default HomePage;
-
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { listCompanies, getLatestServices } from "../api/companies";
 
-/* =========================================================
-   MOCK DATA (có thể thay bằng API sau này)
-   ========================================================= */
-const COMPANIES = [
-  { name: "AUTOMECH", logo: "https://dummyimage.com/160x80/ffffff/333333&text=AUTOMECH" },
-  { name: "MINEBEA",  logo: "https://dummyimage.com/160x80/ffffff/333333&text=MINEBEA"  },
-  { name: "BIDV",     logo: "https://dummyimage.com/160x80/ffffff/333333&text=BIDV"     },
-  { name: "VNPT",     logo: "https://dummyimage.com/160x80/ffffff/333333&text=VNPT"     },
-  { name: "VPBANK",   logo: "https://dummyimage.com/160x80/ffffff/333333&text=VPBANK"   },
-  { name: "SEI",      logo: "https://dummyimage.com/160x80/ffffff/333333&text=SEI"      },
-];
+/** ==== CSS cục bộ cho trang Home (nhẹ, tránh đụng global) ==== */
+const Theme = () => (
+  <style>{`
+    .section-title{ font-weight:800; color:#0f172a; }
+    .muted{ color:#64748b; }
+    .card-soft{ border:0; border-radius:18px; background:#fff; box-shadow:0 12px 28px rgba(2,6,23,.08); overflow:hidden; }
+    .card-soft:hover{ transform:translateY(-2px); box-shadow:0 16px 32px rgba(2,6,23,.12); transition:.18s ease; }
+    .company-logo{ height:52px; object-fit:contain; }
 
-const TIPS = [
-  { id: 1, title: "3 cách đặt xe sân bay tiết kiệm 20%", img: "https://images.unsplash.com/photo-1543269865-0a740d43b90c?q=80&w=1200&auto=format&fit=crop" },
-  { id: 2, title: "Checklist chuyển nhà nhanh gọn",      img: "https://images.unsplash.com/photo-1520367745676-56196632073f?q=80&w=1200&auto=format&fit=crop" },
-  { id: 3, title: "Thuê xe theo giờ: khi nào hợp lý?",    img: "https://images.unsplash.com/photo-1479142506502-19b3a3b7ff33?q=80&w=1200&auto=format&fit=crop" },
-];
+    /* HERO (đặt trước banner) */
+    .hero-search{
+      background: radial-gradient(900px 360px at 12% -20%, #0c6cff33 0%, transparent 60%),
+                  linear-gradient(135deg, #0b5cab 0%, #0a4c90 70%);
+      color:#fff; border-radius:24px; overflow:hidden;
+      box-shadow: 0 16px 36px rgba(2,6,23,.18);
+    }
+    .hero-search h1{ font-weight:900; line-height:1.1; letter-spacing:.2px; }
+    .hero-badge{ background:#ffffff22; color:#fff; border-radius:999px; padding:.45rem .95rem; font-weight:700; letter-spacing:.5px; }
+    .hero-input{ border:1px solid #ffffff44; border-radius:999px; padding:.6rem .8rem; background:#ffffff1a; color:#fff; backdrop-filter: blur(4px); }
+    .hero-input .form-control{ background:transparent !important; border:0 !important; color:#fff !important; }
+    .hero-input .form-control::placeholder{ color:#e2e8f0cc; }
+    .hero-search .chip{ background:#fff; color:#0b5cab; border:0; border-radius:999px; padding:.3rem .65rem; font-weight:600; }
+    .hero-img{ min-height:320px; background-size:cover; background-position:center; }
 
-const TESTIMONIALS = [
-  { id: 1, name: "Anh Trọng – Quận 3", text: "Đặt xe sân bay 5 phút có tài xế, giá hiển thị rõ ràng. Tài xế thân thiện!", company: "Vinasun" },
-  { id: 2, name: "Chị Hạnh – Hà Nội",  text: "Gói đưa đón nhân viên chạy rất ổn định, báo cáo hàng tuần đầy đủ.",        company: "Mai Linh" },
-];
+    /* CATEGORY tiles */
+    .cat-tile{ border:1px solid #e5e7eb; border-radius:14px; padding:14px; background:#fff; }
+    .cat-tile:hover{ border-color:#cfe0ff; box-shadow:0 8px 18px rgba(2,6,23,.06); transform:translateY(-2px); transition:.18s; }
+    .cat-icon{ width:40px; height:40px; display:grid; place-items:center; background:#eff6ff; border-radius:10px; font-size:20px; color:#1d4ed8; }
 
-/* =========================================================
-   SECTION HEADER (tối giản, không phụ thuộc css cũ)
-   ========================================================= */
-function SectionHeader({ title, subtitle, to = "", actionText = "Xem tất cả" }) {
+    /* Latest services grid */
+    .ls-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
+    @media (min-width: 992px){ .ls-grid{ grid-template-columns:1fr 1fr 1fr; } }
+    .ls-card{ border:1px solid #eef1f4; border-radius:16px; padding:16px; background:#fff; }
+    .ls-card:hover{ box-shadow:0 8px 20px rgba(2,6,23,.06); }
+    .ls-price{ color:#ff6a00; font-weight:800; margin-top:2px; }
+
+    /* Spotlight/News/Testimonials */
+    .spotlight{ border-radius:18px; overflow:hidden; background:#fff; }
+    .spotlight .right{
+      background: url('https://images.unsplash.com/photo-1474564862106-1f23a9655d15?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+      min-height:220px;
+    }
+    .mini-card{ border:1px solid #e5e7eb; border-radius:14px; overflow:hidden; background:#fff; }
+    .mini-thumb{ height:120px; background-size:cover; background-position:center; }
+    .testimonial{ border:1px solid #e5e7eb; border-radius:16px; padding:16px; background:#fff; }
+    .promo{ background:#f8fafc; border-radius:18px; padding:24px; }
+  `}</style>
+);
+
+/** ==== DÙNG CHUNG ==== */
+function SectionHeader({ title, subtitle, actionText = "Xem tất cả", to = "#", onAction }) {
   return (
     <div className="d-flex align-items-end justify-content-between mb-3">
       <div>
-        <h4 className="mb-1 fw-bold">{title}</h4>
-        {subtitle && <div className="text-secondary small">{subtitle}</div>}
+        <h4 className="section-title mb-1">{title}</h4>
+        {subtitle && <div className="muted small">{subtitle}</div>}
       </div>
       {to ? (
-        <Link className="btn btn-sm btn-outline-secondary rounded-pill" to={to}>
+        <Link className="btn btn-sm btn-outline-secondary rounded-pill" to={to} onClick={onAction}>
           {actionText}
         </Link>
-      ) : null}
+      ) : (
+        <button className="btn btn-sm btn-outline-secondary rounded-pill" onClick={onAction}>
+          {actionText}
+        </button>
+      )}
     </div>
   );
 }
 
-/* =========================================================
-   HERO SEARCH (gradient inline — không cần class riêng)
-   ========================================================= */
+/** ==== SECTIONS ==== */
 function HeroSearch() {
   const [q, setQ] = useState("");
   const navigate = useNavigate();
-
   const goSearch = () => {
     const qs = q.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
     navigate(`/services${qs}`);
@@ -344,117 +369,129 @@ function HeroSearch() {
 
   return (
     <section className="container my-4">
-      <div
-        className="card-soft p-4 p-lg-5"
-        style={{
-          color: "#fff",
-          background:
-            "radial-gradient(900px 360px at 12% -20%, #0c6cff33 0%, transparent 60%), linear-gradient(135deg, #0b5cab 0%, #0a4c90 70%)",
-        }}
-      >
-        <span className="d-inline-block px-3 py-2 rounded-pill fw-bold" style={{ background: "#ffffff22" }}>
-          DỊCH VỤ LÁI XE & VẬN CHUYỂN
-        </span>
+      <div className="row g-0 hero-search card-soft">
+        <div className="col-lg-7 p-4 p-lg-5 d-flex flex-column justify-content-center">
+          <span className="hero-badge d-inline-block">DỊCH VỤ LÁI XE & VẬN CHUYỂN</span>
+          <h1 className="mt-3">Bạn cần dịch vụ gì?</h1>
+          <p className="mt-2 text-white-50">
+            Taxi 4–16 chỗ, đưa đón sân bay, thuê xe theo giờ, vận chuyển hàng hoá/xe tải/van.
+          </p>
 
-        <div className="row g-4 align-items-center mt-3">
-          <div className="col-lg-7">
-            <h1 className="fw-black" style={{ fontWeight: 900, lineHeight: 1.1 }}>
-              Đặt chuyến nhanh – Giá rõ ràng, tài xế chuẩn
-            </h1>
-            <p className="mt-2 text-white-50">
-              Taxi 4–16 chỗ, đưa đón sân bay, thuê xe theo giờ, vận chuyển hàng hoá/xe tải/van.
-            </p>
-
-            <div className="d-flex gap-2 mt-2">
-              <div
-                className="flex-grow-1 d-flex align-items-center rounded-pill px-3"
-                style={{ border: "1px solid #ffffff44", background: "#ffffff1a", backdropFilter: "blur(4px)" }}
-              >
-                <i className="bi bi-search me-2" />
-                <input
-                  className="form-control border-0 bg-transparent text-white"
-                  placeholder="Bạn cần dịch vụ gì? (VD: Đưa đón sân bay)"
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && goSearch()}
-                />
-              </div>
-              <button className="btn btn-light rounded-pill fw-semibold px-4" onClick={goSearch}>
-                Tìm kiếm
-              </button>
+          <div className="d-flex gap-2 mt-2">
+            <div className="flex-grow-1 d-flex align-items-center hero-input">
+              <i className="bi bi-search me-2" />
+              <input
+                className="form-control"
+                placeholder="Ví dụ: Đưa đón sân bay, Liên tỉnh..."
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && goSearch()}
+              />
             </div>
-
-            <div className="d-flex gap-2 flex-wrap mt-3">
-              {[
-                { k: "airport", label: "Sân bay" },
-                { k: "hourly", label: "Theo giờ" },
-                { k: "intercity", label: "Liên tỉnh" },
-                { k: "cargo", label: "Hàng hoá" },
-              ].map((c) => (
-                <button
-                  key={c.k}
-                  className="btn btn-sm btn-light rounded-pill fw-semibold"
-                  onClick={() => goCategory(c.k)}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
+            <button className="btn btn-light rounded-pill fw-semibold px-4" onClick={goSearch}>
+              Tìm kiếm
+            </button>
           </div>
 
-          <div className="col-lg-5">
-            <div
-              style={{
-                minHeight: 280,
-                borderRadius: 16,
-                background:
-                  "url('https://images.unsplash.com/photo-1606666912724-38b9cf24bbf3?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat",
-                boxShadow: "inset 0 0 0 9999px rgba(0,0,0,.08)",
-              }}
-            />
+          <div className="d-flex gap-2 flex-wrap mt-3">
+            {["airport","hourly","intercity","cargo"].map((c) => (
+              <button key={c} className="chip" onClick={() => goCategory(c)}>
+                {c === "airport" ? "Sân bay" :
+                 c === "hourly" ? "Theo giờ" :
+                 c === "intercity" ? "Liên tỉnh" : "Hàng hoá"}
+              </button>
+            ))}
           </div>
         </div>
+
+        <div
+          className="col-lg-5 hero-img"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1606666912724-38b9cf24bbf3?q=80&w=1400&auto=format&fit=crop')",
+          }}
+        />
       </div>
     </section>
   );
 }
 
-/* =========================================================
-   BANNER CAROUSEL (đơn giản, một slide demo)
-   ========================================================= */
 function BannerCarousel() {
   return (
     <section className="container mb-4">
-      <div className="card-soft overflow-hidden">
-        <div className="row g-0">
-          <div className="col-lg-7 p-4 p-lg-5 d-flex flex-column justify-content-center">
-            <span className="badge bg-warning text-dark rounded-pill px-3 py-2 fw-semibold">ỨNG TUYỂN</span>
-            <h3 className="mt-3 fw-bold">Ứng tuyển dễ dàng – Nhanh chóng & tiện lợi</h3>
-            <p className="text-secondary">
-              Hàng ngàn công việc tài xế mới mỗi ngày, phù hợp với bạn.
-            </p>
-            <Link to="/drivers" className="btn btn-warning rounded-pill px-4 fw-semibold">
-              Ứng tuyển ngay
-            </Link>
+      <div id="bannerCarousel" className="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
+        <div className="carousel-inner rounded-4">
+          {/* Slide 1 */}
+          <div className="carousel-item active">
+            <div
+              className="card-soft"
+              style={{
+                background:
+                  "url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat",
+                minHeight: 320,
+              }}
+            >
+              <div className="p-4 p-lg-5 text-white" style={{ backdropFilter: "brightness(0.85)" }}>
+                <h3 className="fw-bold">Gia nhập đối tác – Thu nhập ổn định</h3>
+                <p className="mb-3">Hợp tác linh hoạt, thưởng doanh thu hấp dẫn</p>
+                <Link to="/drivers" className="btn btn-light rounded-pill px-4 fw-semibold">Tìm cơ hội</Link>
+              </div>
+            </div>
           </div>
-          <div
-            className="col-lg-5"
-            style={{
-              minHeight: 300,
-              background:
-                "url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat",
-            }}
-          />
+
+          {/* Slide 2 */}
+          <div className="carousel-item">
+            <div className="card-soft">
+              <div className="row g-0">
+                <div className="col-lg-7 p-4 p-lg-5 d-flex flex-column justify-content-center">
+                  <span className="badge bg-warning text-dark rounded-pill px-3 py-2 fw-semibold">ỨNG TUYỂN</span>
+                  <h3 className="mt-3 fw-bold">Ứng tuyển dễ dàng – Nhanh chóng & tiện lợi</h3>
+                  <p className="text-muted">Hàng ngàn công việc tài xế mới mỗi ngày, phù hợp với bạn.</p>
+                  <Link to="/drivers" className="btn btn-warning rounded-pill px-4 fw-semibold">Ứng tuyển ngay</Link>
+                </div>
+                <div
+                  className="col-lg-5"
+                  style={{
+                    background: "url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat",
+                    minHeight: "320px",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Controls */}
+        <button className="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+          <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span className="visually-hidden">Previous</span>
+        </button>
+        <button className="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+          <span className="carousel-control-next-icon" aria-hidden="true"></span>
+          <span className="visually-hidden">Next</span>
+        </button>
       </div>
     </section>
   );
 }
 
-/* =========================================================
-   CÁC CÔNG TY HÀNG ĐẦU
-   ========================================================= */
+/** ======= Các công ty hàng đầu (động) ======= */
 function TopCompanies() {
+  const [state, setState] = useState({ loading: true, items: [], error: "" });
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const page = await listCompanies({ isActive: true, sort: "rating:desc", page: 1, size: 6 });
+        if (alive) setState({ loading: false, items: page.items ?? [], error: "" });
+      } catch {
+        if (alive) setState({ loading: false, items: [], error: "Không tải được danh sách công ty" });
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
   return (
     <section className="container mt-2">
       <SectionHeader
@@ -462,36 +499,45 @@ function TopCompanies() {
         subtitle="Đối tác tuyển dụng uy tín – cập nhật việc mới mỗi ngày"
         to="/listings"
       />
-      <div className="row g-3">
-        {COMPANIES.map((c, i) => (
-          <div className="col-6 col-md-4 col-lg-2" key={i}>
-            <div className="card-soft p-3 text-center h-100">
-              <img src={c.logo} alt={c.name} className="mx-auto" style={{ height: 52, objectFit: "contain" }} />
-              <div className="fw-semibold small mt-3">{c.name}</div>
-              <div className="mt-2">
-                <span className="badge bg-light text-dark rounded-pill">VIỆC MỚI</span>
+      {state.loading ? (
+        <div className="row g-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div className="col-6 col-md-4 col-lg-2" key={i}>
+              <div className="card card-soft p-3 placeholder-wave" style={{ height: 112 }}>
+                <div className="placeholder col-8 mb-2" />
+                <div className="placeholder col-5" />
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="row g-3">
+          {state.items.map((c, i) => (
+            <div className="col-6 col-md-4 col-lg-2" key={c.id || i}>
+              <div className="card card-soft p-3 h-100">
+                <div className="d-flex align-items-center gap-3">
+                  <img
+                    src={c?.imgUrl || "https://dummyimage.com/120x60/eff3f9/222&text=Company"}
+                    alt={c?.name || "Company"}
+                    className="company-logo"
+                  />
+                  <div className="ms-1">
+                    <div className="fw-semibold">{c?.name || "Công ty"}</div>
+                    <div className="small text-secondary">Đánh giá: {Number(c?.rating || 0).toFixed(1)}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
 
-/* =========================================================
-   NGÀNH DỊCH VỤ TRỌNG ĐIỂM
-   ========================================================= */
+/** ======= Ngành dịch vụ trọng điểm (fix cứng) ======= */
 function CategoryTiles() {
   const navigate = useNavigate();
-  const items = [
-    { key: "airport",  icon: "bi-airplane",        label: "Đưa đón sân bay" },
-    { key: "hourly",   icon: "bi-hourglass-split", label: "Thuê xe theo giờ" },
-    { key: "intercity",icon: "bi-signpost-2",      label: "Liên tỉnh" },
-    { key: "cargo",    icon: "bi-truck",           label: "Vận chuyển hàng hoá" },
-    { key: "tour",     icon: "bi-map",             label: "Tour/City tour" },
-    { key: "shuttle",  icon: "bi-people",          label: "Đưa đón nhân viên" },
-  ];
   return (
     <section className="container mt-4">
       <SectionHeader
@@ -500,15 +546,17 @@ function CategoryTiles() {
         to="/services"
       />
       <div className="row g-3">
-        {items.map((c) => (
+        {[
+          { key: "airport", icon: "bi-airplane", label: "Đưa đón sân bay" },
+          { key: "hourly", icon: "bi-hourglass-split", label: "Thuê xe theo giờ" },
+          { key: "intercity", icon: "bi-signpost-2", label: "Liên tỉnh" },
+          { key: "cargo", icon: "bi-truck", label: "Vận chuyển hàng hoá" },
+          { key: "tour", icon: "bi-map", label: "Tour/City tour" },
+          { key: "shuttle", icon: "bi-people", label: "Đưa đón nhân viên" },
+        ].map((c) => (
           <div className="col-6 col-md-4 col-lg-2" key={c.key}>
-            <button
-              className="w-100 text-start btn bg-white border rounded-3 p-3"
-              onClick={() => navigate(`/services?category=${c.key}`)}
-            >
-              <div className="d-inline-grid place-items-center bg-light rounded-3 mb-2" style={{ width: 40, height: 40 }}>
-                <i className={`bi ${c.icon}`} />
-              </div>
+            <button className="w-100 text-start cat-tile" onClick={() => navigate(`/services?category=${c.key}`)}>
+              <div className="cat-icon mb-2"><i className={`bi ${c.icon}`} /></div>
               <div className="fw-semibold">{c.label}</div>
               <div className="small text-secondary mt-1">Xem dịch vụ</div>
             </button>
@@ -519,103 +567,80 @@ function CategoryTiles() {
   );
 }
 
-/* =========================================================
-   DỊCH VỤ MỚI NHẤT (đúng spec ls-*)
-   ========================================================= */
-const BRAND_LOGO = {
-  Vinasun: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Vinasun_logo.svg",
-  "Mai Linh": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Mai_Linh.svg",
-  "Xanh SM": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Green_car_icon.svg",
-  "G7 Taxi": "https://dummyimage.com/100x60/f0f3f7/222&text=G7",
-};
+/** ======= Dịch vụ mới nhất (động) ======= */
+function LatestServices() {
+  const [state, setState] = useState({ loading: true, items: [], error: "" });
 
-const LATEST_MOCK = [
-  { id: 1,  title: "Đón sân bay Tân Sơn Nhất → Q.1", brand: "Vinasun", price: "Từ 180K",   loc: "TP.HCM",  hot: true  },
-  { id: 2,  title: "Thuê xe theo giờ – 7 chỗ",        brand: "Mai Linh", price: "Từ 250K/h", loc: "Hà Nội",  hot: true  },
-  { id: 3,  title: "Chở hàng nhẹ nội thành",          brand: "G7 Taxi",  price: "Từ 120K",   loc: "Đà Nẵng", hot: true  },
-  { id: 4,  title: "Liên tỉnh SG ↔ Vũng Tàu",         brand: "Xanh SM",  price: "Từ 950K",   loc: "HCM - VT",hot: true  },
-  { id: 5,  title: "Đưa đón nhân viên (Q.7 ↔ Q.1)",    brand: "Vinasun",  price: "Theo tháng",loc: "TP.HCM",  hot: true  },
-  { id: 6,  title: "Taxi 7 chỗ theo giờ (3h)",         brand: "Mai Linh", price: "Từ 600K",   loc: "Hà Nội",  hot: true  },
-  // page 2 (demo)
-  { id: 7,  title: "Đưa đón sân bay Nội Bài → Ba Đình", brand: "Mai Linh", price: "Từ 180K",  loc: "Hà Nội", hot: false },
-  { id: 8,  title: "Chuyển trọ nhanh gọn (xe tải nhỏ)", brand: "G7 Taxi",  price: "Từ 200K",  loc: "TP.HCM", hot: false },
-  { id: 9,  title: "Liên tỉnh Huế ↔ Đà Nẵng",          brand: "Xanh SM",  price: "Từ 700K",  loc: "Huế - ĐN",hot: false },
-  { id:10,  title: "Đưa đón học sinh theo tháng",       brand: "Vinasun",  price: "Theo tháng",loc: "TP.HCM", hot: false },
-  { id:11,  title: "Thuê xe 16 chỗ đi tour",            brand: "Vinasun",  price: "Liên hệ",  loc: "Nhiều nơi", hot:false},
-  { id:12,  title: "Taxi 4 chỗ theo giờ (2h)",          brand: "Mai Linh", price: "Từ 300K",  loc: "Đà Nẵng", hot:false},
-];
-
-function LatestServices({ items = LATEST_MOCK }) {
-  const pageSize = 6;
-  const [page, setPage] = useState(0);
-
-  const pages = useMemo(() => Math.ceil(items.length / pageSize), [items.length]);
-  const slice = useMemo(
-    () => items.slice(page * pageSize, page * pageSize + pageSize),
-    [items, page]
-  );
-
-  const goPrev = () => setPage((p) => (p - 1 + pages) % pages);
-  const goNext = () => setPage((p) => (p + 1) % pages);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const page = await getLatestServices({ size: 6 });
+        if (alive) setState({ loading: false, items: page.items ?? [], error: "" });
+      } catch {
+        if (alive) setState({ loading: false, items: [], error: "Không tải được dịch vụ mới" });
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
 
   return (
     <section className="container mt-4">
-      <div className="ls-panel">
-        <div className="ls-header">
-          <h3 className="ls-title">Dịch vụ mới nhất</h3>
-          <Link to="/services" className="ls-link">XEM TẤT CẢ</Link>
+      <SectionHeader
+        title="Dịch vụ mới nhất"
+        subtitle="Những chuyến/đơn dịch vụ vừa được cập nhật"
+        to="/services"
+      />
+      {state.loading ? (
+        <div className="ls-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div className="ls-card placeholder-wave" key={i} style={{ height: 96 }}>
+              <div className="placeholder col-4 mb-2" />
+              <div className="placeholder col-2" />
+            </div>
+          ))}
         </div>
-
-        <div className="ls-list">
-          {slice.map((s) => (
-            <article key={s.id} className="ls-item">
-              <div className="ls-logo">
-                <img src={BRAND_LOGO[s.brand] || "https://dummyimage.com/90x54/f3f6fb/222"} alt={s.brand} />
-              </div>
-              <div className="ls-body">
-                <div className="d-flex align-items-center gap-2 flex-wrap">
-                  <h6 className="ls-job text-truncate-2">{s.title}</h6>
-                  {s.hot && (
-                    <span className="ls-hot d-inline-flex align-items-center gap-1">
+      ) : state.items.length ? (
+        <div className="ls-grid">
+          {state.items.map((s) => (
+            <div className="ls-card" key={s.id}>
+              <div className="d-flex align-items-center gap-3">
+                <img
+                  src={s.companyImgUrl || "https://dummyimage.com/80x80/eff3f9/222&text=LOGO"}
+                  alt={s.companyName}
+                  className="rounded-3"
+                  style={{ width: 64, height: 64, objectFit: "cover" }}
+                />
+                <div className="flex-grow-1">
+                  <div className="d-flex align-items-center gap-2 flex-wrap">
+                    <Link to={`/services?id=${s.id}`} className="fw-semibold link-dark text-decoration-none">
+                      {s.title}
+                    </Link>
+                    <span className="badge bg-light text-danger d-inline-flex align-items-center gap-1">
                       <i className="bi bi-fire" /> Hot
                     </span>
-                  )}
-                </div>
-                <div className="text-secondary mt-1">{s.brand}</div>
-                <div className="ls-price">{s.price}</div>
-                <div className="ls-loc">
-                  <i className="bi bi-geo-alt me-1" />
-                  {s.loc}
+                  </div>
+                  <div className="text-secondary small mt-1">{s.companyName}</div>
+                  <div className="ls-price">
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                      maximumFractionDigits: 0,
+                    }).format(s.priceCents)}
+                  </div>
                 </div>
               </div>
-            </article>
+            </div>
           ))}
         </div>
-
-        <div className="ls-footer">
-          <button className="ls-btn" onClick={goPrev} aria-label="Trang trước">
-            <i className="bi bi-chevron-left" />
-          </button>
-          {Array.from({ length: pages }).map((_, i) => (
-            <button
-              key={i}
-              className={`ls-dot ${i === page ? "is-active" : ""}`}
-              onClick={() => setPage(i)}
-              aria-label={`Chuyển đến trang ${i + 1}`}
-            />
-          ))}
-          <button className="ls-btn" onClick={goNext} aria-label="Trang sau">
-            <i className="bi bi-chevron-right" />
-          </button>
-        </div>
-      </div>
+      ) : (
+        <div className="text-secondary">Chưa có dữ liệu dịch vụ.</div>
+      )}
     </section>
   );
 }
 
-/* =========================================================
-   NHÀ TUYỂN DỤNG NỔI BẬT
-   ========================================================= */
+/** ======= Spotlight nhà tuyển dụng (fix cứng) ======= */
 function RecruiterSpotlight() {
   return (
     <section className="container mt-4">
@@ -624,49 +649,44 @@ function RecruiterSpotlight() {
         subtitle="Các đối tác có chương trình ưu đãi/thuê chuyến hấp dẫn"
         to="/listings"
       />
-      <div className="card-soft overflow-hidden">
+      <div className="spotlight card-soft">
         <div className="row g-0">
           <div className="col-lg-8 p-4 p-lg-5">
             <span className="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">
               ƯU ĐÃI DOANH NGHIỆP
             </span>
             <h3 className="fw-bold mt-3">Gói đưa đón nhân viên – Tiết kiệm đến 20%</h3>
-            <p className="text-secondary">
+            <p className="muted">
               Lộ trình cố định, tài xế chuyên nghiệp, báo cáo minh bạch hàng tuần. Phù hợp công ty 50–500 nhân sự.
             </p>
             <Link to="/advertise" className="btn btn-primary rounded-pill px-4">Tư vấn gói</Link>
           </div>
-          <div
-            className="col-lg-4"
-            style={{
-              minHeight: 220,
-              background:
-                "url('https://images.unsplash.com/photo-1474564862106-1f23a9655d15?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat",
-            }}
-          />
+          <div className="col-lg-4 right" />
         </div>
       </div>
     </section>
   );
 }
 
-/* =========================================================
-   MẸO HAY & BẢN TIN
-   ========================================================= */
+/** ======= Mẹo hay & Bản tin (fix cứng) ======= */
+const tips = [
+  { id: 1, title: "3 cách đặt xe sân bay tiết kiệm 20%", img: "https://images.unsplash.com/photo-1543269865-0a740d43b90c?q=80&w=1200&auto=format&fit=crop" },
+  { id: 2, title: "Checklist chuyển nhà nhanh gọn", img: "https://images.unsplash.com/photo-1520367745676-56196632073f?q=80&w=1200&auto=format&fit=crop" },
+  { id: 3, title: "Thuê xe theo giờ: khi nào hợp lý?", img: "https://images.unsplash.com/photo-1479142506502-19b3a3b7ff33?q=80&w=1200&auto=format&fit=crop" },
+];
+
 function TipsNews() {
   return (
     <section className="container mt-4">
       <SectionHeader title="Mẹo hay & Bản tin" subtitle="Kinh nghiệm di chuyển, vận chuyển thông minh" to="/feedback" actionText="Xem thêm" />
       <div className="row g-3">
-        {TIPS.map((t) => (
+        {tips.map((t) => (
           <div className="col-12 col-md-4" key={t.id}>
-            <div className="card-soft h-100 overflow-hidden">
-              <div style={{ height: 120, backgroundImage: `url('${t.img}')`, backgroundSize: "cover", backgroundPosition: "center" }} />
+            <div className="mini-card h-100">
+              <div className="mini-thumb" style={{ backgroundImage: `url('${t.img}')` }} />
               <div className="p-3">
                 <div className="fw-semibold">{t.title}</div>
-                <Link to="/feedback" className="btn btn-sm btn-outline-secondary rounded-pill mt-2">
-                  Đọc tiếp
-                </Link>
+                <Link to="/feedback" className="btn btn-sm btn-outline-secondary rounded-pill mt-2">Đọc tiếp</Link>
               </div>
             </div>
           </div>
@@ -676,18 +696,21 @@ function TipsNews() {
   );
 }
 
-/* =========================================================
-   TESTIMONIALS
-   ========================================================= */
+/** ======= Testimonials (fix cứng) ======= */
+const testimonials = [
+  { id: 1, name: "Anh Trọng – Quận 3", text: "Đặt xe sân bay 5 phút có tài xế, giá hiển thị rõ ràng. Tài xế thân thiện!", company: "Vinasun" },
+  { id: 2, name: "Chị Hạnh – Hà Nội", text: "Gói đưa đón nhân viên chạy rất ổn định, báo cáo hàng tuần đầy đủ.", company: "Mai Linh" },
+];
+
 function Testimonials() {
   return (
     <section className="container mt-4">
-      <SectionHeader title="Khách hàng nói gì?" subtitle="Trải nghiệm thật từ người dùng thực" />
+      <SectionHeader title="Khách hàng nói gì?" subtitle="Trải nghiệm thật từ người dùng thực" to="" actionText=" " />
       <div className="row g-3">
-        {TESTIMONIALS.map((c) => (
+        {testimonials.map((c) => (
           <div className="col-12 col-md-6" key={c.id}>
-            <div className="card-soft h-100 p-3">
-              <div className="mb-2" style={{ fontSize: 28, color: "#94a3b8", lineHeight: 0 }}>“</div>
+            <div className="testimonial h-100">
+              <div className="mb-2" style={{fontSize:28, color:"#94a3b8", lineHeight:0}}>“</div>
               <div className="mb-2">{c.text}</div>
               <div className="small text-secondary">
                 <i className="bi bi-person-circle me-1" />
@@ -701,13 +724,11 @@ function Testimonials() {
   );
 }
 
-/* =========================================================
-   APP PROMO
-   ========================================================= */
+/** ======= App promo (fix cứng) ======= */
 function AppPromo() {
   return (
     <section className="container my-4">
-      <div className="card-soft d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 p-3 p-lg-4">
+      <div className="promo d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3">
         <div>
           <h5 className="fw-bold mb-1">Đặt chuyến nhanh hơn với ứng dụng</h5>
           <div className="text-secondary">Theo dõi tài xế theo thời gian thực, lưu địa chỉ quen thuộc</div>
@@ -721,20 +742,37 @@ function AppPromo() {
   );
 }
 
-/* =========================================================
-   PAGE: HOME
-   ========================================================= */
-export default function Home() {
+/** ==== PAGE ==== */
+export default function HomePage() {
   return (
     <>
+      <Theme />
+
+      {/* 1) “Bạn cần dịch vụ gì?” */}
       <HeroSearch />
+
+      {/* 2) Banner carousel */}
       <BannerCarousel />
+
+      {/* 3) Các công ty hàng đầu (API) */}
       <TopCompanies />
+
+      {/* 4) Ngành dịch vụ trọng điểm */}
       <CategoryTiles />
+
+      {/* 5) Dịch vụ mới nhất (API) */}
       <LatestServices />
+
+      {/* 6) Spotlight đối tác */}
       <RecruiterSpotlight />
+
+      {/* 7) Tin/mẹo */}
       <TipsNews />
+
+      {/* 8) Testimonials */}
       <Testimonials />
+
+      {/* 9) App promo */}
       <AppPromo />
     </>
   );
