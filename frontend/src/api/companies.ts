@@ -9,6 +9,26 @@ import type {
     JobApplication,
 } from "./types";
 
+/** Dịch vụ public (map với PublicServiceDto của BE) */
+export type PublicService = {
+    id: string;
+    companyId: string;
+    title: string;
+    description?: string | null;
+    priceCents: number;
+    updatedAt: string;
+    companyName: string;
+    companyImgUrl?: string | null;
+  };
+/** Unwrap chuẩn ApiResponse<T> (theo interceptor current) */
+function pickData<T>(res: any): T {
+    const body = res?.data;
+    if (body && typeof body === "object" && "success" in body) {
+      return (body as { success: boolean; data: T }).data as T;
+    }
+    return body as T;
+  }
+
 export async function listCompanyTransactions(
     companyId: string,
     params: Record<string, any> = {}
@@ -24,10 +44,29 @@ export async function listCompanyTransactions(
     };
 }
 
-export async function listCompanies(params: Record<string, any> = {}) {
+// export async function listCompanies(params: Record<string, any> = {}) {
+//     const res = await api.get("/api/companies", { params });
+//     return res.data.data as PageResult<Company>;
+// }
+export async function listCompanies(params: {
+    name?: string;
+    membership?: string;
+    isActive?: boolean;
+    minRating?: number;
+    maxRating?: number;
+    page?: number;
+    size?: number;
+    sort?: string; // "rating:desc" | "name:asc" ...
+  } = {}): Promise<PageResult<Company>> {
     const res = await api.get("/api/companies", { params });
-    return res.data.data as PageResult<Company>;
-}
+    // interceptor giữ nguyên body {success,data,error}
+    const body = res.data as ApiResponse<PageResult<Company>>;
+    return (body?.data as PageResult<Company>) ?? {
+      page: 1, size: 0, totalItems: 0, totalPages: 0,
+      hasNext: false, hasPrev: false, items: []
+    };
+  }
+
 
 export async function getCompanyById(id: string) {
     const res = await api.get(`/api/companies/${id}`);
@@ -263,4 +302,11 @@ export async function payMembership(
         payload
     );
     return res.data.data; // { membership, expiresAt, balance }
+}
+/** Public: dịch vụ mới nhất */
+export async function getLatestServices(params: { size?: number } = {}) {
+  const res = await api.get("/api/companies/services/latest", {
+    params: { page: 1, size: params.size ?? 6 },
+  });
+  return pickData<PageResult<PublicService>>(res);
 }

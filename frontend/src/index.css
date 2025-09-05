@@ -1,77 +1,288 @@
-/* Tabs look */
-.subnav-tabs .nav-link {
-    color: #6c757d;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s ease, border-color 0.2s ease;
-    font-weight: 500;
-    white-space: nowrap;
-}
-.subnav-tabs .nav-link:hover {
-    color: #0d6efd;
-}
-.subnav-tabs .nav-link.active {
-    color: #0d6efd;
-    border-bottom: 2px solid #0d6efd;
+/* ============== RESET & THEME VARS ============== */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+:root{
+  /* Navbar theme */
+  --nv-bg-1:#063a9b;
+  --nv-bg-2:#052f82;
+  --nv-ring:#2f5ce6;
+  --nv-ink:#e6ecff;
+  --nv-ink-strong:#ffffff;
+
+  /* Content theme */
+  --ink:#0f172a;
+  --muted:#64748b;
+  --soft:#f8fafc;
+
+  /* Đồng bộ với NAVBAR_HEIGHT trong MainLayout.tsx nếu có dùng */
+  --navbar-height: 74px;
 }
 
-/* Scrollable wrapper */
-.subnav-wrapper {
-    position: relative;
-}
-.subnav-scroll {
-    overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-}
-.subnav-scroll::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+html, body { height: 100%; }
+body{
+  margin: 0;
+  color: var(--ink);
+  background: #fff;         /* ❗ Trả lại nền trắng mặc định */
+  overflow-x: hidden;
 }
 
-/* Shadow effect */
-.subnav-wrapper::before,
-.subnav-wrapper::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 24px;
-    pointer-events: none;
-    transition: opacity 0.2s;
+img{ max-width:100%; display:block; }
+
+/* ============== NAVBAR SKIN ============== */
+.nv-gradient{
+  background: linear-gradient(90deg, var(--nv-bg-1), var(--nv-bg-2));
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.nv-shadow{
+  box-shadow: 0 2px 0 rgba(255,255,255,.12) inset, 0 10px 20px rgba(2,6,23,.22);
+}
+.header-container{ padding-top:.25rem; padding-bottom:.25rem; }
+
+/* Link trên nền xanh navbar */
+.nv-link{
+  color: var(--nv-ink) !important;
+  opacity: .92;
+  text-decoration: none;
+}
+.nv-link.active,
+.nv-link:hover{
+  color: var(--nv-ink-strong) !important;
+  opacity: 1;
 }
 
-.subnav-wrapper::before {
-    left: 0;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
+/* Nút dạng pill trong navbar */
+.pill-btn{
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:999px;
+  color:var(--nv-ink);
+  padding:.45rem .9rem;
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  text-decoration:none;
+  background: transparent;
+  backdrop-filter:saturate(120%) blur(2px);
+  cursor: pointer;
 }
-.subnav-wrapper::after {
-    right: 0;
-    background: linear-gradient(to left, rgba(0, 0, 0, 0.15), transparent);
+.pill-btn:hover{ border-color:#6fa3ff; color:#fff; }
+
+/* Icon tròn (chuông, avatar…) */
+.icon-btn{
+  width:36px; height:36px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.28);
+  display:grid; place-items:center;
+  color:#fff; background:transparent;
+}
+.icon-btn:hover{ border-color:#6fa3ff; }
+
+/* Ẩn caret dropdown trong navbar */
+.nv-gradient .dropdown-toggle::after{ display:none !important; }
+
+/* Dropdown "Tất cả danh mục" */
+#all-categories .dropdown-menu{
+  min-width:520px;
+  padding:12px;
+  border-radius:16px;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(220px, 1fr));
+  gap:6px;
+}
+#all-categories .dropdown-item{
+  border-radius:10px;
+  padding:.55rem .75rem;
+  display:flex; align-items:center;
+}
+#all-categories .dropdown-item:hover{ background:#f1f5f9; }
+
+/* Dropdown avatar */
+#user-dropdown .dropdown-toggle{
+  display:inline-flex; align-items:center; line-height:1;
 }
 
-.subnav-scroll.at-start ~ ::before {
-    opacity: 0;
+/* ============== SUBNAV (tabs dưới header) ============== */
+.subnav-tabs .nav-link{
+  color:#6c757d;
+  border-bottom:2px solid transparent;
+  transition: color .2s ease, border-color .2s ease;
+  font-weight:500;
+  white-space:nowrap;
 }
-.subnav-scroll.at-end ~ ::after {
-    opacity: 0;
+.subnav-tabs .nav-link:hover{ color:#0d6efd; }
+.subnav-tabs .nav-link.active{
+  color:#0d6efd; border-bottom-color:#0d6efd;
+}
+.subnav-scroll{ overflow-x:auto; scrollbar-width:none; }
+.subnav-scroll::-webkit-scrollbar{ display:none; }
+.subnav-shadow-left,
+.subnav-shadow-right{
+  width:24px; pointer-events:none;
+  position:absolute; top:0; bottom:0;
+}
+.subnav-shadow-left{
+  left:0; background:linear-gradient(to right, rgba(0,0,0,.12), transparent);
+}
+.subnav-shadow-right{
+  right:0; background:linear-gradient(to left, rgba(0,0,0,.12), transparent);
 }
 
-/* COMPANY CARD */
-.company-card.hover-lift {
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+/* ============== CARDS / TILES chung ============== */
+.card-soft{
+  background:#fff;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(2,6,23,.08);
+  overflow: hidden;
+  transition: transform .18s ease, box-shadow .18s ease;
 }
-.company-card.hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
-}
-.company-card.hover-lift:hover .company-card__img {
-    transform: scale(1.03);
+.card-soft:hover{
+  transform:translateY(-2px);
+  box-shadow:0 16px 32px rgba(2,6,23,.12);
 }
 
+.company-logo{ height:52px; object-fit:contain; }
 
-/* DRIVER CARD */
-.driver-card.hover-lift {
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+/* ============== HERO SEARCH (section riêng) ============== */
+.hero-search{
+  background: radial-gradient(900px 360px at 12% -20%, #0c6cff33 0%, transparent 60%),
+              linear-gradient(135deg, #0b5cab 0%, #0a4c90 70%);
+  color:#fff; border-radius:24px; overflow:hidden;
+  box-shadow: 0 16px 36px rgba(2,6,23,.18);
 }
-.driver-card.hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+.hero-search h1{ font-weight:900; line-height:1.1; letter-spacing:.2px; }
+.hero-badge{
+  background:#ffffff22; color:#fff;
+  border-radius:999px; padding:.45rem .95rem;
+  font-weight:700; letter-spacing:.5px;
 }
+.hero-input{
+  border:1px solid #ffffff44; border-radius:999px;
+  padding:.6rem .8rem; background:#ffffff1a; color:#fff;
+  backdrop-filter: blur(4px);
+}
+.hero-input .form-control{
+  background:transparent !important; border:0 !important; color:#fff !important;
+}
+.hero-input .form-control::placeholder{ color:#e2e8f0cc; }
+.hero-search .chip{
+  background:#fff; color:#0b5cab; border:0; border-radius:999px;
+  padding:.3rem .65rem; font-weight:600;
+}
+.hero-img{ min-height:320px; background-size:cover; background-position:center; }
+
+/* ============== CATEGORY & SERVICE tiles (Home) ============== */
+.cat-tile{
+  border:1px solid #e5e7eb; border-radius:14px; padding:14px; background:#fff;
+}
+.cat-tile:hover{
+  border-color:#cfe0ff; box-shadow:0 8px 18px rgba(2,6,23,.06);
+  transform:translateY(-2px); transition:.18s;
+}
+.cat-icon{
+  width:40px; height:40px; display:grid; place-items:center;
+  background:#eff6ff; border-radius:10px; font-size:20px; color:#1d4ed8;
+}
+
+.svc-card{
+  border:1px solid #e5e7eb; border-radius:14px; padding:14px; background:#fff; height:100%;
+}
+.svc-card:hover{
+  border-color:#dbeafe; box-shadow:0 10px 20px rgba(2,6,23,.06);
+  transform: translateY(-2px);
+}
+.price{ color:#16a34a; font-weight:800; }
+.badge-soft{ background:#f1f5f9; color:#0f172a; border-radius:999px; padding:.2rem .6rem; font-weight:600; }
+
+/* Spotlight, mini-card, testimonial, promo (Home) */
+.spotlight{ border-radius:18px; overflow:hidden; background:#fff; }
+.spotlight .right{
+  background: url('https://images.unsplash.com/photo-1474564862106-1f23a9655d15?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+  min-height:220px;
+}
+.mini-card{ border:1px solid #e5e7eb; border-radius:14px; overflow:hidden; background:#fff; }
+.mini-thumb{ height:120px; background-size:cover; background-position:center; }
+.testimonial{ border:1px solid #e5e7eb; border-radius:16px; padding:16px; background:#fff; }
+.promo{ background:#f8fafc; border-radius:18px; padding:24px; }
+
+/* ===== Latest Services Panel (Home) ===== */
+.panel {
+    background: #fff;
+    border: 1px solid #e9edf3;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(2, 6, 23, 0.06);
+  }
+  .panel--padded { padding: 16px; }
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 18px; border-bottom: 1px solid #eef2f7;
+  }
+  .panel-title {
+    font-size: 22px; font-weight: 800; margin: 0; color: #0f172a;
+  }
+  .panel-link {
+    font-weight: 700; color: #2563eb; text-decoration: none;
+  }
+  .panel-link:hover { text-decoration: underline; }
+  
+  .job-list {
+    display: grid; gap: 16px; padding: 16px;
+  }
+  @media (min-width: 768px){ .job-list{ grid-template-columns: repeat(2,1fr); } }
+  @media (min-width: 1200px){ .job-list{ grid-template-columns: repeat(3,1fr); } }
+  
+  .job-item {
+    display: flex; gap: 14px; align-items: center;
+    background: #fff; border: 1px solid #eef2f7; border-radius: 12px;
+    padding: 16px; transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+  }
+  .job-item:hover {
+    border-color: #dbeafe; transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(2,6,23,.06);
+  }
+  
+  .job-logo {
+    width: 64px; min-width: 64px; height: 64px; border-radius: 12px;
+    display: grid; place-items: center; background: #f8fafc; overflow: hidden;
+  }
+  .job-logo img { max-width: 80%; max-height: 80%; }
+  .job-body { flex: 1 1 auto; min-width: 0; }
+  .job-title {
+    font-weight: 700; font-size: 16px; color: #0f172a; margin: 0 0 4px 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .job-company { color: #4b5563; font-size: 13px; }
+  .job-salary { color: #f97316; font-weight: 800; margin-top: 4px; }
+  .job-loc { color: #475569; font-size: 13px; margin-top: 2px; }
+  
+  .badge-hot {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #ffeeee; color: #ef4444; border-radius: 999px;
+    padding: 2px 8px; font-size: 12px; font-weight: 700;
+  }
+  
+  .panel-footer {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 0 18px;
+  }
+  .pager-dot {
+    width: 8px; height: 8px; border-radius: 999px; background: #d1d5db; border: 0;
+  }
+  .pager-dot.is-active { background: #2563eb; }
+  
+  .btn-circle {
+    width: 28px; height: 28px; border-radius: 999px; border: 1px solid #e5e7eb;
+    background: #fff; display: grid; place-items: center;
+  }
+  .btn-circle:hover { background: #f8fafc; }
+  .section-title { font-weight: 800; color: #0f172a; }
+  .muted { color: #64748b; }
+  .card-soft { border: 0; border-radius: 18px; background: #fff; box-shadow: 0 12px 28px rgba(2,6,23,.08); overflow: hidden; }
+  .card-soft:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(2,6,23,.12); transition: .18s ease; }
+  
+  /* Lưới dịch vụ mới nhất */
+  .ls-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 992px) { .ls-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .ls-card { border: 1px solid #eef1f4; border-radius: 16px; padding: 16px; background: #fff; }
+  .ls-card:hover { box-shadow: 0 8px 20px rgba(2,6,23,.06); }
+  .ls-price { color: #ff6a00; font-weight: 800; margin-top: 2px; }

@@ -1,3 +1,4 @@
+// src/routes/router.jsx
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import AuthLayout from "../components/layout/AuthLayout";
@@ -20,67 +21,67 @@ import { ROLE_ROUTES, PUBLIC_ROUTES } from "./routes.tsx";
 
 // helper builder
 function buildProtectedChildren(role) {
-    const def = ROLE_ROUTES[role];
-    if (!def) return [];
-    return def.nav.concat(def.children).map((r) => ({
-        path: r.path,
-        element: r.element,
-        index: r.end === true,
-    }));
+  const def = ROLE_ROUTES[role];
+  if (!def) return [];
+  return def.nav.concat(def.children).map((r) => ({
+    path: r.path,
+    element: r.element,
+    index: r.end === true,
+  }));
 }
 
 const router = createBrowserRouter([
-    {
-        path: "/",
-        element: (
-            <MainLayout>
-                <AuthLayout />
-            </MainLayout>
-        ),
+  {
+    path: "/",
+    element: (
+      <MainLayout>
+        <AuthLayout />
+      </MainLayout>
+    ),
+    children: [
+      // public basic (Rider base already covers "/")
+      { index: true, element: <HomePage /> },
+      { path: "listings", element: <CompaniesPage /> },
+      { path: "drivers", element: <DriversPage /> },
+      { path: "services", element: <ServicesPage /> },
+      { path: "advertise", element: <AdvertisePage /> },
+      { path: "feedback", element: <FeedbackPage /> },
+
+      // auth
+      { path: "login", element: <LoginPage /> },
+      { path: "register", element: <RegisterPage /> },
+
+      // protected: Admin
+      {
+        path: ROLE_ROUTES.Admin.base.slice(1),
+        element: <ProtectedRoute allowedRoles={["Admin"]} />,
+        children: buildProtectedChildren("Admin"),
+      },
+
+      // protected: Company
+      {
+        path: ROLE_ROUTES.Company.base.slice(1),
+        element: <ProtectedRoute allowedRoles={["Company"]} />,
+        children: buildProtectedChildren("Company"),
+      },
+
+      // protected: Driver
+      {
+        path: ROLE_ROUTES.Driver.base.slice(1),
+        element: <ProtectedRoute allowedRoles={["Driver"]} />,
+        children: buildProtectedChildren("Driver"),
+      },
+
+      // error layout + catch-all
+      {
+        element: <ErrorLayout />,
         children: [
-            // public basic (Rider base already covers "/")
-            { index: true, element: <HomePage /> },
-            { path: "listings", element: <CompaniesPage /> },
-            { path: "drivers", element: <DriversPage /> },
-            { path: "services", element: <ServicesPage /> },
-            { path: "advertise", element: <AdvertisePage /> },
-            { path: "feedback", element: <FeedbackPage /> },
-
-            // auth
-            { path: "login", element: <LoginPage /> },
-            { path: "register", element: <RegisterPage /> },
-
-            // protected: Admin
-            {
-                path: ROLE_ROUTES.Admin.base.slice(1),
-                element: <ProtectedRoute allowedRoles={["Admin"]} />,
-                children: buildProtectedChildren("Admin"),
-            },
-
-            // protected: Company
-            {
-                path: ROLE_ROUTES.Company.base.slice(1),
-                element: <ProtectedRoute allowedRoles={["Company"]} />,
-                children: buildProtectedChildren("Company"),
-            },
-
-            // protected: Driver
-            {
-                path: ROLE_ROUTES.Driver.base.slice(1),
-                element: <ProtectedRoute allowedRoles={["Driver"]} />,
-                children: buildProtectedChildren("Driver"),
-            },
-
-            // error layout + catch-all
-            {
-                element: <ErrorLayout />,
-                children: [
-                    { path: "unauthorized", element: <UnauthorizedPage /> },
-                    { path: "*", element: <NotFoundPage /> },
-                ],
-            },
+          { path: "unauthorized", element: <UnauthorizedPage /> },
+          { path: "*", element: <NotFoundPage /> },
         ],
-    },
+      },
+    ],
+  },
 ]);
 
 export { router };
