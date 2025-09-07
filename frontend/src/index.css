@@ -1,0 +1,77 @@
+/* Tabs look */
+.subnav-tabs .nav-link {
+    color: #6c757d;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.subnav-tabs .nav-link:hover {
+    color: #0d6efd;
+}
+.subnav-tabs .nav-link.active {
+    color: #0d6efd;
+    border-bottom: 2px solid #0d6efd;
+}
+
+/* Scrollable wrapper */
+.subnav-wrapper {
+    position: relative;
+}
+.subnav-scroll {
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+}
+.subnav-scroll::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Shadow effect */
+.subnav-wrapper::before,
+.subnav-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 24px;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.subnav-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
+}
+.subnav-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.15), transparent);
+}
+
+.subnav-scroll.at-start ~ ::before {
+    opacity: 0;
+}
+.subnav-scroll.at-end ~ ::after {
+    opacity: 0;
+}
+
+/* COMPANY CARD */
+.company-card.hover-lift {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.company-card.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+}
+.company-card.hover-lift:hover .company-card__img {
+    transform: scale(1.03);
+}
+
+
+/* DRIVER CARD */
+.driver-card.hover-lift {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.driver-card.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+}
