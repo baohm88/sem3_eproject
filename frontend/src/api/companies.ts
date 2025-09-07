@@ -292,7 +292,5 @@ export async function getCompanyPublicProfile(
     params: Record<string, any> = {}
 ) {
     const res = await api.get(`/api/companies/${companyId}/public`, { params });
-    console.log("company public profile:", res);
-
     return res.data.data as CompanyPublicProfile;
 }

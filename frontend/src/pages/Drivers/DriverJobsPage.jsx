@@ -76,7 +76,7 @@ export default function DriverJobsPage() {
                 const s = await getEmploymentStatus(driverUserId);
                 setIsHired(!!s?.isHired);
             } catch (e) {
-                // ignore
+                toast.error(e?.message)
             }
         };
         loadEmployment();
@@ -101,8 +101,8 @@ export default function DriverJobsPage() {
                 });
                 setAppliedIds(ids);
                 setApplicationsMap(map);
-            } catch {
-                // ignore
+            } catch (e) {
+                toast.error(e?.message)
             }
         };
         loadApplications();
@@ -249,11 +249,7 @@ export default function DriverJobsPage() {
     return (
         <div>
             <FilterBar
-                search={{
-                    value: q,
-                    onChange: setQ,
-                    placeholder: "Search companies by name…",
-                }}
+                search={{value: q, onChange: setQ, placeholder: "Search companies by name…"}}
                 selects={[
                     {
                         value: membership,

@@ -193,33 +193,6 @@ export default function DriverCard({
                                     )}
                                 </div>
                             </div>
-
-                            <div className="mt-auto d-flex justify-content-end">
-                                {isInvited ? (
-                                    <button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onRecall?.(driver);
-                                        }}
-                                    >
-                                        Recall Invitation
-                                    </button>
-                                ) : (
-                                    !!onInvite && (
-                                        <button
-                                            className={`btn ${isAvailable ? "btn-primary": "btn-secondary"} btn-sm`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onInvite(driver);
-                                            }}
-                                            disabled={ !isAvailable || isHired}
-                                        >
-                                            Invite
-                                        </button>
-                                    )
-                                )}
-                            </div>
                         </div>
 
                         {showBio && (
@@ -250,6 +223,33 @@ export default function DriverCard({
                             <div className="text-muted fst-italic">No skills</div>
                         )}
                     </div>
+
+                    <div className="mt-3">
+                                {isInvited ? (
+                                    <button
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onRecall?.(driver);
+                                        }}
+                                    >
+                                        Recall Invitation
+                                    </button>
+                                ) : (
+                                    !!onInvite && (
+                                        <button
+                                            className={`btn ${isAvailable ? "btn-primary": "btn-secondary"} btn-sm`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onInvite(driver);
+                                            }}
+                                            disabled={ !isAvailable || isHired}
+                                        >
+                                            Invite
+                                        </button>
+                                    )
+                                )}
+                            </div>
                     {footer && <div className="mt-2">{footer}</div>}
                 </div>
             </Card.Body>

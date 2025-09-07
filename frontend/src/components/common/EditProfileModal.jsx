@@ -43,6 +43,8 @@ export default function EditProfileModal({
     }
   };
 
+  
+
   return (
     <Modal show={show} onHide={onHide} centered scrollable={scrollable}>
       <Modal.Header closeButton>
