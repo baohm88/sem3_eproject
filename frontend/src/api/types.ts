@@ -43,6 +43,20 @@ export type DriverProfile = {
     imgUrl?: string;
 };
 
+export type CompanyDriver = {
+  userId: string;
+  fullName: string;
+  phone?: string;
+  bio?: string;
+  imgUrl?: string;
+  rating: number;
+  skills?: string;
+  location?: string;
+  isAvailable: boolean;
+  joinedAt: string;        // ISO
+  baseSalaryCents: number;
+};
+
 export type RiderProfile = {
     id: string;
     userId: string;

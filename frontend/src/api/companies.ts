@@ -8,6 +8,7 @@ import type {
     Invite,
     JobApplication,
     CompanyPublicProfile,
+    CompanyDriver
 } from "./types";
 
 export async function listCompanyTransactions(
@@ -45,14 +46,13 @@ export async function updateMyCompany(payload: Partial<Company>) {
     return res.data.data as Company;
 }
 
+
 export async function listCompanyDrivers(
-    companyId: string,
-    params: Record<string, any> = {}
+  companyId: string,
+  params: Record<string, any> = {}
 ) {
-    const res = await api.get(`/api/companies/${companyId}/drivers`, {
-        params,
-    });
-    return res.data.data;
+  const res = await api.get(`/api/companies/${companyId}/drivers`, { params });
+  return res.data.data as PageResult<CompanyDriver>;
 }
 
 export async function listTransactions(
