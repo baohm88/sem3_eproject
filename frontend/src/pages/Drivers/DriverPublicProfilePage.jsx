@@ -51,8 +51,6 @@ export default function DriverPublicProfilePage() {
         [driver?.skills]
     );
 
-    console.log("DRIVER ID", driverId);
-
     useEffect(() => {
         (async () => {
             try {

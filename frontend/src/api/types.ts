@@ -153,3 +153,11 @@ export type DriverPublicProfile = {
         createdAt: string;
     }>;
 };
+
+export type CompanyPublicProfile = {
+    company: Company;
+    rating: number;
+    activeServicesCount: number;
+    driversCount: number;
+    services: Service[];
+};

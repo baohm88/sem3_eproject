@@ -28,6 +28,7 @@ import DriverPayments from "../pages/Drivers/DriverPayments";
 
 import DriversPage from "../pages/Drivers/DriversPage";
 import DriverDashboard from "../pages/Drivers/DriverDashboard";
+import CompanyPublicProfilePage from "../pages/Companies/CompanyPublicProfilePage";
 
 export type Role = "Admin" | "Company" | "Driver" | "Rider";
 
@@ -51,6 +52,7 @@ export type RoleRoutes = Record<
 export const PUBLIC_ROUTES: RouteItem[] = [
     { path: "/", label: "Home", element: <HomePage />, end: true },
     { path: "/listings", label: "Listings", element: <CompaniesPage /> },
+    { path: "/listings/:companyId", element: <CompanyPublicProfilePage /> },
     { path: "/drivers", label: "Drivers", element: <DriversPage /> },
     { path: "/drivers/:driverId", element: <DriverPublicProfilePage /> },
     { path: "/services", label: "Services", element: <ServicesPage /> },

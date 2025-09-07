@@ -7,6 +7,7 @@ import type {
     Transaction,
     Invite,
     JobApplication,
+    CompanyPublicProfile,
 } from "./types";
 
 export async function listCompanyTransactions(
@@ -212,7 +213,10 @@ export async function updateCompanyService(
     companyId: string,
     serviceId: string,
     payload: Partial<
-        Pick<Service, "title" | "imgUrl" | "description" | "priceCents" | "isActive">
+        Pick<
+            Service,
+            "title" | "imgUrl" | "description" | "priceCents" | "isActive"
+        >
     >
 ) {
     const res = await api.put(
@@ -254,8 +258,19 @@ export async function payMembership(
     return res.data.data; // { membership, expiresAt, balance }
 }
 
+export async function listAllCompaniesServices(
+    params: Record<string, any> = {}
+) {
+    const res = await api.get("/api/companies/all-services", { params });
+    return res.data.data as PageResult<Service>;
+}
 
-export async function listAllCompaniesServices(params: Record<string, any> = {}) {
-  const res = await api.get("/api/companies/all-services", { params });
-  return res.data.data as PageResult<Service>;
+export async function getCompanyPublicProfile(
+    companyId: string,
+    params: Record<string, any> = {}
+) {
+    const res = await api.get(`/api/companies/${companyId}/public`, { params });
+    console.log("company public profile:", res);
+
+    return res.data.data as CompanyPublicProfile;
 }

@@ -189,7 +189,7 @@ export default function CompaniesPage() {
                                         toggleFavorite(c.id)
                                     }
                                     onClick={() =>
-                                        navigate(`/companies/${c.id}`)
+                                        navigate(`/listings/${c.id}`)
                                     }
                                     showDescription
                                     showStatusBadges

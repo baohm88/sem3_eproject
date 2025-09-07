@@ -144,8 +144,5 @@ export async function getEmploymentStatus(userId: string) {
 
 export async function getDriverPublicProfile(userId: string) {
     const res = await api.get(`/api/drivers/${userId}/public`);
-
-    console.log("public profile:", res);
-
     return res.data.data as DriverPublicProfile;
 }
