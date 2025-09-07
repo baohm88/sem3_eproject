@@ -8,7 +8,7 @@ import type {
     Invite,
     JobApplication,
     CompanyPublicProfile,
-    CompanyDriver
+    CompanyDriver,
 } from "./types";
 
 export async function listCompanyTransactions(
@@ -46,13 +46,14 @@ export async function updateMyCompany(payload: Partial<Company>) {
     return res.data.data as Company;
 }
 
-
 export async function listCompanyDrivers(
-  companyId: string,
-  params: Record<string, any> = {}
+    companyId: string,
+    params: Record<string, any> = {}
 ) {
-  const res = await api.get(`/api/companies/${companyId}/drivers`, { params });
-  return res.data.data as PageResult<CompanyDriver>;
+    const res = await api.get(`/api/companies/${companyId}/drivers`, {
+        params,
+    });
+    return res.data.data as PageResult<CompanyDriver>;
 }
 
 export async function listTransactions(
@@ -65,19 +66,40 @@ export async function listTransactions(
     return res.data.data as PageResult<Transaction>;
 }
 
+// export async function paySalary(
+//     companyId: string,
+//     payload: {
+//         driverUserId: string;
+//         amountCents: number;
+//         idempotencyKey?: string;
+//     }
+// ) {
+//     const res = await api.post(
+//         `/api/companies/${companyId}/pay-salary`,
+//         payload
+//     );
+//     return res.data.data;
+// }
 export async function paySalary(
     companyId: string,
     payload: {
         driverUserId: string;
         amountCents: number;
-        idempotencyKey?: string;
+        period?: string; // "YYYY-MM"
+        note?: string;
+        idempotencyKey?: string; // optional - BE tự chuẩn hoá nếu không gửi
     }
 ) {
     const res = await api.post(
         `/api/companies/${companyId}/pay-salary`,
         payload
     );
-    return res.data.data;
+    return res.data.data as {
+        companyBalance: number;
+        driverBalance: number;
+        period: string;
+        reused?: boolean; // idempotency: nếu đã trả kỳ này, BE có thể trả reused=true
+    };
 }
 
 export async function listApplications(
