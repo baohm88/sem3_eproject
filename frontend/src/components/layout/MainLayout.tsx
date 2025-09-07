@@ -87,21 +87,6 @@ export default function MainLayout() {
     };
     const toggleSidebar = () => setShowSidebar((prev) => !prev);
 
-    const onClickNav = (to: string, e?: React.MouseEvent) => {
-        if (to === "/advertise") {
-            if (!isAuthenticated) {
-                e?.preventDefault();
-                navigate("/login", { state: { from: location } });
-                return;
-            }
-            if (profile?.role !== "Company") {
-                e?.preventDefault();
-                toast.error("Only companies can access Advertise");
-                return;
-            }
-        }
-    };
-
     return (
         <>
             {/* MAIN NAV - fixed top */}
@@ -136,7 +121,6 @@ export default function MainLayout() {
                                         key={to}
                                         to={to}
                                         end={end}
-                                        onClick={(e) => onClickNav(to, e)}
                                         className={({ isActive }) =>
                                             `nav-link d-flex align-items-center m-2 ${
                                                 isActive
