@@ -34,34 +34,17 @@ export default function CompanyProfilePage() {
         try {
             const w = await getCompanyWallet(cid);
             setWallet(w);
-            const tRes = await listCompanyTransactions(cid, {
-                size: 5,
-                page: 1,
-            });
+            const tRes = await listCompanyTransactions(cid, { size: 3, page: 1 });
             setTxs(tRes.items || []);
         } catch (e) {
-            // có thể hiện toast nếu muốn
+            toast.error(e)
         }
     };
 
     const editFields = [
-        {
-            name: "name",
-            label: "Name",
-            placeholder: "Company name",
-        },
-        {
-            name: "description",
-            label: "Description",
-            as: "textarea",
-            rows: 3,
-            placeholder: "What does your company do?",
-        },
-        {
-            name: "imgUrl",
-            label: "Logo URL",
-            placeholder: "https://...",
-        },
+        { name: "name", label: "Name", placeholder: "Company name"},
+        { name: "description", label: "Description", as: "textarea", rows: 3, placeholder: "What does your company do?", },
+        { name: "imgUrl", label: "Logo URL", placeholder: "https://..."},
     ];
 
     const refresh = async () => {
@@ -103,17 +86,13 @@ export default function CompanyProfilePage() {
 
     if (loading) {
         return (
-            <div className="py-5 text-center">
-                <Spinner animation="border" />
-            </div>
+            <div className="py-5 text-center"> <Spinner animation="border" /> </div>
         );
     }
 
     if (!company) {
         return (
-            <div className="py-5 text-center text-muted">
-                No company profile.
-            </div>
+            <div className="py-5 text-center text-muted"> No company profile. </div>
         );
     }
 

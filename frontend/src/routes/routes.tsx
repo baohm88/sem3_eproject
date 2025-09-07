@@ -13,7 +13,7 @@ import CompaniesPage from "../pages/Companies/CompaniesPage";
 import CompanyDashboard from "../pages/Companies/CompanyDashboard";
 import CompanyServices from "../pages/Companies/CompanyServices";
 import CompanyDrivers from "../pages/Companies/CompanyDrivers";
-import CompanyPayments from "../pages/Companies/CompanyPayments";
+import CompanyTransactions from "../pages/Companies/CompanyTransactions";
 import CompanyProfilePage from "../pages/Companies/CompanyProfilePage";
 import CompanyInvitesPage from "../pages/Companies/CompanyInvitesPage";
 
@@ -24,7 +24,7 @@ import DriverPublicProfilePage from "../pages/Drivers/DriverPublicProfilePage";
 import DriverJobsPage from "../pages/Drivers/DriverJobsPage";
 import DriverApplicationsPage from "../pages/Drivers/DriverApplicationsPage";
 import DriverInvitesPage from "../pages/Drivers/DriverInvitesPage";
-import DriverPayments from "../pages/Drivers/DriverPayments";
+import DriverTransactions from "../pages/Drivers/DriverTransactions";
 
 import DriversPage from "../pages/Drivers/DriversPage";
 import DriverDashboard from "../pages/Drivers/DriverDashboard";
@@ -106,9 +106,9 @@ export const ROLE_ROUTES: RoleRoutes = {
             },
             { path: "drivers", label: "Drivers", element: <CompanyDrivers /> },
             {
-                path: "payments",
-                label: "Payments",
-                element: <CompanyPayments />,
+                path: "transactions",
+                label: "Transactions",
+                element: <CompanyTransactions />,
             },
         ],
         children: [],
@@ -139,9 +139,9 @@ export const ROLE_ROUTES: RoleRoutes = {
                 element: <DriverApplicationsPage />,
             },
             {
-                path: "payments",
-                label: "Payments",
-                element: <DriverPayments />,
+                path: "transactions",
+                label: "Transactions",
+                element: <DriverTransactions />,
             },
         ],
         children: [],
