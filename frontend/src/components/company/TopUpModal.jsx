@@ -4,13 +4,29 @@ import { toast } from "react-toastify";
 import ModalBase from "../../ui/ModalBase";
 import { topupCompanyWallet, getCompanyWallet } from "../../api/companies";
 
-// util nhỏ
-const toCents = (v) => Math.round(parseFloat(String(v).replace(/,/g, ".")) * 100) || 0;
+/**
+ * Small utility: convert user-entered amount to cents.
+ * - Accepts comma as decimal separator.
+ * - Falls back to 0 on NaN.
+ */
+const toCents = (v) =>
+  Math.round(parseFloat(String(v).replace(/,/g, ".")) * 100) || 0;
 
+/**
+ * TopUpModal
+ * Modal for (mock) topping up a company's wallet.
+ *
+ * Props:
+ * - show: boolean — control visibility
+ * - onHide: () => void — close handler
+ * - companyId: string — target company id
+ * - onDone?: () => void — optional callback after successful top-up (e.g., refresh parent)
+ */
 export default function TopUpModal({ show, onHide, companyId, onDone }) {
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // Validate and perform top-up with a simple idempotency key
   const confirm = async () => {
     const amountCents = toCents(amount);
     if (amountCents <= 0) {
@@ -21,15 +37,20 @@ export default function TopUpModal({ show, onHide, companyId, onDone }) {
       setBusy(true);
       await topupCompanyWallet(companyId, {
         amountCents,
-        idempotencyKey: `topup-${companyId}-${Date.now()}`,
+        idempotencyKey: `topup-${companyId}-${Date.now()}`, // basic idempotency guard
       });
       toast.success("Top up successful");
       onHide?.();
-      // Optional refresh balance
-      try { await getCompanyWallet(companyId); } catch {}
+
+      // Optional: refresh balance silently; tolerate errors
+      try {
+        await getCompanyWallet(companyId);
+      } catch {}
+
+      // Notify parent to re-fetch data if desired
       onDone?.();
     } catch (e) {
-      toast.error(e.message || "Top up failed");
+      toast.error(e?.message || "Top up failed");
     } finally {
       setBusy(false);
     }
@@ -49,14 +70,14 @@ export default function TopUpModal({ show, onHide, companyId, onDone }) {
         <InputGroup>
           <Form.Control
             placeholder="e.g. 200000"
-            inputMode="numeric"
+            inputMode="numeric" // nudge mobile keyboards to numeric layout
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
           <InputGroup.Text>₫</InputGroup.Text>
         </InputGroup>
         <Form.Text className="text-muted">
-          Số tiền sẽ được nạp (mock) vào ví Company của bạn.
+          The amount will be (mock) deposited into your Company wallet.
         </Form.Text>
       </Form>
     </ModalBase>

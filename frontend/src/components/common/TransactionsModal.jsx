@@ -5,16 +5,16 @@ import PaginationBar from "./PaginationBar";
 import TransactionList from "./TransactionList";
 
 /**
- * TransactionsModal (dùng chung Company/Driver/Admin...)
+ * TransactionsModal (shared across Company/Driver/Admin...)
  *
  * Props:
  * - show: boolean
  * - onHide: () => void
  * - title?: string (default "All Transactions")
- * - perspectiveWalletId?: string (để tô màu +/-)
+ * - perspectiveWalletId?: string (to color +/- amounts from a wallet's perspective)
  * - fetchPage: (page: number, size: number) => Promise<PageResultLike>
  *     PageResultLike: { items, totalItems, totalPages, page, size }
- * - pageSizeOptions?: number[] (default [10,20,50])
+ * - pageSizeOptions?: number[] (default [10, 20, 50])
  */
 export default function TransactionsModal({
   show,
@@ -25,8 +25,8 @@ export default function TransactionsModal({
   pageSizeOptions = [10, 20, 50],
 }) {
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(pageSizeOptions[0]);
+  const [page, setPage] = useState(1); // current page index (1-based)
+  const [size, setSize] = useState(pageSizeOptions[0]); // current page size
   const [data, setData] = useState({
     items: [],
     totalItems: 0,
@@ -35,7 +35,9 @@ export default function TransactionsModal({
     size: pageSizeOptions[0],
   });
 
+  // Fetch current page of data
   const loadData = async () => {
+    // Guard: only fetch when modal is visible and a fetcher is provided
     if (!show || !fetchPage) return;
     setLoading(true);
     try {
@@ -48,19 +50,20 @@ export default function TransactionsModal({
         size: res?.size ?? size,
       });
     } catch (e) {
+      // Surface a friendly error toast
       toast.error(e?.message || "Cannot load transactions");
     } finally {
       setLoading(false);
     }
   };
 
-  // mở modal / đổi page / size → nạp trang
+  // When modal opens OR page/size changes → fetch that page
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show, page, size]);
 
-  // đóng modal → reset phân trang
+  // When modal closes → reset pagination to defaults and clear items
   useEffect(() => {
     if (!show) {
       setPage(1);
@@ -87,7 +90,7 @@ export default function TransactionsModal({
               transactions={data.items}
               perspectiveWalletId={perspectiveWalletId}
               emptyText="No transactions"
-              // không truyền limit -> hiển thị hết items của trang hiện tại
+              // Do not pass "limit" → render all items of the current page
             />
 
             <div className="mt-3">

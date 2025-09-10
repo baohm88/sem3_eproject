@@ -1,6 +1,33 @@
+// src/components/common/EditProfileModal.jsx
 import { useEffect, useState } from "react";
 import { Modal, Form, Button, Spinner } from "react-bootstrap";
 
+/**
+ * EditProfileModal
+ *
+ * Generic, schema-less profile editor modal.
+ *
+ * Props:
+ * - show: boolean — whether the modal is visible.
+ * - onHide: () => void — called to close the modal.
+ * - initial?: Record<string, any> — initial field values.
+ * - fields?: Array<{
+ *     name: string;
+ *     label?: string;
+ *     placeholder?: string;
+ *     as?: any;           // e.g., "textarea"
+ *     rows?: number;      // textarea rows
+ *     type?: string;      // input type (text, email, url, etc.)
+ *     helpText?: string;  // small muted helper text
+ *   }>
+ * - onSave?: (payload: Record<string, any>) => (void | Promise<void>)
+ *     Called with a cleaned payload (empty strings & undefined removed).
+ *     If it returns a Promise, a spinner is shown until resolved.
+ * - title?: string — modal title (default: "Edit Profile").
+ * - children?: ReactNode — extra custom content rendered inside the <Form> body
+ *     (e.g., a Skills/TagInput component).
+ * - scrollable?: boolean — enable Bootstrap's scrollable modal body (default: true).
+ */
 export default function EditProfileModal({
   show,
   onHide,
@@ -8,19 +35,22 @@ export default function EditProfileModal({
   fields = [],
   onSave,
   title = "Edit Profile",
-  children,           // <— NEW: nội dung thêm trong Body
-  scrollable = true,  // optional
+  children,          // NEW: additional custom content inside the body (e.g., Skills/TagInput)
+  scrollable = true, // Optional: make modal body scrollable for long forms
 }) {
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
 
+  // Hydrate form state whenever `initial` changes
   useEffect(() => {
     if (initial) setForm({ ...initial });
   }, [initial]);
 
+  // Controlled inputs handler
   const handleChange = (e) =>
     setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
 
+  // Remove empty strings and undefined; keep nulls as-is (caller decides)
   const cleanPayload = (obj) => {
     const out = {};
     for (const [k, v] of Object.entries(obj || {})) {
@@ -30,20 +60,19 @@ export default function EditProfileModal({
     return out;
   };
 
+  // Save handler: show spinner during async, let parent handle toasts on error
   const handleSave = async () => {
     try {
       setSaving(true);
       await onSave?.(cleanPayload(form));
       onHide?.();
     } catch (e) {
-      // để page parent toast lỗi
+      // Let the parent page show toast notification on error
       console.error(e);
     } finally {
       setSaving(false);
     }
   };
-
-  
 
   return (
     <Modal show={show} onHide={onHide} centered scrollable={scrollable}>
@@ -65,13 +94,11 @@ export default function EditProfileModal({
                 rows={f.rows}
                 type={f.type || "text"}
               />
-              {f.helpText && (
-                <Form.Text muted>{f.helpText}</Form.Text>
-              )}
+              {f.helpText && <Form.Text muted>{f.helpText}</Form.Text>}
             </Form.Group>
           ))}
 
-          {/* Nội dung custom (VD: Skills/TagInput) */}
+          {/* Custom body content (e.g., Skills/TagInput, preview, etc.) */}
           {children}
         </Form>
       </Modal.Body>

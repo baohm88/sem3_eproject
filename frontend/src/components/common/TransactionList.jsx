@@ -1,5 +1,17 @@
 import { ListGroup, Badge } from "react-bootstrap";
 
+/**
+ * TransactionList
+ * Renders a (flush) list of transactions with amount, status/type badges, and optional meta info.
+ *
+ * Props:
+ * - transactions: Array of transaction objects.
+ * - emptyText: Placeholder text when there is no data.
+ * - limit: Optional max number of items to render.
+ * - formatAmount: Optional formatter for amount in cents -> display string.
+ * - onItemClick: Optional handler; when provided, items become clickable.
+ * - perspectiveWalletId: Wallet ID used to sign (+/-) and color the amount from a specific wallet's point of view.
+ */
 export default function TransactionList({
   transactions = [],
   emptyText = "No transactions",
@@ -8,8 +20,10 @@ export default function TransactionList({
   onItemClick,
   perspectiveWalletId,
 }) {
+  // Normalize to an array to avoid runtime errors
   const items = Array.isArray(transactions) ? transactions : [];
 
+  // Default amount formatter (VND, no decimals)
   const baseFormatAmount =
     formatAmount ||
     ((cents) =>
@@ -17,6 +31,7 @@ export default function TransactionList({
         maximumFractionDigits: 0,
       }) + " ₫");
 
+  // Map transaction status to a Bootstrap color
   const statusColor = (s) => {
     const key = String(s || "").toLowerCase();
     if (key === "completed") return "success";
@@ -25,6 +40,7 @@ export default function TransactionList({
     return "secondary";
   };
 
+  // Map transaction type to a Bootstrap color
   const typeColor = (t) => {
     const key = String(t || "").toLowerCase();
     switch (key) {
@@ -43,6 +59,7 @@ export default function TransactionList({
     }
   };
 
+  // Best-effort meta parser (supports object or JSON string)
   const parseMeta = (meta) => {
     try {
       if (!meta) return null;
@@ -54,14 +71,17 @@ export default function TransactionList({
     }
   };
 
+  // Build a concise meta line depending on the transaction type
   const renderMetaLine = (tx) => {
     const meta = parseMeta(tx.metaJson);
     if (!meta) return null;
 
     const t = String(tx.type || "").toLowerCase();
+
     if (t === "paymembership" && meta.plan) {
       return <div className="small text-muted">Plan: {meta.plan}</div>;
     }
+
     if (t === "orderpayment" && (meta.orderId || meta.riderUserId)) {
       return (
         <div className="small text-muted">
@@ -69,6 +89,7 @@ export default function TransactionList({
         </div>
       );
     }
+
     if (t === "paysalary" && (meta.driverUserId || meta.companyId)) {
       return (
         <div className="small text-muted">
@@ -76,6 +97,7 @@ export default function TransactionList({
         </div>
       );
     }
+
     if (t === "topup" && (meta.source || meta.companyId)) {
       return (
         <div className="small text-muted">
@@ -83,9 +105,11 @@ export default function TransactionList({
         </div>
       );
     }
-    // fallback: hiển thị 3 key đầu
+
+    // fallback: show the first 3 keys
     const keys = Object.keys(meta || {}).slice(0, 3);
     if (!keys.length) return null;
+
     return (
       <div className="small text-muted">
         {keys.map((k, i) => (
@@ -98,14 +122,18 @@ export default function TransactionList({
     );
   };
 
-  // Tính toán dấu và màu theo góc nhìn một ví
+  // Compute sign and color from the perspective of a given wallet
   const resolveSignedAmount = (tx) => {
     const cents = Number(tx.amountCents) || 0;
+
+    // No perspective -> neutral text
     if (!perspectiveWalletId) {
       return { text: baseFormatAmount(cents), className: "" };
     }
+
     const isIncome = tx.toWalletId && tx.toWalletId === perspectiveWalletId;
-    const isExpense = tx.fromWalletId && tx.fromWalletId === perspectiveWalletId;
+    const isExpense =
+      tx.fromWalletId && tx.fromWalletId === perspectiveWalletId;
 
     if (isIncome) {
       return {
@@ -113,16 +141,19 @@ export default function TransactionList({
         className: "text-success",
       };
     }
+
     if (isExpense) {
       return {
         text: `-${baseFormatAmount(cents)}`,
         className: "text-danger",
       };
     }
-    // không liên quan trực tiếp ví này → trung tính
+
+    // Unrelated to this wallet -> neutral
     return { text: baseFormatAmount(cents), className: "text-muted" };
   };
 
+  // Respect optional limit for compact lists
   const sliced = typeof limit === "number" ? items.slice(0, limit) : items;
 
   return (
@@ -134,13 +165,17 @@ export default function TransactionList({
             <ListGroup.Item
               key={t.id}
               className="d-flex justify-content-between align-items-center"
+              // If onItemClick is provided, make the row interactive
               action={!!onItemClick}
               onClick={onItemClick ? () => onItemClick(t) : undefined}
             >
               <div>
+                {/* Localized datetime (browser locale/timezone) */}
                 <div className="small text-muted">
                   {new Date(t.createdAt).toLocaleString()}
                 </div>
+
+                {/* Status text + type/status badges */}
                 <div className="fw-semibold d-flex align-items-center gap-2">
                   <span>{t.status}</span>
                   {t.type ? (
@@ -150,8 +185,11 @@ export default function TransactionList({
                   ) : null}
                   <Badge bg={statusColor(t.status)}>{t.status}</Badge>
                 </div>
+
                 {renderMetaLine(t)}
               </div>
+
+              {/* Signed amount (from perspectiveWalletId) */}
               <div className={`fw-bold ${amt.className}`}>{amt.text}</div>
             </ListGroup.Item>
           );

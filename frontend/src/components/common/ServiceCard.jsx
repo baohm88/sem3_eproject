@@ -1,24 +1,45 @@
 import { Badge, Button, Card, Image, ListGroup, Spinner } from "react-bootstrap";
 
+/**
+ * ServiceCard
+ *
+ * Presentational card for a company's service.
+ * Can be used in public listings (footer CTA) or owner dashboard (edit/toggle).
+ *
+ * Props:
+ * - service:              { id, title, description, priceCents, isActive, imgUrl?, ... }
+ * - bannerUrl?:           string   // Optional override for the banner image (falls back to service.imgUrl)
+ * - priceFormatter?:      (cents:number) => string  // Formats priceCents -> display string
+ * - showOwnerActions?:    boolean  // Show Edit / Pause|Reactivate actions (owner-only UX)
+ * - busy?:                boolean  // Loading state while toggling active status
+ * - onEdit?:              () => void
+ * - onToggleActive?:      () => void
+ * - extraListItems?:      ReactNode // Optional extra <ListGroup.Item> content
+ * - footer?:              ReactNode // Optional footer (e.g., “Book” CTA for riders)
+ */
 export default function ServiceCard({
   service,                   // { id, title, description, priceCents, isActive, ... }
-  bannerUrl,                 // optional
-  priceFormatter,            // (cents)=>string
-  showOwnerActions = false,  // chỉ bật nếu là owner
-  busy = false,              // id đang toggle
-  onEdit,                    // () => void
-  onToggleActive,            // () => void
-  extraListItems,            // optional ReactNode
-  footer,                    // optional ReactNode
+  bannerUrl,                 // optional banner override
+  priceFormatter,            // formats cents to string
+  showOwnerActions = false,  // enable owner actions (Edit / Pause / Reactivate)
+  busy = false,              // show spinner while toggling state
+  onEdit,                    // edit handler
+  onToggleActive,            // toggle active handler
+  extraListItems,            // optional extra list content
+  footer,                    // optional footer area
 }) {
-  const centsToStr = priceFormatter ?? ((c) => (c ?? 0).toLocaleString("vi-VN"));
+  // Default price formatter (no division by 100 here; `priceCents` is treated as unit value per current model)
+  const centsToStr =
+    priceFormatter ?? ((c) => (c ?? 0).toLocaleString("vi-VN"));
 
   return (
     <Card className="h-100 shadow-sm">
+      {/* Banner image with active/paused badge */}
       <div style={{ position: "relative" }}>
         <Image
           src={
-            bannerUrl || service.imgUrl ||
+            bannerUrl ||
+            service.imgUrl ||
             "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1200&auto=format&fit=crop"
           }
           alt="banner"
@@ -33,15 +54,22 @@ export default function ServiceCard({
       </div>
 
       <Card.Body className="d-flex flex-column">
+        {/* Title + price */}
         <div className="d-flex justify-content-between align-items-start">
           <Card.Title className="mb-1">{service.title}</Card.Title>
-          <div className="fw-bold text-primary">{centsToStr(service.priceCents)} ₫</div>
+          <div className="fw-bold text-primary">
+            {centsToStr(service.priceCents)} ₫
+          </div>
         </div>
 
+        {/* Description (fallback to italic placeholder) */}
         <Card.Text className="text-muted" style={{ minHeight: 48 }}>
-          {service.description || <span className="fst-italic">No description</span>}
+          {service.description || (
+            <span className="fst-italic">No description</span>
+          )}
         </Card.Text>
 
+        {/* Extra list items or default hint */}
         <ListGroup variant="flush" className="mb-3">
           {extraListItems ?? (
             <ListGroup.Item className="small">
@@ -51,6 +79,9 @@ export default function ServiceCard({
           )}
         </ListGroup>
 
+        {/* Footer area:
+            - Owner mode: Edit + Pause/Reactivate
+            - Public mode: custom footer (e.g., Book button) */}
         <div className="mt-auto d-flex gap-2">
           {showOwnerActions ? (
             <>
@@ -63,7 +94,13 @@ export default function ServiceCard({
                 onClick={onToggleActive}
                 disabled={busy}
               >
-                {busy ? <Spinner size="sm" /> : service.isActive ? "Pause" : "Reactivate"}
+                {busy ? (
+                  <Spinner size="sm" />
+                ) : service.isActive ? (
+                  "Pause"
+                ) : (
+                  "Reactivate"
+                )}
               </Button>
             </>
           ) : (

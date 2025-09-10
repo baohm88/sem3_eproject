@@ -13,8 +13,9 @@ import CompanyServicesList from "./CompanyServicesList";
 const FALLBACK_LOGO =
   "https://dummyimage.com/300x300/e9ecef/6c757d.jpg&text=No+Logo";
 
-// ⭐ giống DriverCard
+// ⭐ Same as DriverCard
 function Stars({ value = 0, size = 16 }) {
+  // `value` expected 0..5 (can be 0..5.0). Clamp for safety.
   const v = Math.max(0, Math.min(5, Number(value) || 0));
   const full = Math.floor(v);
   const half = v - full >= 0.5 ? 1 : 0;
@@ -57,7 +58,7 @@ export default function CompanyCardForDriver({
   className = "",
   imgSize = 56,
 }) {
-  // Ảnh
+  // Image
   const preferred =
     company?.imgUrl && String(company.imgUrl).trim().length > 0
       ? company.imgUrl
@@ -65,37 +66,37 @@ export default function CompanyCardForDriver({
   const [imgSrc, setImgSrc] = useState(preferred);
   useEffect(() => { setImgSrc(preferred); }, [preferred]);
 
-  // Badge membership
+  // Membership badge color mapping
   const membershipBadge = (m) => (
     <Badge bg={m === "Premium" ? "success" : m === "Basic" ? "primary" : "secondary"}>
       {m || "Free"}
     </Badge>
   );
 
-  // ✅ Optimistic UI cho Apply/Recall (không cần refresh)
+  // ✅ Optimistic UI for Apply/Recall (no refresh required)
   const [appliedLocal, setAppliedLocal] = useState(!!isApplied);
   useEffect(() => { setAppliedLocal(!!isApplied); }, [isApplied]);
-  const applied = appliedLocal; // trạng thái hiệu lực hiển thị
+  const applied = appliedLocal; // effective display state
 
   const handleApplyClick = async (e) => {
     e.stopPropagation();
-    // optimistic on
+    // optimistic: turn on
     setAppliedLocal(true);
     try {
       const ret = onApply?.(company);
-      // nếu parent trả Promise, chờ lỗi để rollback
+      // if parent returns a Promise, await to catch errors and rollback
       if (ret && typeof ret.then === "function") {
         await ret;
       }
     } catch (err) {
-      // rollback khi lỗi
+      // rollback on error
       setAppliedLocal(false);
     }
   };
 
   const handleRecallClick = async (e) => {
     e.stopPropagation();
-    // optimistic off
+    // optimistic: turn off
     setAppliedLocal(false);
     try {
       const ret = onRecall?.(company);
@@ -103,7 +104,7 @@ export default function CompanyCardForDriver({
         await ret;
       }
     } catch (err) {
-      // rollback khi lỗi
+      // rollback on error
       setAppliedLocal(true);
     }
   };
@@ -152,7 +153,7 @@ export default function CompanyCardForDriver({
                   {company?.isActive ? <Badge bg="success">Active</Badge> : <Badge bg="secondary">Inactive</Badge>}
                 </div>
 
-                {/* Meta: rating */}
+                {/* Meta: rating with numeric tooltip */}
                 <div className="d-flex flex-wrap align-items-center gap-2 text-muted small mt-1">
                   <OverlayTrigger
                     placement="top"
@@ -167,7 +168,7 @@ export default function CompanyCardForDriver({
                 </div>
               </div>
 
-              {/* Accept/Reject (nếu có invite flow) */}
+              {/* Accept/Reject (if invite flow is present) */}
               {(onAccept || onReject) && (
                 <div className="ms-auto d-flex gap-2">
                   <Button
@@ -195,7 +196,7 @@ export default function CompanyCardForDriver({
               {company?.description || <span className="fst-italic">No description</span>}
             </Card.Text>
 
-            {/* 🔹 Invite badges: base salary / expires at — đặt NGAY TRÊN FOOTER */}
+            {/* 🔹 Invite badges: base salary / expires at — place RIGHT ABOVE the footer */}
             {invite && (invite.baseSalaryCents != null || invite.expiresAt) && (
               <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
                 {invite.expiresAt && (
@@ -212,7 +213,7 @@ export default function CompanyCardForDriver({
             )}
           </div>
 
-          {/* FOOTER: trái = View services, phải = CTA Apply/Recall */}
+          {/* FOOTER: left = View services, right = CTA Apply/Recall */}
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-1">
             {typeof onToggleServices === "function" && (
               <Button
@@ -230,7 +231,7 @@ export default function CompanyCardForDriver({
                   size="sm"
                   disabled
                   variant="secondary"
-                  title="Bạn đã là tài xế của một công ty"
+                  title="Bạn đã là tài xế của một công ty" // note: tooltip left in Vietnamese by design
                   onClick={(e) => e.stopPropagation()}
                 >
                   Apply to Company

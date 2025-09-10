@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Form, Badge } from "react-bootstrap";
 
 /**
- * TagInput – nhập skills dưới dạng CSV nhưng UX tốt hơn
+ * TagInput – input skills in CSV format but better UX
  * props:
  * - value: string (csv) | string[]
  * - onChange: (csvString)=>void
