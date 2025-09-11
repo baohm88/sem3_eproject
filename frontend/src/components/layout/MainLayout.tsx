@@ -6,13 +6,11 @@ import {
   Nav,
   Container,
   Button,
-  Form,
-  FormControl,
   NavDropdown,
   Image,
 } from "react-bootstrap";
 import { RiMenu2Line } from "react-icons/ri";
-import { toast } from "react-toastify";
+
 import { useAuth } from "../../context/AuthContext";
 import SideBar from "./SideBar";
 import SubNav from "./SubNav";

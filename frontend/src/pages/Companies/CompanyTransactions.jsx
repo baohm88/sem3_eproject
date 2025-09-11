@@ -1,3 +1,4 @@
+// src/pages/Companies/CompanyTransactions.jsx
 import { useEffect, useState } from "react";
 import { Row, Col, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
@@ -15,6 +16,11 @@ import TopUpModal from "../../components/common/TopUpModal";
 import WithdrawModal from "../../components/common/WithdrawModal";
 import TransactionsModal from "../../components/common/TransactionsModal";
 
+/**
+ * CompanyTransactions
+ * - Loads company, wallet, and recent transactions.
+ * - Provides Top Up / Withdraw actions and a modal to view all transactions.
+ */
 export default function CompanyTransactions() {
   const [loading, setLoading] = useState(true);
   const [company, setCompany] = useState(null);
@@ -24,6 +30,7 @@ export default function CompanyTransactions() {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showAllTx, setShowAllTx] = useState(false);
 
+  // Fetch wallet + a small page of recent transactions
   const refreshWalletAndTx = async (cid) => {
     try {
       const w = await getCompanyWallet(cid);
@@ -35,6 +42,7 @@ export default function CompanyTransactions() {
     }
   };
 
+  // Fetch company, then wallet + tx
   const refresh = async () => {
     setLoading(true);
     try {
@@ -52,6 +60,7 @@ export default function CompanyTransactions() {
     refresh();
   }, []);
 
+  // Confirm handlers for top up / withdraw
   const handleTopUpConfirm = async ({ amountCents, idempotencyKey }) => {
     if (!company?.id) throw new Error("Missing company id");
     await topupCompanyWallet(company.id, { amountCents, idempotencyKey });
@@ -98,7 +107,7 @@ export default function CompanyTransactions() {
             limit={5}
             perspectiveWalletId={wallet?.id}
             title="Recent Transactions"
-            onViewAll={() => setShowAllTx(true)}  // Bật modal xem tất cả
+            onViewAll={() => setShowAllTx(true)}  // Open modal to view all
           />
         </Col>
       </Row>

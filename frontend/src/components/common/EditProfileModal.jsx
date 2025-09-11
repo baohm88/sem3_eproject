@@ -1,6 +1,7 @@
 // src/components/common/EditProfileModal.jsx
 import { useEffect, useState } from "react";
 import { Modal, Form, Button, Spinner } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 /**
  * EditProfileModal
@@ -35,8 +36,8 @@ export default function EditProfileModal({
   fields = [],
   onSave,
   title = "Edit Profile",
-  children,          // NEW: additional custom content inside the body (e.g., Skills/TagInput)
-  scrollable = true, // Optional: make modal body scrollable for long forms
+  children, 
+  scrollable = true, 
 }) {
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
@@ -67,7 +68,7 @@ export default function EditProfileModal({
       await onSave?.(cleanPayload(form));
       onHide?.();
     } catch (e) {
-      // Let the parent page show toast notification on error
+      toast.error(e?.message)
       console.error(e);
     } finally {
       setSaving(false);

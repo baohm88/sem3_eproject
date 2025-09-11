@@ -1,20 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Button,
-  Card,
-  Col,
-  Form,
-  InputGroup,
-  Modal,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { Button, Card, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
-import {
-  getMyCompany,
-  getCompanyWallet,
-  payMembership,
-} from "../../api/companies";
+import { getMyCompany, getCompanyWallet, payMembership } from "../../api/companies";
 import TopUpModal from "./TopUpModal";
 
 // Available membership plans (mock pricing in cents)
@@ -101,7 +88,7 @@ export default function CompanyMembershipCard() {
     } catch (e) {
       // Keep the original message (Vietnamese) for UX consistency
       if (e.code === "INSUFFICIENT_FUNDS") {
-        toast.error("Số dư không đủ. Hãy Top Up trước.");
+        toast.error("Insufficient balance. Top Up first.");
       } else {
         toast.error(e.message || "Pay membership failed");
       }

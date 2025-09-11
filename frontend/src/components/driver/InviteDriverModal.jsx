@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 /**
  * InviteDriverModal
@@ -36,7 +37,7 @@ export default function InviteDriverModal({ show, onHide, onSubmit, driver }) {
   const handleSubmit = async () => {
     // Guard: require a valid driver id
     if (!driver?.userId) {
-      // You can replace with toast if desired
+      toast.error('User ID is required.')
       return;
     }
 
