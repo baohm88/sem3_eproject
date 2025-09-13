@@ -29,7 +29,7 @@ let _onUnauthorized: (err: AppError) => void = (err) => {
     localStorage.removeItem("token");
     localStorage.removeItem("profile");
   } catch {}
-  if (!location.pathname.startsWith("/auth")) {
+  if (!location.pathname.startsWith("/login")) {
     window.location.assign("/login?reason=unauthorized");
   }
 };

@@ -5,7 +5,6 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 import { Button, Form as BootstrapForm } from "react-bootstrap";
-import FormWrapper from "../../components/common/FormWrapper";
 import { loginAsync } from "../../api/auth";
 
 const LoginSchema = Yup.object().shape({
@@ -33,15 +32,7 @@ export default function LoginPage() {
     };
 
     return (
-        <FormWrapper
-            title="Login"
-            footer={
-                <>
-                    <span>Don't have an account? </span>
-                    <Link to="/register">Register here</Link>
-                </>
-            }
-        >
+        <>
             <Formik
                 initialValues={{ email: "", password: "" }}
                 validationSchema={LoginSchema}
@@ -101,6 +92,11 @@ export default function LoginPage() {
                     </Form>
                 )}
             </Formik>
-        </FormWrapper>
+            
+            <div className="text-center mt-3">
+                <span>Don't have an account? </span>
+                <Link to="/register">Register here</Link>
+            </div>
+        </>
     );
 }

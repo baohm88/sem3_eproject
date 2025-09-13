@@ -149,21 +149,17 @@
 // }
 // https://www.google.com/url?sa=i&url=https%3A%2F%2Fpk.ign.com%2Favatar-generations&psig=AOvVaw1duyGsWzPIcf_m6V3NN6oY&ust=1756699367019000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKCMqKCVtI8DFQAAAAAdAAAAABAE
 import RegisterRolePicker from "../../components/auth/RegisterRolePicker";
-import FormWrapper from "../../components/common/FormWrapper";
 import { Link } from "react-router-dom";
 
 export default function RegisterPage() {
     return (
-        <FormWrapper
-            title="Create an account"
-            footer={
-                <>
-                    <span>Already have an account? </span>
-                    <Link to="/login">Login here</Link>
-                </>
-            }
-        >
+        <>
             <RegisterRolePicker />
-        </FormWrapper>
+            
+            <div className="text-center mt-3">
+                <span>Already have an account? </span>
+                <Link to="/login">Login here</Link>
+            </div>
+        </>
     );
 }

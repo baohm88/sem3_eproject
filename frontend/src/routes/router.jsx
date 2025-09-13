@@ -32,11 +32,7 @@ function buildProtectedChildren(role) {
 const router = createBrowserRouter([
     {
         path: "/",
-        element: (
-            <MainLayout>
-                <AuthLayout />
-            </MainLayout>
-        ),
+        element: <MainLayout />,
         children: [
             // public basic (Rider base already covers "/")
             ...PUBLIC_ROUTES.map((r) => ({
@@ -44,9 +40,24 @@ const router = createBrowserRouter([
                 path: r.path.replace(/^\//, ""),
                 element: r.element,
             })),
-            // auth
-            { path: "login", element: <LoginPage /> },
-            { path: "register", element: <RegisterPage /> },
+            
+            // auth routes with AuthLayout
+            {
+                path: "login",
+                element: (
+                    <AuthLayout title="Login">
+                        <LoginPage />
+                    </AuthLayout>
+                ),
+            },
+            {
+                path: "register", 
+                element: (
+                    <AuthLayout title="Register">
+                        <RegisterPage />
+                    </AuthLayout>
+                ),
+            },
 
             // protected: Admin
             {
