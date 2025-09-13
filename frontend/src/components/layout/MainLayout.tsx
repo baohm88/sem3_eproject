@@ -314,7 +314,7 @@ import {
     type Role,
     type RouteItem,
 } from "../../routes/routes";
-
+import SiteFooter from "./SiteFooter"; 
 type LinkItem = { to: string; label: string; end?: boolean };
 
 const NAVBAR_HEIGHT = 80;
@@ -436,28 +436,31 @@ export default function MainLayout() {
     <div className="right-tools d-flex align-items-center gap-2">
       {/* Cột 1: Dropdown Tất cả việc làm */}
       <div className="control">
-        <Nav className="w-100">
-          <NavDropdown
-            align="start"
-            id="nav-all-jobs-dropdown"
-            title={<span className="px-3">Tất cả việc làm</span>}
-            renderMenuOnMount
-            className="w-100"
-          >
-            {links.map(({ to, label, end }) => (
-              <NavDropdown.Item
-                as={NavLink}
-                key={to}
-                to={to}
-                end={end}
-                onClick={(e) => onClickNav(to, e)}
-                className="d-flex align-items-center"
-              >
-                {label}
-              </NavDropdown.Item>
-            ))}
-          </NavDropdown>
-        </Nav>
+<Nav className="w-100">
+  <NavDropdown
+    align="start"
+    id="nav-all-jobs-dropdown"
+    title={<span className="px-3">Tất cả việc làm</span>}
+    renderMenuOnMount
+    className="w-100"
+  >
+    {links.map(({ to, label, end }) => (
+      <NavDropdown.Item
+        as={NavLink}
+        key={to}
+        to={to}
+        end={end}
+        onClick={(e) => onClickNav(to, e)}
+        className="alljobs-item"
+      >
+        <span className="menu-icon blue">
+          <i className="bi bi-grid-3x3-gap-fill" />
+        </span>
+        <span>{label}</span>
+      </NavDropdown.Item>
+    ))}
+  </NavDropdown>
+</Nav>
       </div>
 
       {/* Cột 2: Search box (ngắn gọn) */}
@@ -481,46 +484,52 @@ export default function MainLayout() {
       <>
         <i className="bi bi-bell-fill fs-5 text-muted" />
         <Nav>
-          <NavDropdown
-            align="end"
-            show={showDropdown}
-            onMouseEnter={() => setShowDropdown(true)}
-            onMouseLeave={() => setShowDropdown(false)}
-            onToggle={() => {}}
-            title={
-              <Image
-                src={
-                  (profile as any)?.imgUrl ||
-                  "https://png.pngtree.com/png-clipart/20240705/original/pngtree-web-programmer-avatar-png-image_15495270.png"
-                }
-                roundedCircle
-                height={30}
-                width={30}
-              />
-            }
-            id="user-dropdown"
-          >
-            <NavDropdown.Item disabled className="small text-muted">
-              {(profile as any)?.email || "Account"}
-            </NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item as={NavLink} to={dashboardTo} end>
-              <i className="bi bi-clipboard-data-fill me-2" />
-              Dashboard
-            </NavDropdown.Item>
-            <NavDropdown.Item
-              as={NavLink}
-              to={`/${(profile as any)?.role?.toLowerCase?.()}/profile`}
-            >
-              <i className="bi bi-heart-fill me-2 text-danger" />
-              Profile
-            </NavDropdown.Item>
-            <NavDropdown.Item as="button" onClick={logout}>
-              <i className="bi bi-box-arrow-right me-2" />
-              Logout
-            </NavDropdown.Item>
-          </NavDropdown>
-        </Nav>
+  <NavDropdown
+    align="end"
+    show={showDropdown}
+    onMouseEnter={() => setShowDropdown(true)}
+    onMouseLeave={() => setShowDropdown(false)}
+    onToggle={() => {}}
+    title={
+      <Image
+        src={(profile as any)?.imgUrl || "https://png.pngtree.com/png-clipart/20240705/original/pngtree-web-programmer-avatar-png-image_15495270.png"}
+        roundedCircle
+        height={30}
+        width={30}
+      />
+    }
+    id="user-dropdown"
+  >
+    {/* Header email */}
+    <div className="profile-menu__email">
+      {(profile as any)?.email || "Account"}
+    </div>
+    <div className="dropdown-divider" />
+
+    {/* Dashboard */}
+    <NavDropdown.Item as={NavLink} to={dashboardTo} end className="profile-menu__item">
+      <span className="menu-icon blue"><i className="bi bi-clipboard-data-fill" /></span>
+      <span>Dashboard</span>
+    </NavDropdown.Item>
+
+    {/* Profile */}
+    <NavDropdown.Item
+      as={NavLink}
+      to={`/${(profile as any)?.role?.toLowerCase?.()}/profile`}
+      className="profile-menu__item"
+    >
+      <span className="menu-icon red"><i className="bi bi-heart-fill" /></span>
+      <span>Profile</span>
+    </NavDropdown.Item>
+
+    {/* Logout */}
+    <NavDropdown.Item as="button" onClick={logout} className="profile-menu__item">
+      <span className="menu-icon gray"><i className="bi bi-box-arrow-right" /></span>
+      <span>Logout</span>
+    </NavDropdown.Item>
+  </NavDropdown>
+</Nav>
+
       </>
     ) : (
       <Button variant="success" size="sm" as={NavLink} to="/login">
@@ -564,6 +573,7 @@ export default function MainLayout() {
             <main className="container py-3">
                 <Outlet />
             </main>
+            <SiteFooter />
         </>
     );
 }

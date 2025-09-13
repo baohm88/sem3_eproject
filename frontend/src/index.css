@@ -263,3 +263,401 @@
   }
   .social-round:hover{ background:#2b72ff; color:#fff; }
   
+  /* ===== Khung tổng của mục Dịch vụ nổi bật ===== */
+.featured-box{
+  background:#eef3ff;                /* xanh nhạt */
+  border:1px solid #dbe6ff;
+  border-radius:20px;
+  padding:28px 22px;
+}
+
+/* Heading to, đậm, giống ảnh mẫu */
+.featured-box .section-hdg{
+  font-weight:800;
+  letter-spacing:.2px;
+  font-size:clamp(20px, 2.2vw, 28px);
+  color:#0f172a;
+}
+
+/* nút “Xem tất cả” nổi bật hơn một chút */
+.featured-box .btn.btn-outline-secondary{
+  border-color:#bfd2ff;
+  color:#1d4ed8;
+  padding:.35rem .9rem;
+  border-radius:999px;
+}
+.featured-box .btn.btn-outline-secondary:hover{
+  background:#1d4ed8;
+  color:#fff;
+  border-color:#1d4ed8;
+}
+
+/* Card dịch vụ – trắng, bóng đổ nhẹ, bo góc */
+.featured-box .svc-card{
+  border:1px solid #e7eefc;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 8px 22px rgba(15,23,42,.06);
+  transition:transform .18s, box-shadow .18s, border-color .18s;
+}
+.featured-box .svc-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 16px 34px rgba(15,23,42,.12);
+  border-color:#dbe6ff;
+}
+
+/* Ảnh đầu card + vệt tối nhẹ phía dưới giống sample */
+.featured-box .svc-media{
+  aspect-ratio:16/9;
+  background-size:cover;
+  background-position:center;
+  position:relative;
+}
+.featured-box .svc-media::after{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(2,6,23,0) 35%, rgba(2,6,23,.35));
+  border-top-left-radius:16px; border-top-right-radius:16px;
+}
+
+/* Giá màu xanh lục bo tròn ở góc ảnh */
+.featured-box .svc-price{
+  position:absolute; right:10px; top:10px;
+  background:#eaf9f0; color:#16a34a;
+  border:1px solid rgba(22,163,74,.15);
+  padding:.25rem .6rem; border-radius:999px;
+  font-weight:700; font-size:.8rem;
+  box-shadow:0 2px 6px rgba(22,163,74,.15);
+}
+
+/* Nội dung card */
+.featured-box .svc-body{ padding:12px 14px 14px; }
+
+/* Chip tên công ty xanh dương */
+.featured-box .svc-company{
+  font-size:.725rem; font-weight:700;
+  color:#1d4ed8;
+  background:#e9f2ff;
+  border:1px solid rgba(13,110,253,.15);
+  border-radius:999px; padding:.15rem .55rem;
+}
+
+/* Tiêu đề lớn, đậm */
+.featured-box .svc-title{
+  margin:.35rem 0 .1rem; font-weight:800; color:#0f172a;
+  line-height:1.25;
+}
+
+/* Mô tả xám nhẹ, 2 dòng */
+.featured-box .svc-desc{
+  font-size:.92rem; color:#6b7280; min-height:2.2em;
+}
+
+/* Nút hành động */
+.featured-box .svc-actions{ display:flex; gap:.5rem; margin-top:.75rem; }
+.featured-box .svc-actions .btn{ border-radius:999px; padding:.4rem .85rem; }
+.featured-box .svc-actions .btn-primary{ background:#1d4ed8; border-color:#1d4ed8; }
+.featured-box .svc-actions .btn-primary:hover{ filter:brightness(.95); }
+.featured-box .svc-actions .btn-outline-secondary{ border-color:#d0d7e2; }
+
+/* ====== Pager cho Services (4 card/slide) ====== */
+.featured-box .pager{
+  display:flex; align-items:center; justify-content:center;
+  gap:18px; padding:10px 0 4px;
+}
+.featured-box .nav-round{
+  width:36px; height:36px; border-radius:50%;
+  border:1px solid #cfd6e7; background:transparent;
+  display:flex; align-items:center; justify-content:center;
+  color:#64748b;
+}
+.featured-box .nav-round:hover{
+  border-color:#94a3b8; color:#334155; background:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+.featured-box .nav-round:disabled{
+  opacity:.45; cursor:not-allowed; box-shadow:none;
+}
+.featured-box .dots{ display:flex; align-items:center; gap:16px; }
+.featured-box .dot{
+  width:12px; height:12px; border-radius:50%;
+  background:#e6e8ee; border:none; padding:0;
+}
+.featured-box .dot.active{ background:#0d6efd; }
+/* ============ Home styles ============ */
+:root {
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --band-from: #061d3b;
+  --band-mid: #0a3a80;
+  --band-to: #0b5ed7;
+}
+
+/* Dải nền xanh (full width) */
+.home-band{
+  background: linear-gradient(180deg, var(--band-from) 0%, var(--band-mid) 55%, var(--band-to) 100%);
+  padding: 24px 0 40px;
+  color: #fff;
+}
+.banner-shadow { box-shadow: 0 16px 40px rgba(0,0,0,.25); }
+
+/* Section header chấm xanh */
+.section-hdg{ font-weight:800; color:var(--ink); }
+.hdg-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; background:#0d6efd; margin-right:.5rem; }
+
+/* Company cards */
+.company-card{
+  background:#fff; border-radius:18px; box-shadow:0 10px 24px rgba(0,0,0,.08);
+  padding:16px 14px; height:100%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.company-card:hover{ transform:translateY(-2px); box-shadow:0 16px 36px rgba(0,0,0,.12); }
+.company-logo{ height:84px; object-fit:contain; }
+.hover-lift{ transition:transform .18s ease, box-shadow .18s ease; }
+
+/* Generic dots & circle buttons */
+.dot{ width:12px; height:12px; border-radius:50%; background:#e5e7eb; border:1px solid #e5e7eb; }
+.dot.active{ background:#0d6efd; border-color:#0d6efd; }
+.circle-nav{
+  width:36px; height:36px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid #cbd5e1; box-shadow:0 4px 12px rgba(2,6,23,.08);
+}
+.circle-nav:hover{ background:#f8fafc; }
+
+/* Driver chip */
+.driver-chip{
+  background:#fff; border:1px solid #eef2ff; border-radius:14px;
+  padding:12px; text-align:left; box-shadow:0 8px 18px rgba(2,6,23,.05);
+}
+.driver-chip .xsmall{ font-size:11px; color:var(--muted); }
+.btn-xxs{ --bs-btn-padding-y:.2rem; --bs-btn-padding-x:.45rem; --bs-btn-font-size:.72rem; --bs-btn-border-radius:999px; }
+
+/* ===== Khung tổng của mục Dịch vụ nổi bật ===== */
+.featured-box{
+  background:#eef3ff;
+  border:1px solid #dbe6ff;
+  border-radius:20px;
+  padding:28px 22px;
+}
+
+/* Heading + nút xem tất cả */
+.featured-box .section-hdg{ font-weight:800; letter-spacing:.2px; font-size:clamp(20px, 2.2vw, 28px); color:#0f172a; }
+.featured-box .btn.btn-outline-secondary{
+  border-color:#bfd2ff; color:#1d4ed8; padding:.35rem .9rem; border-radius:999px;
+}
+.featured-box .btn.btn-outline-secondary:hover{
+  background:#1d4ed8; color:#fff; border-color:#1d4ed8;
+}
+
+/* Card dịch vụ */
+.svc-card{
+  border:1px solid #e7eefc; border-radius:16px; background:#fff;
+  box-shadow:0 8px 22px rgba(15,23,42,.06);
+  transition:transform .18s, box-shadow .18s, border-color .18s;
+}
+.svc-card:hover{ transform:translateY(-3px); box-shadow:0 16px 34px rgba(15,23,42,.12); border-color:#dbe6ff; }
+
+/* Media: FIX chiều cao để ảnh luôn hiện */
+.svc-media{
+  aspect-ratio: 16/9;       /* ưu tiên */
+  min-height: 160px;        /* fallback khi aspect-ratio không hoạt động */
+  background-size: cover !important;
+  background-position: center !important;
+  position: relative;
+  border-top-left-radius:16px; border-top-right-radius:16px;
+}
+.svc-media::after{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(2,6,23,0) 35%, rgba(2,6,23,.35));
+  border-top-left-radius:16px; border-top-right-radius:16px;
+}
+
+/* Giá */
+.svc-price{
+  position:absolute; right:10px; top:10px;
+  background:#eaf9f0; color:#16a34a;
+  border:1px solid rgba(22,163,74,.15);
+  padding:.25rem .6rem; border-radius:999px;
+  font-weight:700; font-size:.8rem;
+  box-shadow:0 2px 6px rgba(22,163,74,.15);
+}
+
+/* Body */
+.svc-body{ padding:12px 14px 14px; }
+.svc-company{
+  font-size:.725rem; font-weight:700; color:#1d4ed8;
+  background:#e9f2ff; border:1px solid rgba(13,110,253,.15);
+  border-radius:999px; padding:.15rem .55rem;
+}
+.svc-title{ margin:.35rem 0 .1rem; font-weight:800; color:#0f172a; line-height:1.25; }
+.svc-desc{ font-size:.92rem; color:#6b7280; min-height:2.2em; }
+.svc-actions{ display:flex; gap:.5rem; margin-top:.75rem; }
+.svc-actions .btn{ border-radius:999px; padding:.4rem .85rem; }
+.svc-actions .btn-primary{ background:#1d4ed8; border-color:#1d4ed8; }
+.svc-actions .btn-primary:hover{ filter:brightness(.95); }
+.svc-actions .btn-outline-secondary{ border-color:#d0d7e2; }
+
+/* Pager cho Services (4 card/slide) */
+.pager{ display:flex; align-items:center; justify-content:center; gap:18px; padding:10px 0 4px; }
+.nav-round{
+  width:36px; height:36px; border-radius:50%;
+  border:1px solid #cfd6e7; background:transparent;
+  display:flex; align-items:center; justify-content:center; color:#64748b;
+}
+.nav-round:hover{ border-color:#94a3b8; color:#334155; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.08); }
+.nav-round:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+.dots{ display:flex; align-items:center; gap:16px; }
+
+/* ===== Full-bleed helper cho dải nền xanh ===== */
+.edge-to-edge{
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+}
+
+/* Nếu container bên trong cần “ôm” theo grid Bootstrap thì giữ .container như cũ */
+
+/* ===== Ảnh dịch vụ luôn hiện dù thiếu kích thước ===== */
+.svc-media{
+  aspect-ratio: 16/9;
+  min-height: 160px;               /* fallback cho trình duyệt không hỗ trợ aspect-ratio */
+  background-size: cover !important;
+  background-position: center !important;
+  position: relative;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+/* ========== Full-bleed cho dải nền xanh ========== */
+.edge-to-edge{
+  position:relative; left:50%; right:50%;
+  margin-left:-50vw; margin-right:-50vw; width:100vw;
+}
+
+/* ========== WOWCV / INSIDER / PRESS / TESTI / AUDIO ========== */
+.wowcv-hero{ background:linear-gradient(135deg,#eef4ff,#ffffff); }
+.wowcv-card{ border:1px solid #e8edff; }
+
+.press-pill{ border:1px solid #e9ecf5; min-height:56px; }
+
+.testi-card{ border:1px solid #e9ecf5; max-width:520px; }
+
+.audio-card{ border:1px solid #e8ecff; }
+
+.insider-card{ border:1px solid #e8ecff; transition:transform .15s ease, box-shadow .15s ease; }
+.insider-card:hover{ transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,.08); }
+.insider-thumb{
+  aspect-ratio: 16/9;
+  background-size: cover; background-position: center;
+  border-top-left-radius: 16px; border-top-right-radius: 16px;
+}
+
+/* bảo đảm ảnh dịch vụ luôn hiển thị từ URL động */
+.svc-media{
+  aspect-ratio:16/9;
+  min-height:160px;
+  background-size:cover!important; background-position:center!important;
+  position:relative; border-top-left-radius:16px; border-top-right-radius:16px;
+}
+/* ===== Profile dropdown (avatar) ===== */
+.dropdown-menu[aria-labelledby="user-dropdown"]{
+  min-width: 280px;
+  padding: 8px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 20px 40px rgba(2,6,23,.18);
+  overflow: hidden;
+  z-index: 1100; /* luôn nổi trên header */
+}
+
+/* Email header trên cùng */
+.dropdown-menu[aria-labelledby="user-dropdown"] .profile-menu__email{
+  padding: .75rem .9rem;
+  font-weight: 700;
+  color: #111827;
+  border-radius: 12px;
+}
+
+/* Item chung */
+.dropdown-menu[aria-labelledby="user-dropdown"] .profile-menu__item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: .6rem .75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dropdown-menu[aria-labelledby="user-dropdown"] .profile-menu__item:hover{
+  background: #eef2ff;
+  color: #0d6efd;
+}
+
+/* Icon vòng tròn trái */
+.dropdown-menu[aria-labelledby="user-dropdown"] .menu-icon{
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+/* Màu vòng tròn theo loại */
+.dropdown-menu[aria-labelledby="user-dropdown"] .menu-icon.blue{
+  background: #e9f2ff; color: #1d4ed8;
+}
+.dropdown-menu[aria-labelledby="user-dropdown"] .menu-icon.red{
+  background: #fee2e2; color: #ef4444;
+}
+.dropdown-menu[aria-labelledby="user-dropdown"] .menu-icon.gray{
+  background: #f3f4f6; color: #374151;
+}
+
+/* Divider mảnh như mẫu */
+.dropdown-menu[aria-labelledby="user-dropdown"] .dropdown-divider{
+  margin: 6px 0;
+  border-top: 1px solid #eef2f7;
+}
+/* ===== All-jobs dropdown (nav-all-jobs-dropdown) ===== */
+.dropdown-menu[aria-labelledby="nav-all-jobs-dropdown"]{
+  min-width: 280px;
+  padding: 8px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 20px 40px rgba(2,6,23,.18);
+  overflow: hidden;
+  z-index: 1100;
+}
+
+/* Item giống profile */
+.dropdown-menu[aria-labelledby="nav-all-jobs-dropdown"] .alljobs-item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: .6rem .75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dropdown-menu[aria-labelledby="nav-all-jobs-dropdown"] .alljobs-item:hover{
+  background: #eef2ff;
+  color: #0d6efd;
+}
+
+/* Dùng lại phong cách icon tròn */
+.dropdown-menu[aria-labelledby="nav-all-jobs-dropdown"] .menu-icon{
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.dropdown-menu[aria-labelledby="nav-all-jobs-dropdown"] .menu-icon.blue{
+  background: #e9f2ff; color: #1d4ed8;
+}

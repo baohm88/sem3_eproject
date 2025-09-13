@@ -1,83 +1,44 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
-
-/* =========================================================
-   Hardcoded Top Companies (không dùng API)
-   -> Thay logo/name/rating/membership theo ý bạn
-========================================================= */
+import Carousel from "react-bootstrap/Carousel";
+/* ====== Hardcoded Top Companies (giữ nguyên) ====== */
 const HARDCODED_COMPANIES = [
-  {
-    id: "c_vnpt",
-    name: "VNPT",
-    img_url: "https://dummyimage.com/160x80/ffffff/333&text=VNPT",
-    rating: 4.6,
-    membership: "Premium",
-  },
-  {
-    id: "c_vpbank",
-    name: "VPBANK",
-    img_url: "https://dummyimage.com/160x80/ffffff/333&text=VPBANK",
-    rating: 4.4,
-    membership: "Premium",
-  },
-  {
-    id: "c_bidv",
-    name: "BIDV",
-    img_url: "https://dummyimage.com/160x80/ffffff/333&text=BIDV",
-    rating: 4.3,
-    membership: "Basic",
-  },
-  {
-    id: "c_automech",
-    name: "AUTOMECH",
-    img_url: "https://dummyimage.com/160x80/ffffff/333&text=AUTOMECH",
-    rating: 4.2,
-    membership: "Basic",
-  },
-  {
-    id: "c_minebea",
-    name: "MINEBEA",
-    img_url: "https://dummyimage.com/160x80/ffffff/333&text=MINEBEA",
-    rating: 4.1,
-    membership: "Free",
-  },
-  {
-    id: "c_sei",
-    name: "SEI",
-    img_url: "https://dummyimage.com/160x80/ffffff/333&text=SEI",
-    rating: 4.0,
-    membership: "Free",
-  },
+  { id: "c_XANHSM", name: "XANHSM", img_url: "https://dummyimage.com/160x80/ffffff/333&text=XANHSM", rating: 4.6, membership: "Premium" },
+  { id: "c_MAILINH", name: "MAILINH", img_url: "https://dummyimage.com/160x80/ffffff/333&text=MAILINH", rating: 4.4, membership: "Premium" },
+  { id: "c_BE", name: "BE", img_url: "https://dummyimage.com/160x80/ffffff/333&text=BE", rating: 4.3, membership: "Basic" },
+  { id: "c_GRAP", name: "GRAP", img_url: "https://dummyimage.com/160x80/ffffff/333&text=GRAP", rating: 4.2, membership: "Basic" },
+  { id: "c_GOJEK", name: "GOJEK", img_url: "https://dummyimage.com/160x80/ffffff/333&text=GOJEK", rating: 4.1, membership: "Free" },
+  { id: "c_SHOPEE", name: "SHOPEE", img_url: "https://dummyimage.com/160x80/ffffff/333&text=SHOPEE", rating: 4.0, membership: "Free" },
 ];
 
-/* ---------- Local styles (chỉ áp cho trang này) ---------- */
-const LocalStyle = () => (
-  <style>{`
-    .card-soft{border:0;border-radius:18px;box-shadow:0 10px 24px rgba(0,0,0,.06)}
-    .card-soft:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,0,0,.1)}
-    .company-logo{height:52px;object-fit:contain}
-    .section-hdg{font-weight:800}
-    .hdg-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#0d6efd;margin-right:.4rem}
-    .hscroll-wrap{position:relative}
-    .hscroll{display:flex;gap:12px;overflow:auto;scrollbar-width:none;padding:2px}
-    .hscroll::-webkit-scrollbar{display:none}
-    .hs-btn{position:absolute;top:50%;transform:translateY(-50%);border:none;background:#fff;border-radius:50%;width:36px;height:36px;
-      box-shadow:0 6px 18px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center}
-    .hs-btn.prev{left:-6px}.hs-btn.next{right:-6px}
-    .banner-shadow{box-shadow:0 12px 32px rgba(0,0,0,.12)}
-  `}</style>
-);
+/* ====== Hardcoded Home – khối cuối trang ====== */
+const PRESS_ITEMS = [
+  { id: 1, logo: "https://dummyimage.com/120x28/ffffff/555&text=DANTRI", text: "Giải thưởng quốc tế" },
+  { id: 2, logo: "https://dummyimage.com/120x28/ffffff/555&text=VNEXP", text: "Báo chí nói về chúng tôi" },
+  { id: 3, logo: "https://dummyimage.com/120x28/ffffff/555&text=CAFEF", text: "Thị trường tuyển dụng" },
+  { id: 4, logo: "https://dummyimage.com/120x28/ffffff/555&text=ICTNEWS", text: "Công nghệ nhân sự" },
+];
 
-/* ---------- helpers ---------- */
+const TESTIMONIALS = [
+  { id: 1, quote: "Nhờ nền tảng, tôi tìm được công việc phù hợp rất nhanh. UI dễ dùng, tư vấn rõ ràng.", author: "Ms. Trúc Năng" },
+  { id: 2, quote: "Tin tuyển chất lượng, có lọc theo ngành/địa điểm, ứng tuyển mượt.", author: "Mr. Quang Tùng" },
+  { id: 3, quote: "Tính năng gợi ý công việc rất hữu ích với người mới.", author: "Anh Tuấn" },
+];
+
+const INSIDER_POSTS = [
+  { id: 1, title: "CHRO là gì? Vai trò & nhiệm vụ", cat: "Phát triển kỹ năng", img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop" },
+  { id: 2, title: "Dự báo lương & các điều quan trọng", cat: "Phát triển kỹ năng", img: "https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=1200&auto=format&fit=crop" },
+  { id: 3, title: "Học tại chỗ/On-the-job có nên?", cat: "Phát triển kỹ năng", img: "https://images.unsplash.com/photo-1554774853-b415df9eeb92?q=80&w=1200&auto=format&fit=crop" },
+  { id: 4, title: "Podcast: Những kỹ năng cần có", cat: "Phát triển kỹ năng", img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1200&auto=format&fit=crop" },
+  { id: 5, title: "Từ data analyst đến data science", cat: "Phát triển kỹ năng", img: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200&auto=format&fit=crop" },
+];
+
+/* ---------- helpers chung ---------- */
 const memberRank = { Premium: 3, Basic: 2, Free: 1 };
 const vnd = (cents) =>
-  typeof cents === "number"
-    ? (cents / 100)
-        .toLocaleString("vi-VN", { style: "currency", currency: "VND" })
-        .replace(",00", "")
-    : "";
+  typeof cents === "number" ? (cents / 100).toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace(",00", "") : "";
 
-/** Bóc mảng từ mọi dạng trả về: data.items | items | data(array) | array */
 const extractItems = (res) => {
   const d = res?.data;
   if (Array.isArray(d)) return d;
@@ -88,7 +49,7 @@ const extractItems = (res) => {
   return [];
 };
 
-/** Chuẩn hoá field về format dùng trong UI */
+/* Service chuẩn hoá – có ảnh động từ API */
 const normalizeService = (s) => ({
   id: s.id ?? s._id,
   company_id: s.company_id ?? s.companyId,
@@ -96,7 +57,17 @@ const normalizeService = (s) => ({
   description: s.description,
   price_cents: s.price_cents ?? s.priceCents,
   is_active: (s.is_active ?? s.isActive) ? 1 : 0,
+  img_url:
+    s.imageUrl ??
+    s.imageURL ??
+    s.image_url ??
+    s.imgUrl ??
+    s.img_url ??
+    (Array.isArray(s.images) && s.images[0]) ??
+    (Array.isArray(s.photos) && s.photos[0]) ??
+    null,
 });
+
 const normalizeDriver = (d) => ({
   id: d.id ?? d._id,
   full_name: d.full_name ?? d.fullName,
@@ -106,7 +77,7 @@ const normalizeDriver = (d) => ({
   is_available: (d.is_available ?? d.isAvailable ?? 1) ? 1 : 0,
 });
 
-/* ---------- UI bits ---------- */
+/* ---------- small UI ---------- */
 function SectionHeader({ title, actionText = "Xem tất cả", onAction }) {
   return (
     <div className="d-flex align-items-center justify-content-between mb-3">
@@ -124,63 +95,85 @@ function HScroll({ children }) {
   const ref = useRef(null);
   const scrollBy = (dir) => ref.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
   return (
-    <div className="hscroll-wrap">
-      <button className="hs-btn prev" aria-label="prev" onClick={() => scrollBy(-1)}>
+    <div className="position-relative">
+      <button className="circle-nav position-absolute" style={{ left: -6, top: "50%", transform: "translateY(-50%)" }} onClick={() => scrollBy(-1)}>
         <i className="bi bi-chevron-left" />
       </button>
-      <div ref={ref} className="hscroll">
+      <div ref={ref} className="d-flex gap-3 overflow-auto" style={{ scrollbarWidth: "none" }}>
         {children}
       </div>
-      <button className="hs-btn next" aria-label="next" onClick={() => scrollBy(1)}>
+      <button className="circle-nav position-absolute" style={{ right: -6, top: "50%", transform: "translateY(-50%)" }} onClick={() => scrollBy(1)}>
         <i className="bi bi-chevron-right" />
       </button>
     </div>
   );
 }
 
-/* ---------- Banner (code cứng + auto slide) ---------- */
-const banners = [
-  { img: "https://images.unsplash.com/photo-1523419409543-8c8cd488a75e?q=80&w=1600&auto=format&fit=crop", alt: "Banner 1", href: "#" },
-  { img: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop", alt: "Banner 2", href: "#" },
-  { img: "https://images.unsplash.com/photo-1520975693416-35a2b3d13d05?q=80&w=1600&auto=format&fit=crop", alt: "Banner 3", href: "#" },
+/* ---------- Banner ---------- */
+const BANNERS = [
+  { img: "/assets/xanhsm.jpg", alt: "Xanh SM", href: "/services?category=taxi" },
+  { img: "/assets/airport.jpg", alt: "Taxi sân bay", href: "/services?category=airport" },
+  { img: "/assets/4-7cho.jpg", alt: "Xe 4–7 chỗ", href: "/services?category=car" },
 ];
-
-function BannerCarousel() {
+function BannerCarousel({
+  items = BANNERS,
+  interval = 4000,
+  height = 340,
+  fade = false,
+}) {
   return (
-    <section className="container mt-3">
-      <div id="homeBanners" className="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
-        <div className="carousel-inner rounded-4 overflow-hidden banner-shadow">
-          {banners.map((b, i) => (
-            <a key={i} className={`carousel-item ${i === 0 ? "active" : ""}`} href={b.href}>
-              <img src={b.img} className="d-block w-100" alt={b.alt} height={340} style={{ objectFit: "cover" }} />
-            </a>
-          ))}
-        </div>
-        <button className="carousel-control-prev" type="button" data-bs-target="#homeBanners" data-bs-slide="prev">
-          <span className="carousel-control-prev-icon" aria-hidden="true" />
-          <span className="visually-hidden">Previous</span>
-        </button>
-        <button className="carousel-control-next" type="button" data-bs-target="#homeBanners" data-bs-slide="next">
-          <span className="carousel-control-next-icon" aria-hidden="true" />
-          <span className="visually-hidden">Next</span>
-        </button>
-      </div>
-    </section>
+    <Carousel
+      interval={interval}
+      controls      // có nút trái/phải
+      indicators    // có chấm tròn
+      pause="hover" // di chuột vào sẽ tạm dừng
+      touch         // hỗ trợ vuốt trên mobile
+      slide={!fade}
+      fade={fade}
+      className="rounded-4 overflow-hidden banner-shadow"
+    >
+      {items.map((b, idx) => (
+        <Carousel.Item key={idx}>
+          {/* bọc <img> trong <a> nếu muốn click đi đâu đó */}
+          <a href={b.href || "#"} style={{ display: "block" }}>
+            <img
+              src={b.src}
+              alt={b.alt || `banner-${idx}`}
+              className="d-block w-100"
+              style={{
+                height,
+                objectFit: "cover",
+              }}
+            />
+          </a>
+
+          {/* Caption (tuỳ chọn) */}
+          {b.caption && (
+            <Carousel.Caption className="text-start">
+              <h5 className="fw-bold">{b.caption}</h5>
+            </Carousel.Caption>
+          )}
+        </Carousel.Item>
+      ))}
+    </Carousel>
   );
 }
 
-/* ========================== HOME PAGE ========================== */
+/* ========================== HOME ========================== */
 export default function Home() {
-  const [companies, setCompanies] = useState([]); // sẽ set bằng HARDCODED_COMPANIES
+  const navigate = useNavigate();
+  const [companies, setCompanies] = useState([]);
   const [services, setServices] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState({ companies: true, services: true, drivers: true });
 
+  // pager cho Services (4/slide)
+  const [svcPage, setSvcPage] = useState(0);
+  const pageSize = 4;
+
   useEffect(() => {
     const ac = new AbortController();
-
     (async () => {
-      // 1) SERVICES (public)
       try {
         const res = await api.get("/api/companies/all-services", { signal: ac.signal });
         const svcs = extractItems(res).map(normalizeService);
@@ -190,32 +183,21 @@ export default function Home() {
       } finally {
         setLoading((x) => ({ ...x, services: false }));
       }
-
-      // 2) COMPANIES - hardcoded, không gọi API
-      try {
-        setCompanies(HARDCODED_COMPANIES);
-      } catch (e) {
-        console.error("companies (hardcoded):", e);
-      } finally {
-        setLoading((x) => ({ ...x, companies: false }));
-      }
-
-      // 3) DRIVERS (public nếu có)
+      setCompanies(HARDCODED_COMPANIES);
+      setLoading((x) => ({ ...x, companies: false }));
       try {
         const res = await api.get("/api/drivers", { params: { limit: 20 }, signal: ac.signal });
         const items = extractItems(res).map(normalizeDriver);
         setDrivers(items);
       } catch (e) {
-        console.warn("drivers public không khả dụng hoặc lỗi:", e);
+        console.warn("drivers public lỗi/không khả dụng:", e);
       } finally {
         setLoading((x) => ({ ...x, drivers: false }));
       }
     })();
-
     return () => ac.abort();
   }, []);
 
-  /* chọn & sắp xếp */
   const topCompanies = useMemo(() => {
     return [...companies]
       .filter((c) => c?.name)
@@ -233,10 +215,10 @@ export default function Home() {
     return map;
   }, [companies]);
 
-  const featuredServices = useMemo(
-    () => [...services].filter((s) => s?.is_active !== 0).slice(0, 12),
-    [services]
-  );
+  const featuredServices = useMemo(() => [...services].filter((s) => s?.is_active !== 0), [services]);
+  const totalSvcPages = Math.max(1, Math.ceil(featuredServices.length / pageSize));
+  const svcSlice = featuredServices.slice(svcPage * pageSize, svcPage * pageSize + pageSize);
+  const gotoSvc = (p) => setSvcPage(Math.min(Math.max(p, 0), totalSvcPages - 1));
 
   const topDrivers = useMemo(
     () =>
@@ -247,153 +229,235 @@ export default function Home() {
     [drivers]
   );
 
+  const fallbackCover =
+    "https://images.unsplash.com/photo-1493238792000-8113da705763?q=80&w=1200&auto=format&fit=crop";
+
   return (
     <>
-      <LocalStyle />
-      <BannerCarousel />
-
-      {/* Companies (hardcoded) */}
-      <section className="container mt-4">
-        <SectionHeader title="Các công ty hàng đầu" />
-        {loading.companies ? (
-          <div className="row g-3">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div className="col-6 col-md-4 col-lg-2" key={i}>
-                <div className="card card-soft p-3 h-100 placeholder-glow">
-                  <div className="placeholder col-12" style={{ height: 52 }} />
-                  <div className="placeholder col-8 mt-3" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : topCompanies.length === 0 ? (
-          <div className="text-muted small">Chưa có dữ liệu công ty.</div>
-        ) : (
-          <div className="row g-3">
-            {topCompanies.map((c) => (
-              <div className="col-6 col-md-4 col-lg-2" key={c.id}>
-                <div className="card card-soft text-center p-3 h-100">
-                  <img
-                    src={c.img_url || "https://dummyimage.com/160x80/ffffff/333&text=No+Logo"}
-                    alt={c.name}
-                    className="company-logo mx-auto"
-                  />
-                  <div className="fw-semibold small mt-3">{c.name}</div>
-                  <div className="mt-2 d-flex justify-content-center gap-2">
-                    {c.membership && (
-                      <span className="badge rounded-pill bg-primary-subtle text-primary">
-                        {c.membership}
-                      </span>
-                    )}
-                    {Number(c.rating) > 0 && (
-                      <span className="badge bg-warning-subtle text-warning-emphasis rounded-pill">
-                        ★ {Number(c.rating).toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Services */}
-      <section className="container mt-4">
-        <SectionHeader title="Dịch vụ/Việc làm nổi bật" />
-        {loading.services ? (
-          <div className="row g-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div className="col-12 col-md-6 col-lg-4" key={i}>
-                <div className="card card-soft h-100 placeholder-glow">
-                  <div className="placeholder col-12" style={{ height: 140 }} />
-                  <div className="p-3">
-                    <div className="placeholder col-4" />
+      {/* ====== FULL-BLEED BLUE BAND ====== */}
+      <section className="home-band edge-to-edge">
+        <div className="container">
+          <BannerCarousel />
+          <div className="mt-3 text-white-50 small">Các Công Ty Hàng Đầu</div>
+          {loading.companies ? (
+            <div className="row g-3 mt-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div className="col-6 col-md-4 col-lg-2" key={i}>
+                  <div className="card company-card placeholder-glow">
+                    <div className="placeholder col-12" style={{ height: 84 }} />
                     <div className="placeholder col-8 mt-2" />
-                    <div className="placeholder col-6 mt-2" />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : featuredServices.length === 0 ? (
-          <div className="text-muted small">Chưa có dịch vụ hoạt động.</div>
-        ) : (
-          <div className="row g-3">
-            {featuredServices.map((s) => {
-              const comp = companyById.get(s.company_id);
-              return (
-                <div className="col-12 col-md-6 col-lg-4" key={s.id}>
-                  <div className="card card-soft h-100">
-                    <div
-                      style={{
-                        background:
-                          "url('https://images.unsplash.com/photo-1493238792000-8113da705763?q=80&w=1200&auto=format&fit=crop') center/cover no-repeat",
-                        height: 140,
-                        borderTopLeftRadius: 16,
-                        borderTopRightRadius: 16,
-                      }}
-                    />
-                    <div className="p-3">
-                      <div className="d-flex align-items-center justify-content-between">
-                        <span className="badge bg-primary-subtle text-primary rounded-pill">
-                          {comp?.name || "Company"}
-                        </span>
-                        <span className="badge bg-success-subtle text-success rounded-pill">
-                          {vnd(s.price_cents)}
-                        </span>
-                      </div>
-                      <h6 className="mt-2 mb-1">{s.title}</h6>
-                      {s.description && (
-                        <div className="small text-muted">
-                          {String(s.description).slice(0, 100)}
-                          {String(s.description).length > 100 ? "…" : ""}
-                        </div>
-                      )}
-                      <div className="d-flex gap-2 mt-3">
-                        <button className="btn btn-sm btn-primary rounded-pill">Đặt/Ứng tuyển</button>
-                        <button className="btn btn-sm btn-outline-secondary rounded-pill">Chi tiết</button>
-                      </div>
+              ))}
+            </div>
+          ) : (
+            <div className="row g-3 mt-2">
+              {topCompanies.map((c) => (
+                <div className="col-6 col-md-4 col-lg-2" key={c.id}>
+                  <div className="card company-card hover-lift">
+                    <img src={c.img_url} alt={c.name} className="company-logo" />
+                    <div className="fw-semibold small mt-2 text-dark">{c.name}</div>
+                    <div className="mt-1 d-flex gap-2">
+                      <span className="badge bg-primary-subtle text-primary rounded-pill">{c.membership}</span>
+                      <span className="badge bg-warning-subtle text-warning-emphasis rounded-pill">★ {c.rating.toFixed(1)}</span>
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* Drivers */}
-      <section className="container mt-4 mb-5">
-        <SectionHeader title="Top Drivers nổi bật" />
-        {loading.drivers ? (
+      {/* ====== SERVICES FEATURED (4/slide) ====== */}
+      <section className="container my-4">
+        <div className="featured-box">
+          <div className="d-flex align-items-center justify-content-between mb-2">
+            <h5 className="m-0 section-hdg">
+              Việc Làm Nổi Bật <span className="text-primary">Chuyên Viên IT</span>
+            </h5>
+            <Link to="/services" className="btn btn-sm btn-outline-secondary rounded-pill">
+              Xem tất cả
+            </Link>
+          </div>
+          {featuredServices.length === 0 ? (
+            <div className="text-muted small">{loading.services ? "Đang tải…" : "Chưa có dịch vụ hoạt động."}</div>
+          ) : (
+            <>
+              <div className="row g-3">
+                {svcSlice.map((s) => {
+                  const comp = companyById.get(s.company_id);
+                  const cover = s.img_url || fallbackCover;
+                  return (
+                    <div className="col-12 col-md-6 col-lg-3" key={s.id}>
+                      <div className="svc-card h-100">
+                        <div className="svc-media" style={{ backgroundImage: `url('${cover}')` }}>
+                          {typeof s.price_cents === "number" && <span className="svc-price">{vnd(s.price_cents)}</span>}
+                        </div>
+                        <div className="svc-body">
+                          <span className="svc-company">{comp?.name || "Company"}</span>
+                          <h6 className="svc-title">{s.title}</h6>
+                          {s.description && <div className="svc-desc text-truncate-2">{String(s.description)}</div>}
+                          <div className="svc-actions">
+                            <button className="btn btn-sm btn-primary">Đặt/Ứng tuyển</button>
+                            <button className="btn btn-sm btn-outline-secondary">Chi tiết</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="pager">
+                <button className="nav-round" onClick={() => gotoSvc(svcPage - 1)} disabled={svcPage === 0}>
+                  <i className="bi bi-chevron-left" />
+                </button>
+                <div className="dots">
+                  {Array.from({ length: totalSvcPages }).map((_, i) => (
+                    <button key={i} className={`dot ${i === svcPage ? "active" : ""}`} onClick={() => gotoSvc(i)} />
+                  ))}
+                </div>
+                <button className="nav-round" onClick={() => gotoSvc(svcPage + 1)} disabled={svcPage >= totalSvcPages - 1}>
+                  <i className="bi bi-chevron-right" />
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* ====== WOWCV / PRESS / TESTIMONIALS / INSIDER ====== */}
+      <section className="container my-4">
+        {/* WOWCV hero dòng đầu */}
+        <div className="row g-3">
+          <div className="col-lg-8">
+            <div className="wowcv-hero card-soft p-4">
+              <div className="row align-items-center g-3">
+                <div className="col-md-7">
+                  <h4 className="mb-2">Tạo Ấn Tượng Với Nhà Tuyển Dụng Cùng <span className="text-primary">WowCV</span></h4>
+                  <p className="text-muted mb-3">Tạo mẫu CV nhanh gọn & miễn phí, để nhà tuyển dụng “Wow!” ngay khi nhìn thấy CV của bạn.</p>
+                  <button className="btn btn-brand rounded-pill">Tạo CV ngay</button>
+                </div>
+                <div className="col-md-5">
+                  <img
+                    src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop"
+                    alt=""
+                    className="img-fluid rounded-3"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-4 d-flex flex-column gap-3">
+            <div className="wowcv-card card-soft p-3">
+              <div className="fw-semibold mb-1">Nhân Số Học</div>
+              <div className="text-muted">Khám phá năng lực và nghề phù hợp qua biểu đồ nhân số học.</div>
+              <a href="#" className="stretched-link small mt-2">Xem thêm</a>
+            </div>
+            <div className="wowcv-card card-soft p-3">
+              <div className="fw-semibold mb-1">Lộ Trình Sự Nghiệp</div>
+              <div className="text-muted">Gợi ý kỹ năng/khóa học theo từng cấp bậc & ngành.</div>
+              <a href="#" className="stretched-link small mt-2">Xem thêm</a>
+            </div>
+          </div>
+        </div>
+
+        {/* Báo chí nói về */}
+        <div className="mt-4">
+          <div className="fw-semibold mb-2">Báo chí nói về</div>
           <HScroll>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div className="card card-soft p-3" key={i} style={{ width: 300 }}>
-                <div className="placeholder rounded-circle" style={{ width: 64, height: 64 }} />
-                <div className="placeholder col-8 mt-2" />
-                <div className="placeholder col-6 mt-2" />
+            {PRESS_ITEMS.map((p) => (
+              <div key={p.id} className="press-pill card-soft px-3 py-2" style={{ minWidth: 220 }}>
+                <div className="d-flex align-items-center gap-3">
+                  <img src={p.logo} alt="" height={22} />
+                  <div className="small text-muted">{p.text}</div>
+                </div>
               </div>
             ))}
           </HScroll>
-        ) : topDrivers.length === 0 ? (
-          <div className="text-muted small">Chưa có dữ liệu driver.</div>
+        </div>
+
+        {/* Ứng viên nói về */}
+        <div className="mt-4">
+          <div className="fw-semibold mb-2">Ứng viên nói về</div>
+          <HScroll>
+            {TESTIMONIALS.map((t) => (
+              <div key={t.id} className="testi-card card-soft p-3" style={{ minWidth: 360 }}>
+                <div className="text-muted">“{t.quote}”</div>
+                <div className="mt-2 fw-semibold">{t.author}</div>
+              </div>
+            ))}
+          </HScroll>
+        </div>
+
+        {/* Audio bar (tĩnh – layout) */}
+        <div className="audio-card card-soft mt-4 p-3 d-flex align-items-center justify-content-between">
+          <div className="d-flex align-items-center gap-3">
+            <button className="btn btn-light rounded-circle border"><i className="bi bi-play-fill" /></button>
+            <div>
+              <div className="fw-semibold">Một dòng CV: nếu lầm mãi không lên chức… liệu có nên nhảy việc?</div>
+              <div className="small text-muted">00:00 — 09:00</div>
+            </div>
+          </div>
+          <button className="btn btn-outline-secondary rounded-circle"><i className="bi bi-chevron-right" /></button>
+        </div>
+
+        {/* HR Insider */}
+        <div className="d-flex align-items-center justify-content-between mt-4 mb-2">
+          <h5 className="m-0 section-hdg">Tư Vấn Nghề Nghiệp Từ HR Insider</h5>
+          <a href="#" className="text-primary fw-semibold text-decoration-none small">XEM TẤT CẢ</a>
+        </div>
+        <div className="row g-3">
+          {INSIDER_POSTS.map((p) => (
+            <div className="col-12 col-sm-6 col-lg-4 col-xl-3" key={p.id}>
+              <div className="insider-card card-soft h-100">
+                <div className="insider-thumb" style={{ backgroundImage: `url('${p.img}')` }} />
+                <div className="p-3">
+                  <div className="small text-primary">{p.cat}</div>
+                  <div className="fw-semibold mt-1">{p.title}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Tag cloud (tĩnh) */}
+        <div className="tags-cloud mt-4">
+          <div className="tags-wrap">
+            {["tìm việc làm", "tuyển dụng", "Vận chuyển", "TAXI", "Giao hàng", "Dịch vụ", "Hướng dẫn tour", "hà nội", "hồ chí minh"].map(
+              (t, i) => (
+                <a key={i} href="#" className="tag-pill">{t}</a>
+              )
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ====== DRIVERS ====== */}
+      <section className="container mt-4 mb-5">
+        <SectionHeader
+          title="Top Drivers nổi bật"
+          onAction={() => navigate("/drivers")}
+        />
+        {topDrivers.length === 0 ? (
+          <div className="text-muted small">{loading.drivers ? "Đang tải…" : "Chưa có dữ liệu driver."}</div>
         ) : (
           <HScroll>
             {topDrivers.map((d) => (
-              <div className="card card-soft p-3" key={d.id} style={{ width: 300 }}>
+              <div className="card driver-chip" key={d.id} style={{ width: 300 }}>
                 <div className="d-flex align-items-center gap-3">
                   <img
                     src={d.img_url || "https://i.pravatar.cc/64"}
                     alt={d.full_name}
-                    width={64}
-                    height={64}
+                    width={56}
+                    height={56}
                     className="rounded-circle"
                     style={{ objectFit: "cover" }}
                   />
                   <div>
                     <div className="fw-semibold">{d.full_name}</div>
-                    <div className="small text-muted">{d.location || "—"}</div>
+                    <div className="xsmall">{d.location || "—"}</div>
                     {Number(d.rating) > 0 && (
                       <span className="badge bg-warning-subtle text-warning-emphasis rounded-pill mt-1">
                         ★ {Number(d.rating).toFixed(1)}
@@ -402,8 +466,8 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="d-flex gap-2 mt-3">
-                  <button className="btn btn-sm btn-outline-secondary rounded-pill">Xem hồ sơ</button>
-                  <button className="btn btn-sm btn-primary rounded-pill">Liên hệ</button>
+                  <button className="btn btn-xxs btn-outline-secondary rounded-pill">Xem hồ sơ</button>
+                  <button className="btn btn-xxs btn-primary rounded-pill">Liên hệ</button>
                 </div>
               </div>
             ))}
@@ -413,5 +477,3 @@ export default function Home() {
     </>
   );
 }
-
-
