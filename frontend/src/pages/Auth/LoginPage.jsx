@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom"; // ⬅️ add useLocation
 import { Button, Form as BootstrapForm } from "react-bootstrap";
 import FormWrapper from "../../components/common/FormWrapper";
 import { loginAsync } from "../../api/auth";
@@ -17,6 +17,10 @@ const LoginSchema = Yup.object().shape({
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Prefill email if we were redirected from registration: navigate("/login", { state: { email } })
+  const prefillEmail = location.state?.email || "";
 
   /** Map a role to its post-login landing route */
   const redirectByRole = (role) => {
@@ -28,7 +32,6 @@ export default function LoginPage() {
       case "Company":
         return "/company";
       case "Rider":
-        return "/";
       default:
         return "/";
     }
@@ -45,17 +48,15 @@ export default function LoginPage() {
       }
     >
       <Formik
-        initialValues={{ email: "", password: "" }}
+        initialValues={{ email: prefillEmail, password: "" }} // ⬅️ use prefilled email
+        enableReinitialize // ⬅️ allow reinit if state changes
         validationSchema={LoginSchema}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            // Call API -> get token + profile, then persist via AuthContext
             const { token, profile } = await loginAsync(values);
             login(profile, token);
             toast.success("Login successful!");
-            // Redirect based on role
-            const target = redirectByRole(profile.role);
-            navigate(target, { replace: true });
+            navigate(redirectByRole(profile.role), { replace: true });
           } catch (err) {
             toast.error(err.message || "Invalid credentials!");
           } finally {
@@ -70,9 +71,9 @@ export default function LoginPage() {
               <Field
                 type="email"
                 name="email"
-                autoFocus
                 as={BootstrapForm.Control}
                 placeholder="Enter email"
+                autoFocus={!prefillEmail} // focus email only if not prefilled
               />
               <ErrorMessage
                 name="email"
@@ -88,6 +89,7 @@ export default function LoginPage() {
                 name="password"
                 as={BootstrapForm.Control}
                 placeholder="Enter password"
+                autoFocus={!!prefillEmail} // focus password if email is prefilled
               />
               <ErrorMessage
                 name="password"

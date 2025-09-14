@@ -68,8 +68,8 @@ export const ROLE_ROUTES: RoleRoutes = {
     base: "/admin",
     nav: [
       { path: "", label: "Dashboard", element: <AdminDashboard />, end: true },
-      { path: "companies", label: "Companies", element: <CompaniesPage /> },
-      { path: "drivers", label: "Drivers", element: <DriversPage /> },
+      // { path: "companies", label: "Companies", element: <CompaniesPage /> },
+      // { path: "drivers", label: "Drivers", element: <DriversPage /> },
     ],
     children: [],
   },

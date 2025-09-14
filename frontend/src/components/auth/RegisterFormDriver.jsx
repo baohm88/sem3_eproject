@@ -3,11 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button, Form as BForm } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { registerAsync, loginAsync } from "../../api/auth";
-import { getMyDriverProfile, updateMyDriverProfile } from "../../api/drivers";
-import { useAuth } from "../../context/AuthContext";
+import { registerAsync } from "../../api/auth";   // ⬅️ only register now
 import { useNavigate } from "react-router-dom";
-import { cleanPayload } from "../../utils/cleanPayload";
 
 /**
  * Validation schema:
@@ -28,7 +25,7 @@ const Schema = Yup.object().shape({
     .trim()
     .nullable()
     .test("optional-url", "Must be a valid URL", (val) => {
-      if (!val) return true; // allow empty
+      if (!val) return true;
       try {
         new URL(val.startsWith("http") ? val : `https://${val}`);
         return true;
@@ -39,15 +36,13 @@ const Schema = Yup.object().shape({
 });
 
 /**
- * Driver registration flow:
+ * Driver registration flow (OTP mock):
  * 1) Register auth account with role "Driver".
- * 2) Login to obtain token + profile and hydrate AuthContext.
- * 3) Ensure backend creates/returns driver profile (`getMyDriverProfile`).
- * 4) Update driver profile fields (uses `cleanPayload` to strip empties).
- * 5) Navigate to /driver dashboard.
+ * 2) Show success + tell user to check OTP in server console.
+ * 3) Redirect to /login (prefill email).
+ * 4) After login, you can create/update the driver profile.
  */
 export default function RegisterFormDriver({ onDone }) {
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -74,32 +69,11 @@ export default function RegisterFormDriver({ onDone }) {
             role: "Driver",
           });
 
-          // Step 2: login and store session
-          const { token, profile } = await loginAsync({
-            email: payload.email,
-            password: payload.password,
-          });
-          login(profile, token);
-
-          // Step 3: make sure driver profile exists server-side
-          await getMyDriverProfile();
-
-          // Step 4: update driver profile (cleanPayload removes "", null, undefined)
-          await updateMyDriverProfile(
-            cleanPayload({
-              fullName: payload.fullName,
-              phone: payload.phone,
-              skills: payload.skills,     // comma-separated or JSON string; parsed later by UI code if needed
-              location: payload.location,
-              imgUrl: payload.imgUrl,     // will be omitted if empty
-            })
-          );
-
-          // Step 5: UX feedback + redirect
-          toast.success("Registered & signed in!");
+          // Step 2–3: success message + redirect to login
+          toast.success("Registered! Please log in.");
           resetForm();
           onDone?.();
-          navigate("/driver", { replace: true });
+          navigate("/login", { replace: true, state: { email: payload.email } });
         } catch (err) {
           toast.error(err.message || "Registration failed");
         } finally {
@@ -130,7 +104,7 @@ export default function RegisterFormDriver({ onDone }) {
 
           <hr className="my-3" />
 
-          {/* Driver profile fields */}
+          {/* Driver profile fields (collected now; update after login) */}
           <BForm.Group className="mb-3">
             <Field name="fullName" as={BForm.Control} placeholder="Full name" />
             <ErrorMessage name="fullName" component="div" className="text-danger small" />

@@ -1,4 +1,4 @@
-/* Tabs look */
+
 .subnav-tabs .nav-link {
     color: #6c757d;
     border-bottom: 2px solid transparent;
@@ -75,3 +75,5 @@
     transform: translateY(-5px);
     box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
 }
+
+

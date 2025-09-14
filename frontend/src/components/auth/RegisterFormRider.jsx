@@ -1,19 +1,11 @@
-// // src/components/auth/RegisterFormRider.jsx
+// src/components/auth/RegisterFormRider.jsx
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button, Form as BForm } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { registerAsync, loginAsync } from "../../api/auth";
-import { getMyRider, updateMyRider } from "../../api/riders";
-import { useAuth } from "../../context/AuthContext";
+import { registerAsync } from "../../api/auth"; // ⬅️ only need register now
 import { useNavigate } from "react-router-dom";
-import { cleanPayload } from "../../utils/cleanPayload";
 
-/**
- * Validation schema:
- * - `imgUrl` is optional; if provided it must be a valid URL (http/https assumed if missing).
- * - `confirmPassword` must match `password`.
- */
 const Schema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
   password: Yup.string().min(6, "Min 6 chars").required("Required"),
@@ -26,7 +18,7 @@ const Schema = Yup.object().shape({
     .trim()
     .nullable()
     .test("optional-url", "Must be a valid URL", (val) => {
-      if (!val) return true; // allow empty
+      if (!val) return true;
       try {
         new URL(val.startsWith("http") ? val : `https://${val}`);
         return true;
@@ -36,16 +28,7 @@ const Schema = Yup.object().shape({
     }),
 });
 
-/**
- * Rider registration flow:
- * 1) Register account with role "Rider".
- * 2) Login to obtain token + profile and hydrate AuthContext.
- * 3) Ensure backend rider resource exists (`getMyRider`).
- * 4) Update rider profile (uses `cleanPayload` to drop empty fields).
- * 5) Navigate to home page.
- */
 export default function RegisterFormRider({ onDone }) {
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -69,33 +52,12 @@ export default function RegisterFormRider({ onDone }) {
             password: payload.password,
             role: "Rider",
           });
-
-          // Step 2: login and store session in context
-          const { token, profile } = await loginAsync({
-            email: payload.email,
-            password: payload.password,
-          });
-          login(profile, token);
-
-          // Step 3: ensure rider profile exists server-side
-          await getMyRider();
-
-          // Step 4: update rider profile (cleanPayload removes "", null, undefined)
-          const res2 = await updateMyRider(
-            cleanPayload({
-              fullName: payload.fullName,
-              phone: payload.phone,
-              imgUrl: payload.imgUrl,
-            })
-          );
-          // Useful during development; consider removing in production:
-          console.log("update rider res: ", res2);
-
-          // Step 5: UX feedback + redirect
-          toast.success("Registered & signed in!");
+          toast.success("Registered! Please log in!");
           resetForm();
           onDone?.();
-          navigate("/", { replace: true });
+
+          // Pass email so login form can prefill it (optional)
+          navigate("/login", { replace: true, state: { email: payload.email } });
         } catch (err) {
           toast.error(err.message || "Registration failed");
         } finally {
@@ -115,18 +77,13 @@ export default function RegisterFormRider({ onDone }) {
             <ErrorMessage name="password" component="div" className="text-danger small" />
           </BForm.Group>
           <BForm.Group className="mb-3">
-            <Field
-              type="password"
-              name="confirmPassword"
-              as={BForm.Control}
-              placeholder="Confirm password"
-            />
+            <Field type="password" name="confirmPassword" as={BForm.Control} placeholder="Confirm password" />
             <ErrorMessage name="confirmPassword" component="div" className="text-danger small" />
           </BForm.Group>
 
           <hr className="my-3" />
 
-          {/* Rider profile fields */}
+          {/* Rider profile fields (still collected, but you’ll update them after login) */}
           <BForm.Group className="mb-3">
             <Field name="fullName" as={BForm.Control} placeholder="Full name" />
             <ErrorMessage name="fullName" component="div" className="text-danger small" />
@@ -140,7 +97,6 @@ export default function RegisterFormRider({ onDone }) {
             <ErrorMessage name="imgUrl" component="div" className="text-danger small" />
           </BForm.Group>
 
-          {/* Submit */}
           <div className="d-grid">
             <Button type="submit" variant="primary" disabled={isSubmitting}>
               {isSubmitting ? "Registering..." : "Register"}
