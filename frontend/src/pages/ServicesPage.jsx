@@ -25,6 +25,8 @@ export default function ServicesPage() {
 
   const deb = useRef(null);
 
+  document.title = "Services — Mycabs.com";
+
   const fetchData = async (p = page, s = size) => {
     setLoading(true);
     try {

@@ -18,6 +18,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  document.title = "Login — Mycabs.com";
 
   // Prefill email if we were redirected from registration: navigate("/login", { state: { email } })
   const prefillEmail = location.state?.email || "";

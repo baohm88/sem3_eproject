@@ -43,6 +43,8 @@ export default function CompaniesPage() {
 
   const navigate = useNavigate();
 
+  document.title = "Listings — Mycabs.com";
+
   // Debounce search term → update `debouncedName`
   const [debouncedName, setDebouncedName] = useState(searchTerm);
   useEffect(() => {

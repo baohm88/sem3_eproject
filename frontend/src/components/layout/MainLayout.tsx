@@ -10,6 +10,7 @@ import {
   Image,
 } from "react-bootstrap";
 import { RiMenu2Line } from "react-icons/ri";
+import { CgProfile } from "react-icons/cg";
 
 import { useAuth } from "../../context/AuthContext";
 import SideBar from "./SideBar";
@@ -111,7 +112,7 @@ export default function MainLayout() {
                 onClick={toggleSidebar}
                 style={{ cursor: "pointer" }}
               />
-              <Navbar.Brand as={NavLink} to="/" className="d-none d-md-block">
+              <Navbar.Brand as={NavLink} to="/listings" className="d-none d-md-block">
                 <img
                   src="https://cdn.xanhsm.com/2023/08/1d8dda9d-xe-premium-06-2025-2048x1365.png"
                   alt="AutoBid"
@@ -173,13 +174,6 @@ export default function MainLayout() {
                     <NavDropdown.Divider />
                     <NavDropdown.Item as={NavLink} to={dashboardTo} end>
                       <i className="bi bi-clipboard-data-fill me-2" />
-                      Dashboard
-                    </NavDropdown.Item>
-                    <NavDropdown.Item
-                      as={NavLink}
-                      to={`/${(profile as any)?.role?.toLowerCase?.()}/profile`}
-                    >
-                      <i className="bi bi-heart-fill me-2 text-danger" />
                       Profile
                     </NavDropdown.Item>
                     <NavDropdown.Item as="button" onClick={logout}>

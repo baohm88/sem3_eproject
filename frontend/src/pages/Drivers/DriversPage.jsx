@@ -41,6 +41,8 @@ export default function DriversPage() {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  document.title = "Drivers — Mycabs.com";
+
   // Debounce search to limit API calls
   const [debouncedName, setDebouncedName] = useState(searchTerm);
   useEffect(() => {

@@ -1,6 +1,5 @@
 // src/routes/routes.tsx
 import React from "react";
-import HomePage from "../pages/Home";
 import ServicesPage from "../pages/ServicesPage";
 import AdvertisePage from "../pages/AdvertisePage";
 import FeedbackPage from "../pages/FeedbackPage";
@@ -8,7 +7,6 @@ import FeedbackPage from "../pages/FeedbackPage";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import CompaniesPage from "../pages/Companies/CompaniesPage";
 
-import CompanyDashboard from "../pages/Companies/CompanyDashboard";
 import CompanyServices from "../pages/Companies/CompanyServices";
 import CompanyDrivers from "../pages/Companies/CompanyDrivers";
 import CompanyTransactions from "../pages/Companies/CompanyTransactions";
@@ -23,7 +21,6 @@ import DriverInvitesPage from "../pages/Drivers/DriverInvitesPage";
 import DriverTransactions from "../pages/Drivers/DriverTransactions";
 
 import DriversPage from "../pages/Drivers/DriversPage";
-import DriverDashboard from "../pages/Drivers/DriverDashboard";
 import CompanyPublicProfilePage from "../pages/Companies/CompanyPublicProfilePage";
 import CompanyApplicationsPage from "../pages/Companies/CompanyApplicationsPage";
 
@@ -52,13 +49,12 @@ export type RoleRoutes = Record<
 
 /** Public (unauthenticated) routes visible in the main navbar when applicable. */
 export const PUBLIC_ROUTES: RouteItem[] = [
-  { path: "/", label: "Home", element: <HomePage />, end: true },
+  // { path: "/listings", label: "Home", element: <CompaniesPage />, end: true },
   { path: "/listings", label: "Listings", element: <CompaniesPage /> },
   { path: "/listings/:companyId", element: <CompanyPublicProfilePage /> },
   { path: "/drivers", label: "Drivers", element: <DriversPage /> },
   { path: "/drivers/:driverId", element: <DriverPublicProfilePage /> },
   { path: "/services", label: "Services", element: <ServicesPage /> },
-  { path: "/feedback", label: "Feedback", element: <FeedbackPage /> },
   { path: "/advertise", label: "Advertise", element: <AdvertisePage /> },
 ];
 
@@ -67,17 +63,14 @@ export const ROLE_ROUTES: RoleRoutes = {
   Admin: {
     base: "/admin",
     nav: [
-      { path: "", label: "Dashboard", element: <AdminDashboard />, end: true },
-      // { path: "companies", label: "Companies", element: <CompaniesPage /> },
-      // { path: "drivers", label: "Drivers", element: <DriversPage /> },
+      { path: "", label: "Admin Dashboard", element: <AdminDashboard />, end: true },
     ],
     children: [],
   },
   Company: {
     base: "/company",
     nav: [
-      { path: "", label: "Dashboard", element: <CompanyDashboard />, end: true },
-      { path: "profile", label: "Profile", element: <CompanyProfilePage /> },
+      { path: "", label: "Profile", element: <CompanyProfilePage />, end: true },
       { path: "services", label: "Services", element: <CompanyServices /> },
       { path: "invites", label: "Invites", element: <CompanyInvitesPage /> },
       { path: "drivers", label: "Drivers", element: <CompanyDrivers /> },
@@ -89,8 +82,7 @@ export const ROLE_ROUTES: RoleRoutes = {
   Driver: {
     base: "/driver",
     nav: [
-      { path: "", label: "Dashboard", element: <DriverDashboard />, end: true },
-      { path: "profile", label: "Profile", element: <DriverProfilePage /> },
+      { path: "", label: "Profile", element: <DriverProfilePage />, end: true },
       { path: "jobs", label: "Openings", element: <DriverJobsPage /> },
       { path: "invites", label: "Invites", element: <DriverInvitesPage /> },
       { path: "applications", label: "Applications", element: <DriverApplicationsPage /> },
