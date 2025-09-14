@@ -322,12 +322,10 @@ export default function CompanyPublicProfilePage() {
   }
 
   const company = data.company;
+  document.title = company.name;
   const logoSrc =
     company.imgUrl && company.imgUrl.trim() ? company.imgUrl : FALLBACK_LOGO;
-
-
-    console.log(reviews);
-    
+  
 
   return (
     <div className="py-3">

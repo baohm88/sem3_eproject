@@ -33,6 +33,8 @@ export default function DriverTransactions() {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showAllTx, setShowAllTx] = useState(false);
 
+  document.title = "Your Transactions - Mycabs.com";
+
   const refreshWalletAndTx = async (driverUserId) => {
     setLoading(true);
     try {

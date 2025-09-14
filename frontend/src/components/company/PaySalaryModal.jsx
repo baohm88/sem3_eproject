@@ -93,7 +93,7 @@ export default function PaySalaryModal({
             <Form.Label>Amount</Form.Label>
             <InputGroup>
               <Form.Control
-                placeholder="Ví dụ: 1,500,000"
+                placeholder="Example: 1,500,000"
                 inputMode="decimal" // helps mobile keyboards show numeric layout
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -108,7 +108,7 @@ export default function PaySalaryModal({
             <Form.Control
               as="textarea"
               rows={2}
-              placeholder="Ghi chú nội bộ…"
+              placeholder="Note..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />

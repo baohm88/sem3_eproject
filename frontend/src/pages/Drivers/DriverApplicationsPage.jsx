@@ -54,6 +54,9 @@ export default function DriverApplicationsPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [recallingApp, setRecallingApp] = useState(null); // { appId, companyId }
 
+
+  document.title = "Your Job Applications - Mycabs.com";
+
   const debounced = useRef(null);
 
   // Ensure driver id is known (fetch if missing)

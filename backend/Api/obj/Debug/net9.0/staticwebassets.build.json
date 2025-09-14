@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "wWCfurCwmvxBbTR1pJ9Vi4+/6aWN5qUjrpRefo87yeY=",
+  "Hash": "V1DbaHNtLtUopFroi+JODcoMECwak3fRKDOJDiePtxw=",
   "Source": "Api",
   "BasePath": "_content/Api",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "Api/wwwroot",
       "Source": "Api",
-      "ContentRoot": "/Users/baoha/Downloads/mvp-starter/backend/Api/wwwroot/",
+      "ContentRoot": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/wwwroot/",
       "BasePath": "_content/Api",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "/Users/baoha/Downloads/mvp-starter/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
+      "Identity": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
       "SourceId": "Api",
       "SourceType": "Discovered",
-      "ContentRoot": "/Users/baoha/Downloads/mvp-starter/backend/Api/obj/Debug/net9.0/compressed/",
+      "ContentRoot": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/Api",
       "RelativePath": "swagger-ui/custom#[.{fingerprint=ejkuv129mn}]?.css.gz",
       "AssetKind": "All",
@@ -28,20 +28,20 @@
       "AssetRole": "Alternative",
       "AssetMergeBehavior": "",
       "AssetMergeSource": "",
-      "RelatedAsset": "/Users/baoha/Downloads/mvp-starter/backend/Api/wwwroot/swagger-ui/custom.css",
+      "RelatedAsset": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/wwwroot/swagger-ui/custom.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
       "Fingerprint": "bwyu8lmmt7",
       "Integrity": "1Zdvm5+/7CD4l41SL0T3UxG+NNKAt0yUJG5bAsJQ5yY=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "/Users/baoha/Downloads/mvp-starter/backend/Api/wwwroot/swagger-ui/custom.css"
+      "OriginalItemSpec": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/wwwroot/swagger-ui/custom.css"
     },
     {
-      "Identity": "/Users/baoha/Downloads/mvp-starter/backend/Api/wwwroot/swagger-ui/custom.css",
+      "Identity": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/wwwroot/swagger-ui/custom.css",
       "SourceId": "Api",
       "SourceType": "Discovered",
-      "ContentRoot": "/Users/baoha/Downloads/mvp-starter/backend/Api/wwwroot/",
+      "ContentRoot": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/wwwroot/",
       "BasePath": "_content/Api",
       "RelativePath": "swagger-ui/custom#[.{fingerprint}]?.css",
       "AssetKind": "All",
@@ -62,7 +62,7 @@
   "Endpoints": [
     {
       "Route": "swagger-ui/custom.css",
-      "AssetFile": "/Users/baoha/Downloads/mvp-starter/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
+      "AssetFile": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
@@ -117,7 +117,7 @@
     },
     {
       "Route": "swagger-ui/custom.css",
-      "AssetFile": "/Users/baoha/Downloads/mvp-starter/backend/Api/wwwroot/swagger-ui/custom.css",
+      "AssetFile": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/wwwroot/swagger-ui/custom.css",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -154,7 +154,7 @@
     },
     {
       "Route": "swagger-ui/custom.css.gz",
-      "AssetFile": "/Users/baoha/Downloads/mvp-starter/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
+      "AssetFile": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -199,7 +199,7 @@
     },
     {
       "Route": "swagger-ui/custom.ejkuv129mn.css",
-      "AssetFile": "/Users/baoha/Downloads/mvp-starter/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
+      "AssetFile": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
@@ -262,7 +262,7 @@
     },
     {
       "Route": "swagger-ui/custom.ejkuv129mn.css",
-      "AssetFile": "/Users/baoha/Downloads/mvp-starter/backend/Api/wwwroot/swagger-ui/custom.css",
+      "AssetFile": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/wwwroot/swagger-ui/custom.css",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -307,7 +307,7 @@
     },
     {
       "Route": "swagger-ui/custom.ejkuv129mn.css.gz",
-      "AssetFile": "/Users/baoha/Downloads/mvp-starter/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
+      "AssetFile": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/obj/Debug/net9.0/compressed/cdidhjid37-ejkuv129mn.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {

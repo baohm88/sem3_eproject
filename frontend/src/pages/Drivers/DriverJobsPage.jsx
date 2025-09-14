@@ -54,6 +54,8 @@ export default function DriverJobsPage() {
   const [recallOpen, setRecallOpen] = useState(false);
   const [recallingCompany, setRecallingCompany] = useState(null);
 
+  document.title = "Available Openings - Mycabs.com";
+
   const debounced = useRef(null);
 
   // Ensure driver id (fetch if missing)

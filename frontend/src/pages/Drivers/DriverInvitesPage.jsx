@@ -46,6 +46,8 @@ export default function DriverInvitesPage() {
 
   const debounced = useRef(null);
 
+  document.title = "Your Invites - Mycabs.com";
+
   // Ensure we have the driver id (fetch if missing)
   useEffect(() => {
     if (!driverUserId) {

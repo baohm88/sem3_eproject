@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/Domain.csproj",
+      "projectUniqueName": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/Domain.csproj",
       "projectName": "Domain",
-      "projectPath": "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/Domain.csproj",
+      "projectPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/Domain.csproj",
       "packagesPath": "/Users/baoha/.nuget/packages/",
-      "outputPath": "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/obj/",
+      "outputPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/baoha/.nuget/NuGet/NuGet.Config"

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/baoha/Downloads/mvp-starter/backend/Api/Api.csproj": {}
+    "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/Api.csproj": {}
   },
   "projects": {
-    "/Users/baoha/Downloads/mvp-starter/backend/Api/Api.csproj": {
+    "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/baoha/Downloads/mvp-starter/backend/Api/Api.csproj",
+        "projectUniqueName": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/Api.csproj",
         "projectName": "Api",
-        "projectPath": "/Users/baoha/Downloads/mvp-starter/backend/Api/Api.csproj",
+        "projectPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/Api.csproj",
         "packagesPath": "/Users/baoha/.nuget/packages/",
-        "outputPath": "/Users/baoha/Downloads/mvp-starter/backend/Api/obj/",
+        "outputPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/baoha/.nuget/NuGet/NuGet.Config"
@@ -26,8 +26,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/baoha/Downloads/mvp-starter/backend/Infrastructure/Infrastructure.csproj": {
-                "projectPath": "/Users/baoha/Downloads/mvp-starter/backend/Infrastructure/Infrastructure.csproj"
+              "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Infrastructure/Infrastructure.csproj": {
+                "projectPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Infrastructure/Infrastructure.csproj"
               }
             }
           }
@@ -102,14 +102,14 @@
         }
       }
     },
-    "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/Domain.csproj": {
+    "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/Domain.csproj",
+        "projectUniqueName": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/Domain.csproj",
+        "projectPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/Domain.csproj",
         "packagesPath": "/Users/baoha/.nuget/packages/",
-        "outputPath": "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/obj/",
+        "outputPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/baoha/.nuget/NuGet/NuGet.Config"
@@ -161,14 +161,14 @@
         }
       }
     },
-    "/Users/baoha/Downloads/mvp-starter/backend/Infrastructure/Infrastructure.csproj": {
+    "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Infrastructure/Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/baoha/Downloads/mvp-starter/backend/Infrastructure/Infrastructure.csproj",
+        "projectUniqueName": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Infrastructure/Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "/Users/baoha/Downloads/mvp-starter/backend/Infrastructure/Infrastructure.csproj",
+        "projectPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Infrastructure/Infrastructure.csproj",
         "packagesPath": "/Users/baoha/.nuget/packages/",
-        "outputPath": "/Users/baoha/Downloads/mvp-starter/backend/Infrastructure/obj/",
+        "outputPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Infrastructure/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/baoha/.nuget/NuGet/NuGet.Config"
@@ -183,8 +183,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/Domain.csproj": {
-                "projectPath": "/Users/baoha/Downloads/mvp-starter/backend/Core/Domain/Domain.csproj"
+              "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/Domain.csproj": {
+                "projectPath": "/Users/baoha/Desktop/Aptech/sem3/sem3_eproject/backend/Core/Domain/Domain.csproj"
               }
             }
           }
