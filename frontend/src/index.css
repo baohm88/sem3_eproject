@@ -661,3 +661,146 @@
 .dropdown-menu[aria-labelledby="nav-all-jobs-dropdown"] .menu-icon.blue{
   background: #e9f2ff; color: #1d4ed8;
 }
+
+
+/* ===================== SERVICES PAGE ===================== */
+
+/* thanh công cụ trên cùng (search + sort) */
+.srv-toolbar {
+  display:flex; align-items:center; gap:12px;
+}
+.srv-toolbar .srv-search {
+  flex:1; position:relative;
+}
+.srv-toolbar .srv-search .form-control{
+  border-radius:999px; height:42px;
+  border:1px solid #dfe6ff; box-shadow:0 2px 10px rgba(13,110,253,.06) inset;
+}
+.srv-toolbar .srv-search .bi-search{
+  position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8;
+}
+.srv-toolbar .srv-search .form-control{ padding-left:36px; }
+.srv-toolbar .form-select{
+  width:240px; height:42px; border-radius:999px;
+  border:1px solid #dfe6ff; background-position:right .75rem center;
+}
+
+/* lưới card */
+.srv-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+@media (max-width: 1200px){ .srv-grid{ grid-template-columns:repeat(2,1fr);} }
+@media (max-width: 576px){ .srv-grid{ grid-template-columns:1fr;} }
+
+/* card */
+.srv-card{
+  border:1px solid #e7eefc; border-radius:16px; background:#fff;
+  box-shadow:0 10px 26px rgba(15,23,42,.06); overflow:hidden;
+  transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+.srv-card:hover{ transform:translateY(-3px); box-shadow:0 18px 36px rgba(15,23,42,.12); border-color:#dbe6ff; }
+
+/* ảnh 16:9 + nhãn */
+.srv-thumb{
+  position:relative; background:#f3f6ff; aspect-ratio:16/9; min-height:170px;
+  background-size:cover!important; background-position:center!important;
+}
+.srv-badge{
+  position:absolute; left:12px; top:12px;
+  background:#e9f7ff; color:#0ea5e9; border:1px solid rgba(14,165,233,.25);
+  font-weight:700; padding:.2rem .55rem; border-radius:999px; font-size:.8rem;
+}
+.srv-price{
+  position:absolute; right:12px; top:12px;
+  background:#eaf9f0; color:#16a34a; border:1px solid rgba(22,163,74,.18);
+  font-weight:700; padding:.2rem .6rem; border-radius:999px; font-size:.8rem;
+  box-shadow:0 2px 6px rgba(22,163,74,.16);
+}
+
+/* body */
+.srv-body{ padding:12px 14px 14px; }
+.srv-company{ font-size:.75rem; font-weight:700; color:#1d4ed8; background:#eef4ff; border:1px solid rgba(13,110,253,.15); border-radius:999px; padding:.15rem .55rem; }
+.srv-title{ font-weight:800; margin:.35rem 0 .1rem; color:#0f172a; }
+.srv-desc{ color:#667085; font-size:.92rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.srv-meta{ font-size:.82rem; color:#667085; }
+.srv-promote{ font-size:.82rem; color:#0f172a; display:flex; align-items:center; gap:6px; }
+.srv-promote .bi-megaphone{ color:#f59e0b; }
+
+/* footer card (hàng nút… nếu cần) */
+.srv-actions{ display:flex; gap:8px; margin-top:.75rem; }
+.srv-actions .btn{ border-radius:999px; padding:.4rem .85rem; }
+.srv-actions .btn-primary{ background:#1d4ed8; border-color:#1d4ed8; }
+
+/* paginate dưới grid */
+.srv-pager{ display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-top:14px; }
+.srv-pager .page-btn{
+  width:36px; height:36px; border-radius:10px; border:1px solid #e5e7eb; background:#fff;
+}
+.srv-pager .page-btn.active{ border-color:#0d6efd; color:#0d6efd; box-shadow:0 0 0 2px rgba(13,110,253,.15) inset; }
+
+
+
+/* ===== Services (list layout + right rail) ===== */
+.services-list-page .svc-hero{
+  background: linear-gradient(180deg,#0b2a66 0%, #0a3a80 55%, #0b5ed7 100%);
+  border-bottom: 1px solid rgba(255,255,255,.18);
+}
+.edge-to-edge{ position:relative; left:50%; right:50%; margin-left:-50vw; margin-right:-50vw; width:100vw; }
+
+.services-list-page .svc-filter{
+  border-radius: 14px;
+  top: 84px; /* chỉnh nếu navbar cao khác */
+}
+.services-list-page .svc-filter .form-control,
+.services-list-page .svc-filter .form-select{ border-radius:999px; }
+
+/* list item */
+.services-list-page .svc-item{
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: .75rem;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.services-list-page .svc-item:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(15,23,42,.12);
+}
+.services-list-page .svc-thumb{
+  position: relative;
+  height: 180px;
+  background: #f6f8ff;
+}
+.services-list-page .svc-thumb img{
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.services-list-page .svc-badge-active{
+  position: absolute; left: 10px; top: 10px;
+  padding: .25rem .5rem; border-radius: 999px;
+  background: #e8f5e9; color:#16803c; border:1px solid rgba(22,128,60,.2);
+  font-size: .75rem; font-weight: 700;
+}
+.services-list-page .svc-title-link{
+  color:#0f172a; text-decoration:none; font-weight: 700; font-size: 1.05rem;
+}
+.services-list-page .svc-title-link:hover{ color:#0b5ed7; text-decoration:underline; }
+.services-list-page .svc-desc{ line-height: 1.45; }
+.services-list-page .svc-price{
+  font-weight: 800; color:#0b5ed7;
+}
+
+/* right rail */
+.services-list-page .svc-col-rail .svc-rail{ top: 96px; }
+.services-list-page .rail-card .rail-img{ width: 100%; height: 160px; object-fit: cover; }
+.services-list-page .insider-row{
+  display:flex; gap:.5rem; text-decoration:none; color:#0f172a;
+}
+.services-list-page .insider-row:hover .title{ text-decoration: underline; }
+.services-list-page .insider-row img{
+  width:62px; height:62px; object-fit:cover; border-radius:8px;
+}
+.services-list-page .insider-row .title{
+  font-size:.92rem; line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+
+/* pagination (bo tròn) */
+.services-list-page .svc-pagination .page-link{ border-radius:999px!important; }
+
+main.container { padding-top: 0 !important; }
