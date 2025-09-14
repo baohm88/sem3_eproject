@@ -172,8 +172,7 @@ export default function DriversPage() {
   // Cancel an existing invitation
   const doRecall = async () => {
     try {
-      const res = await cancelInvitation(companyId, invitedMap[recallDriver.userId]);
-      console.log("after cancel:", res);
+      await cancelInvitation(companyId, invitedMap[recallDriver.userId]);
       setInvitedMap((prev) => {
         const { [recallDriver.userId]: _, ...rest } = prev;
         return rest;

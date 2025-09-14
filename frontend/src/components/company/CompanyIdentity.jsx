@@ -32,9 +32,7 @@ export default function CompanyIdentity({
    * - default/unknown -> secondary ("Free")
    */
   const membershipBadge = (m, expires) => (
-    <Badge
-      bg={m === "Pro" ? "success" : m === "Business" ? "primary" : "secondary"}
-    >
+    <Badge bg={m === "Premium" ? "success" : m === "Basic" ? "primary" : "secondary"} >
       {m || "Free"}
       {/* Append short local date when available */}
       {expires ? ` · exp ${new Date(expires).toLocaleDateString()}` : ""}

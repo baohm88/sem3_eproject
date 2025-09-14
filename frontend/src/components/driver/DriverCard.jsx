@@ -103,7 +103,7 @@ export default function DriverCard({
   const joinedAt =
     employment?.joinedAt ??
     (typeof driver?.joinedAt !== "undefined" ? driver.joinedAt : undefined);
-
+  
   return (
     <Card
       className={`driver-card hover-lift h-100 shadow-sm ${className}`}
@@ -207,6 +207,20 @@ export default function DriverCard({
                       <span className="text-truncate">{driver.phone}</span>
                     </span>
                   )}
+
+                  {driver?.email && (
+                    <div className="text-muted text-truncate">
+                      <i className="bi bi-envelope me-1" />
+                      <a
+                        href={`mailto:${driver.email}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-decoration-none"
+                      >
+                        {driver.email}
+                      </a>
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>

@@ -7,7 +7,11 @@ import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import ConfirmModal from "../../components/common/ConfirmModal";
 
-import { getCompanyPublicProfile } from "../../api/companies";
+import { 
+  getCompanyPublicProfile, 
+  listCompanyReviews, 
+  createCompanyReview,
+} from "../../api/companies";
 import {
   applyToCompanyAsDriver,
   getMyDriverProfile,
@@ -21,7 +25,24 @@ import FilterBar from "../../components/common/FilterBar";
 import PaginationBar from "../../components/common/PaginationBar";
 
 const FALLBACK_LOGO =
-  "https://dummyimage.com/300x300/e9ecef/6c757d.jpg&text=No+Logo";
+  "https://imgt.taimienphi.vn/cf/Images/tt/2021/8/20/top-anh-dai-dien-dep-chat-39.jpg";
+
+
+function StarInput({ value, onChange, size = 20 }) {
+  const v = Number(value || 0);
+  return (
+    <span>
+      {[1,2,3,4,5].map((n) => (
+        <i
+          key={n}
+          className={`bi ${n <= v ? "bi-star-fill text-warning" : "bi-star"}`}
+          style={{ fontSize: size, cursor: "pointer" }}
+          onClick={() => onChange(n)}
+        />
+      ))}
+    </span>
+  );
+}
 
 export default function CompanyPublicProfilePage() {
   const { companyId } = useParams();
@@ -52,6 +73,20 @@ export default function CompanyPublicProfilePage() {
   const [applyOpen, setApplyOpen] = useState(false);
   const [recallOpen, setRecallOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  // --- Feedback state ---
+  const [revPage, setRevPage] = useState(1);
+  const [revSize, setRevSize] = useState(5);
+  const [reviews, setReviews] = useState([]);
+  const [revTotalItems, setRevTotalItems] = useState(0);
+  const [revTotalPages, setRevTotalPages] = useState(1);
+  const [revLoading, setRevLoading] = useState(false);
+
+  // form
+  const isLoggedIn = !!profile;
+  const [myRating, setMyRating] = useState(0);
+  const [myComment, setMyComment] = useState("");
+  const [posting, setPosting] = useState(false);
 
   // ---------- Fetch profile ----------
   const fetchProfile = async () => {
@@ -126,6 +161,24 @@ export default function CompanyPublicProfilePage() {
       }
     })();
   }, [isDriver, driverUserId, companyId]);
+
+
+  useEffect(() => {
+    if (!companyId) return;
+    (async () => {
+      try {
+        setRevLoading(true);
+        const res = await listCompanyReviews(companyId, { page: revPage, size: revSize });
+        setReviews(res.items || []);
+        setRevTotalItems(res.totalItems || 0);
+        setRevTotalPages(res.totalPages || 1);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setRevLoading(false);
+      }
+    })();
+  }, [companyId, revPage, revSize]);
 
   // ---------- Derivations (hooks must be top-level) ----------
   const services = Array.isArray(data?.services) ? data.services : [];
@@ -214,6 +267,37 @@ export default function CompanyPublicProfilePage() {
     }
   };
 
+
+  const submitReview = async () => {
+    if (!isLoggedIn) {
+      toast.error("Please log in to leave feedback.");
+      return;
+    }
+    const r = Number(myRating);
+    if (r < 1 || r > 5) {
+      toast.error("Please select a rating (1–5).");
+      return;
+    }
+    setPosting(true);
+    try {
+      await createCompanyReview(companyId, { rating: r, comment: myComment?.trim() || undefined });
+      toast.success("Thanks for your feedback!");
+      // reset & reload first page to show newest
+      setMyRating(0);
+      setMyComment("");
+      setRevPage(1);
+      // refetch
+      const res = await listCompanyReviews(companyId, { page: 1, size: revSize });
+      setReviews(res.items || []);
+      setRevTotalItems(res.totalItems || 0);
+      setRevTotalPages(res.totalPages || 1);
+    } catch (e) {
+      toast.error(e?.response?.data?.error?.message || "Failed to submit review.");
+    } finally {
+      setPosting(false);
+    }
+  };
+
   // ---------- Guards / loading states ----------
   if (!companyId) {
     return (
@@ -240,6 +324,10 @@ export default function CompanyPublicProfilePage() {
   const company = data.company;
   const logoSrc =
     company.imgUrl && company.imgUrl.trim() ? company.imgUrl : FALLBACK_LOGO;
+
+
+    console.log(reviews);
+    
 
   return (
     <div className="py-3">
@@ -405,6 +493,121 @@ export default function CompanyPublicProfilePage() {
               ) : (
                 <div className="text-muted">No active services</div>
               )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+      
+      {/* Feedback */}
+      <Row className="g-3 mt-3">
+        <Col xs={12}>
+          <Card className="shadow-sm">
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <Card.Title className="h6 mb-0">Feedback</Card.Title>
+              </div>
+
+              <Row className="g-3">
+                {/* Left: Public list of reviews */}
+                <Col xs={12} md={7}>
+                  {revLoading ? (
+                    <div className="py-3 text-center">
+                      <Spinner animation="border" />
+                    </div>
+                  ) : reviews.length === 0 ? (
+                    <div className="text-muted">No feedback yet.</div>
+                  ) : (
+                    <>
+                      <div className="d-flex flex-column gap-3">
+                        {reviews.map((r) => (
+                          <div key={r.id} className="border rounded p-2">
+                            <div className="d-flex align-items-center gap-2">
+                              <img
+                                src={r.userImgUrl || FALLBACK_LOGO}
+                                onError={(e)=> e.currentTarget.src = FALLBACK_LOGO}
+                                alt={r.userName || "User"}
+                                width={32}
+                                height={32}
+                                style={{ objectFit: "cover", borderRadius: 8 }}
+                              />
+                              <div className="flex-grow-1">
+                                <div className="d-flex align-items-center gap-2">
+                                  <strong className="me-1">{r.userName || "Anonymous"}</strong>
+                                  <span className="text-muted small">
+                                    {new Date(r.createdAt).toLocaleString()}
+                                  </span>
+                                </div>
+                                <div>
+                                  {/* read-only stars */}
+                                  {[1,2,3,4,5].map((n) => (
+                                    <i
+                                      key={n}
+                                      className={`bi ${n <= r.rating ? "bi-star-fill text-warning" : "bi-star"}`}
+                                      style={{ fontSize: 14 }}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            {r.comment && (
+                              <div className="mt-2">{r.comment}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-3">
+                        <PaginationBar
+                          page={revPage}
+                          size={revSize}
+                          totalItems={revTotalItems}
+                          totalPages={revTotalPages}
+                          onPageChange={setRevPage}
+                          onSizeChange={(s) => { setRevSize(s); setRevPage(1); }}
+                          sizeOptions={[5, 10, 20]}
+                        />
+                      </div>
+                    </>
+                  )}
+                </Col>
+
+                {/* Right: form for logged-in users */}
+                <Col xs={12} md={5}>
+                  <div className="border rounded p-3">
+                    <div className="fw-semibold mb-2">Leave a review</div>
+                    {isLoggedIn ? (
+                      <>
+                        <div className="mb-2">
+                          <div className="small text-muted mb-1">Your rating</div>
+                          <StarInput value={myRating} onChange={setMyRating} />
+                        </div>
+                        <div className="mb-2">
+                          <div className="small text-muted mb-1">Comment (optional)</div>
+                          <textarea
+                            className="form-control"
+                            rows={3}
+                            value={myComment}
+                            onChange={(e) => setMyComment(e.target.value)}
+                            placeholder="Share your experience…"
+                          />
+                        </div>
+                        <div className="d-grid">
+                          <Button size="sm" onClick={submitReview} disabled={posting}>
+                            {posting ? "Submitting..." : "Submit"}
+                          </Button>
+                        </div>
+                        <div className="small text-muted mt-2">
+                          Note: later we’ll only allow riders who used this company’s services to review.
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-muted">
+                        Please log in to leave feedback.
+                      </div>
+                    )}
+                  </div>
+                </Col>
+              </Row>
             </Card.Body>
           </Card>
         </Col>

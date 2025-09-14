@@ -568,3 +568,21 @@ export async function getCompanyPublicProfile(
   const res = await api.get(`/api/companies/${companyId}/public`, { params });
   return res.data.data as CompanyPublicProfile;
 }
+
+
+// --- Company reviews ---
+export async function listCompanyReviews(
+  companyId: string,
+  params: { page?: number; size?: number } = {}
+) {
+  const res = await api.get(`/api/companies/${companyId}/reviews`, { params });
+  return res.data.data; // { page, size, totalItems, totalPages, items: CompanyReview[] }
+}
+
+export async function createCompanyReview(
+  companyId: string,
+  payload: { rating: number; comment?: string }
+) {
+  const res = await api.post(`/api/companies/${companyId}/reviews`, payload);
+  return res.data.data;
+}

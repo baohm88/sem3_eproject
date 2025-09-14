@@ -25,6 +25,7 @@ import DriverTransactions from "../pages/Drivers/DriverTransactions";
 import DriversPage from "../pages/Drivers/DriversPage";
 import DriverDashboard from "../pages/Drivers/DriverDashboard";
 import CompanyPublicProfilePage from "../pages/Companies/CompanyPublicProfilePage";
+import CompanyApplicationsPage from "../pages/Companies/CompanyApplicationsPage";
 
 /**
  * Route typing and role-based route configuration for the app.
@@ -80,6 +81,7 @@ export const ROLE_ROUTES: RoleRoutes = {
       { path: "services", label: "Services", element: <CompanyServices /> },
       { path: "invites", label: "Invites", element: <CompanyInvitesPage /> },
       { path: "drivers", label: "Drivers", element: <CompanyDrivers /> },
+      { path: "applications", label: "Applications", element: <CompanyApplicationsPage /> },
       { path: "transactions", label: "Transactions", element: <CompanyTransactions /> },
     ],
     children: [],

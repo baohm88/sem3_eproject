@@ -70,6 +70,7 @@ export default function LoginPage() {
               <Field
                 type="email"
                 name="email"
+                autoFocus
                 as={BootstrapForm.Control}
                 placeholder="Enter email"
               />

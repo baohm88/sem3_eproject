@@ -242,7 +242,7 @@ export default function CompanyInvitesPage() {
         </div>
       ) : totalItems === 0 ? (
         <div className="text-center text-muted py-5">
-          Không có lời mời nào đang chờ driver duyệt.
+          No invite pending driver's approval.
         </div>
       ) : (
         <>
@@ -318,7 +318,7 @@ export default function CompanyInvitesPage() {
         message={
           selectedInvite ? (
             <div>
-              Thu hồi lời mời đã gửi cho{" "}
+              Recall invite to
               <strong>
                 {driversMap[selectedInvite.driverUserId]?.fullName || "driver"}
               </strong>
