@@ -26,6 +26,8 @@ export default function CompanyDrivers() {
   const [showPay, setShowPay] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState(null);
 
+  document.title = "Your Drivers - Mycabs.com"
+
   // Fetch company id on mount
   useEffect(() => {
     (async () => {

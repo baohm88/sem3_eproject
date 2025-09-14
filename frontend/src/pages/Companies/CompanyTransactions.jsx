@@ -30,6 +30,8 @@ export default function CompanyTransactions() {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showAllTx, setShowAllTx] = useState(false);
 
+  document.title = "Your Transactions - Mycabs.com"
+
   // Fetch wallet + a small page of recent transactions
   const refreshWalletAndTx = async (cid) => {
     try {

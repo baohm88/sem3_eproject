@@ -34,6 +34,8 @@ export default function CompanyApplicationsPage() {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(6);
 
+  document.title = "Job Applications to Your Company - Mycabs.com"
+
   // Client-side name search (on current page only)
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedName, setDebouncedName] = useState(searchTerm);

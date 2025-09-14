@@ -34,6 +34,7 @@ export default function DriverProfilePage() {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [showTopUp, setShowTopUp] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
+  document.title = "Your Profile - Mycabs.com"
 
   const placeholderAvatar =
     "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=1200&auto=format&fit=crop&q=60";

@@ -38,6 +38,8 @@ export default function CompanyInvitesPage() {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(3);
 
+  document.title = "Your Invites - Mycabs.com"
+
   // Debounce search
   const [debouncedName, setDebouncedName] = useState(searchTerm);
   useEffect(() => {

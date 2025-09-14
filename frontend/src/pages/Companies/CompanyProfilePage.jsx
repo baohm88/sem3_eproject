@@ -27,6 +27,8 @@ export default function CompanyProfilePage() {
   const [showTopUp, setShowTopUp] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
 
+  document.title = "Your Profile - Mycabs.com"
+
   // Constant paths / assets
   const dashboardPath = useMemo(() => "/company", []);
   const placeholderLogo =

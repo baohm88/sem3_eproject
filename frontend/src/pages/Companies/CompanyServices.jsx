@@ -160,6 +160,7 @@ export default function CompanyServices() {
   const [showEditor, setShowEditor] = useState(false);
   const [editing, setEditing] = useState(null);
   const [busyId, setBusyId] = useState(null);
+  document.title = "Your Services - Mycabs.com"
 
   const fetchAll = async (page = 1, query = "") => {
     if (!company?.id) return;
