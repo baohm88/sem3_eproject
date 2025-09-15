@@ -10,7 +10,7 @@ import {
   Image,
 } from "react-bootstrap";
 import { RiMenu2Line } from "react-icons/ri";
-import { CgProfile } from "react-icons/cg";
+import { CgProfile } from "react-icons/cg"; // (không dùng cũng không sao)
 
 import { useAuth } from "../../context/AuthContext";
 import SideBar from "./SideBar";
@@ -22,6 +22,7 @@ import {
   type Role,
   type RouteItem,
 } from "../../routes/routes";
+import Footer from "./Footer";
 
 type LinkItem = { to: string; label: string; end?: boolean };
 
@@ -96,7 +97,7 @@ export default function MainLayout() {
   const toggleSidebar = () => setShowSidebar((prev) => !prev);
 
   return (
-    <>
+    <div className="d-flex flex-column min-vh-100">
       {/* MAIN NAV - fixed top */}
       <header>
         <Navbar
@@ -221,10 +222,12 @@ export default function MainLayout() {
       />
 
       {/* Main content area */}
-      <main className="container py-3">
+      <main className="container py-3 flex-grow-1">
         <Outlet />
       </main>
-    </>
+
+      {/* Footer */}
+      <Footer />
+    </div>
   );
 }
-
